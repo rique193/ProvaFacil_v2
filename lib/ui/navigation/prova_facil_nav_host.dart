@@ -1,6 +1,11 @@
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../data/local/app_database.dart';
+import '../../data/repository/prova_repository.dart';
 import '../components/tela_provisoria.dart';
+import '../provas/list/prova_list_screen.dart';
+import '../provas/list/prova_list_view_model.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
@@ -35,7 +40,17 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
       routes: [
         GoRoute(
           path: rotaLista,
-          builder: (context, state) => const TelaProvisoria(nome: 'ProvaList'),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (context) => ProvaListViewModel(ProvaRepository(context.read<AppDatabase>())),
+            child: ProvaListScreen(
+              onNovaProva: () => context.push(rotaFormulario(null)),
+              onEditarProva: (provaId) => context.push(rotaFormulario(provaId)),
+              onAbrirGabarito: (provaId) => context.push(rotaGabarito(provaId)),
+              onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
+              onAbrirAlunos: () => context.push(rotaAlunos),
+              onAbrirHistorico: () => context.push(rotaHistorico),
+            ),
+          ),
         ),
         GoRoute(
           path: '/provas/form',

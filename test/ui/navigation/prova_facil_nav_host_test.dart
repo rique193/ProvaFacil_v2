@@ -1,17 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
 
-Future<void> abrir(WidgetTester tester, String rota) async {
-  await tester.pumpWidget(MaterialApp.router(routerConfig: provaFacilNavHost(initialLocation: rota)));
-  await tester.pumpAndSettle();
-}
+import '../../ajudantes/app_de_teste.dart';
+
+Future<void> abrir(WidgetTester tester, String rota) => abrirApp(tester, rota);
 
 void main() {
   testWidgets('abre na lista de provas', (tester) async {
-    await tester.pumpWidget(MaterialApp.router(routerConfig: provaFacilNavHost()));
-    await tester.pumpAndSettle();
-    expect(find.text('ProvaList'), findsWidgets);
+    await abrirApp(tester, rotaLista);
+    expect(find.text('Dashboard'), findsOneWidget);
   });
 
   testWidgets('formulário sem prova recebe null', (tester) async {
