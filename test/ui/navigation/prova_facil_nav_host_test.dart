@@ -22,10 +22,10 @@ void main() {
     expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
-  testWidgets('gabarito', (tester) async {
+  testWidgets('gabarito de prova inexistente avisa', (tester) async {
     await abrir(tester, rotaGabarito(3));
-    expect(find.text('Gabarito'), findsWidgets);
-    expect(find.text('provaId: 3'), findsOneWidget);
+    expect(find.text('Gabarito'), findsOneWidget);
+    expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
   testWidgets('scanner do QR Code', (tester) async {

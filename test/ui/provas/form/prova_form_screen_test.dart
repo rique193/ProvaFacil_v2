@@ -65,9 +65,10 @@ void main() {
     await preencherProva(tester);
     await salvar(tester);
 
-    expect(find.text('Gabarito'), findsWidgets);
+    expect(find.text('Salvar Gabarito'), findsOneWidget);
+    expect(find.text('Ciências — Prova de Ciências · 1 questões'), findsOneWidget);
 
-    await tester.pageBack();
+    await tester.tap(find.byTooltip('Voltar'));
     await tester.pumpAndSettle();
     expect(find.text('Dashboard'), findsOneWidget);
   });
@@ -78,7 +79,7 @@ void main() {
     await tester.pumpAndSettle();
     await preencherProva(tester);
     await salvar(tester);
-    await tester.pageBack();
+    await tester.tap(find.byTooltip('Voltar'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Prova de Ciências'));

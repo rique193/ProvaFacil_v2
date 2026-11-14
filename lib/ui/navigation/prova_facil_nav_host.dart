@@ -6,6 +6,8 @@ import '../../data/repository/prova_repository.dart';
 import '../components/tela_provisoria.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
+import '../provas/gabarito/gabarito_screen.dart';
+import '../provas/gabarito/gabarito_view_model.dart';
 import '../provas/list/prova_list_screen.dart';
 import '../provas/list/prova_list_view_model.dart';
 
@@ -76,7 +78,14 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           path: '/provas/:$_argProvaId/gabarito',
           builder: (context, state) {
             final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'Gabarito', parametros: {_argProvaId: provaId});
+            return ChangeNotifierProvider(
+              create: (context) =>
+                  GabaritoViewModel(ProvaRepository(context.read<AppDatabase>()), provaId),
+              child: GabaritoScreen(
+                onVoltar: () => context.pop(),
+                onSalvo: () => context.pop(),
+              ),
+            );
           },
         ),
         GoRoute(
