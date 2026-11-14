@@ -11,15 +11,15 @@ void main() {
     expect(find.text('Dashboard'), findsOneWidget);
   });
 
-  testWidgets('formulário sem prova recebe null', (tester) async {
+  testWidgets('formulário sem prova abre como prova nova', (tester) async {
     await abrir(tester, rotaFormulario(null));
-    expect(find.text('ProvaForm'), findsWidgets);
-    expect(find.text('provaId: null'), findsOneWidget);
+    expect(find.text('Nova Prova'), findsOneWidget);
   });
 
-  testWidgets('formulário de edição recebe o id', (tester) async {
+  testWidgets('formulário com id abre em modo de edição', (tester) async {
     await abrir(tester, rotaFormulario(7));
-    expect(find.text('provaId: 7'), findsOneWidget);
+    expect(find.text('Editar Prova'), findsOneWidget);
+    expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
   testWidgets('gabarito', (tester) async {

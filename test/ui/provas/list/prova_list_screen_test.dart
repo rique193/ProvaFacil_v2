@@ -22,7 +22,7 @@ Future<int> criarProva(WidgetTester tester, AppDatabase db) async {
       ],
     ),
   );
-  await tester.pumpAndSettle();
+  await esperarBanco(tester);
   return id!;
 }
 
@@ -47,8 +47,7 @@ void main() {
     expect(find.text('1 questão(ões)'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Excluir prova'));
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
-    await tester.pumpAndSettle();
+    await esperarBanco(tester);
 
     expect(find.text('Frações'), findsNothing);
     expect(find.text('Você tem 0 prova(s) cadastrada(s).'), findsOneWidget);
