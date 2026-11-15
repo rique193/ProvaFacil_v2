@@ -1,34 +1,31 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
 
-Future<void> abrir(WidgetTester tester, String rota) async {
-  await tester.pumpWidget(MaterialApp.router(routerConfig: provaFacilNavHost(initialLocation: rota)));
-  await tester.pumpAndSettle();
-}
+import '../../ajudantes/app_de_teste.dart';
+
+Future<void> abrir(WidgetTester tester, String rota) => abrirApp(tester, rota);
 
 void main() {
   testWidgets('abre na lista de provas', (tester) async {
-    await tester.pumpWidget(MaterialApp.router(routerConfig: provaFacilNavHost()));
-    await tester.pumpAndSettle();
-    expect(find.text('ProvaList'), findsWidgets);
+    await abrirApp(tester, rotaLista);
+    expect(find.text('Dashboard'), findsOneWidget);
   });
 
-  testWidgets('formulário sem prova recebe null', (tester) async {
+  testWidgets('formulário sem prova abre como prova nova', (tester) async {
     await abrir(tester, rotaFormulario(null));
-    expect(find.text('ProvaForm'), findsWidgets);
-    expect(find.text('provaId: null'), findsOneWidget);
+    expect(find.text('Nova Prova'), findsOneWidget);
   });
 
-  testWidgets('formulário de edição recebe o id', (tester) async {
+  testWidgets('formulário com id abre em modo de edição', (tester) async {
     await abrir(tester, rotaFormulario(7));
-    expect(find.text('provaId: 7'), findsOneWidget);
+    expect(find.text('Editar Prova'), findsOneWidget);
+    expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
-  testWidgets('gabarito', (tester) async {
+  testWidgets('gabarito de prova inexistente avisa', (tester) async {
     await abrir(tester, rotaGabarito(3));
-    expect(find.text('Gabarito'), findsWidgets);
-    expect(find.text('provaId: 3'), findsOneWidget);
+    expect(find.text('Gabarito'), findsOneWidget);
+    expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
   testWidgets('scanner do QR Code', (tester) async {

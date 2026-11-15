@@ -1,6 +1,15 @@
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../data/local/app_database.dart';
+import '../../data/repository/prova_repository.dart';
 import '../components/tela_provisoria.dart';
+import '../provas/form/prova_form_screen.dart';
+import '../provas/form/prova_form_view_model.dart';
+import '../provas/gabarito/gabarito_screen.dart';
+import '../provas/gabarito/gabarito_view_model.dart';
+import '../provas/list/prova_list_screen.dart';
+import '../provas/list/prova_list_view_model.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
@@ -35,20 +44,48 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
       routes: [
         GoRoute(
           path: rotaLista,
-          builder: (context, state) => const TelaProvisoria(nome: 'ProvaList'),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (context) => ProvaListViewModel(ProvaRepository(context.read<AppDatabase>())),
+            child: ProvaListScreen(
+              onNovaProva: () => context.push(rotaFormulario(null)),
+              onEditarProva: (provaId) => context.push(rotaFormulario(provaId)),
+              onAbrirGabarito: (provaId) => context.push(rotaGabarito(provaId)),
+              onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
+              onAbrirAlunos: () => context.push(rotaAlunos),
+              onAbrirHistorico: () => context.push(rotaHistorico),
+            ),
+          ),
         ),
         GoRoute(
           path: '/provas/form',
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
-            return TelaProvisoria(nome: 'ProvaForm', parametros: {_argProvaId: provaId});
+            return ChangeNotifierProvider(
+              create: (context) =>
+                  ProvaFormViewModel(ProvaRepository(context.read<AppDatabase>()), provaId),
+              child: ProvaFormScreen(
+                onSalvo: (idSalvo) {
+                  final router = GoRouter.of(context);
+                  router.pop();
+                  if (provaId == null) router.push(rotaGabarito(idSalvo));
+                },
+                onVoltar: () => context.pop(),
+              ),
+            );
           },
         ),
         GoRoute(
           path: '/provas/:$_argProvaId/gabarito',
           builder: (context, state) {
             final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'Gabarito', parametros: {_argProvaId: provaId});
+            return ChangeNotifierProvider(
+              create: (context) =>
+                  GabaritoViewModel(ProvaRepository(context.read<AppDatabase>()), provaId),
+              child: GabaritoScreen(
+                onVoltar: () => context.pop(),
+                onSalvo: () => context.pop(),
+              ),
+            );
           },
         ),
         GoRoute(
