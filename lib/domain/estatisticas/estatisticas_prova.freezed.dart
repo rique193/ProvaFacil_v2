@@ -564,4 +564,318 @@ as int,
 
 }
 
+/// @nodoc
+mixin _$EstatisticaQuestao {
+
+ int get questaoId; int get numero; int get totalRespostas; int get acertos;/// Acertos / respostas (0 a 1); `null` quando a questão não tem respostas registradas.
+ double? get percentualAcerto;/// Gabarito da correção mais recente; `null` sem respostas.
+ String? get letraDoGabarito;/// Quantos marcaram só aquela letra, em ordem alfabética, incluindo letras com 0.
+ Map<String, int> get distribuicao; int get emBranco;/// Marcaram mais de uma alternativa; não entram em nenhuma letra da [distribuicao].
+ int get marcacaoMultipla; String? get alternativaMaisMarcada; bool get divergeDoGabarito;/// As respostas foram corrigidas com gabaritos diferentes (gabarito editado entre correções).
+ bool get gabaritoAlterado;
+/// Create a copy of EstatisticaQuestao
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EstatisticaQuestaoCopyWith<EstatisticaQuestao> get copyWith => _$EstatisticaQuestaoCopyWithImpl<EstatisticaQuestao>(this as EstatisticaQuestao, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as EstatisticaQuestao;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EstatisticaQuestao&&(identical(other.questaoId, _this.questaoId) || other.questaoId == _this.questaoId)&&(identical(other.numero, _this.numero) || other.numero == _this.numero)&&(identical(other.totalRespostas, _this.totalRespostas) || other.totalRespostas == _this.totalRespostas)&&(identical(other.acertos, _this.acertos) || other.acertos == _this.acertos)&&(identical(other.percentualAcerto, _this.percentualAcerto) || other.percentualAcerto == _this.percentualAcerto)&&(identical(other.letraDoGabarito, _this.letraDoGabarito) || other.letraDoGabarito == _this.letraDoGabarito)&&const DeepCollectionEquality().equals(other.distribuicao, _this.distribuicao)&&(identical(other.emBranco, _this.emBranco) || other.emBranco == _this.emBranco)&&(identical(other.marcacaoMultipla, _this.marcacaoMultipla) || other.marcacaoMultipla == _this.marcacaoMultipla)&&(identical(other.alternativaMaisMarcada, _this.alternativaMaisMarcada) || other.alternativaMaisMarcada == _this.alternativaMaisMarcada)&&(identical(other.divergeDoGabarito, _this.divergeDoGabarito) || other.divergeDoGabarito == _this.divergeDoGabarito)&&(identical(other.gabaritoAlterado, _this.gabaritoAlterado) || other.gabaritoAlterado == _this.gabaritoAlterado));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as EstatisticaQuestao;
+  return Object.hash(runtimeType,_this.questaoId,_this.numero,_this.totalRespostas,_this.acertos,_this.percentualAcerto,_this.letraDoGabarito,const DeepCollectionEquality().hash(_this.distribuicao),_this.emBranco,_this.marcacaoMultipla,_this.alternativaMaisMarcada,_this.divergeDoGabarito,_this.gabaritoAlterado);
+}
+
+@override
+String toString() {
+  final _this = this as EstatisticaQuestao;
+  return 'EstatisticaQuestao(questaoId: ${_this.questaoId}, numero: ${_this.numero}, totalRespostas: ${_this.totalRespostas}, acertos: ${_this.acertos}, percentualAcerto: ${_this.percentualAcerto}, letraDoGabarito: ${_this.letraDoGabarito}, distribuicao: ${_this.distribuicao}, emBranco: ${_this.emBranco}, marcacaoMultipla: ${_this.marcacaoMultipla}, alternativaMaisMarcada: ${_this.alternativaMaisMarcada}, divergeDoGabarito: ${_this.divergeDoGabarito}, gabaritoAlterado: ${_this.gabaritoAlterado})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $EstatisticaQuestaoCopyWith<$Res>  {
+  factory $EstatisticaQuestaoCopyWith(EstatisticaQuestao value, $Res Function(EstatisticaQuestao) _then) = _$EstatisticaQuestaoCopyWithImpl;
+@useResult
+$Res call({
+ int questaoId, int numero, int totalRespostas, int acertos, double? percentualAcerto, String? letraDoGabarito, Map<String, int> distribuicao, int emBranco, int marcacaoMultipla, String? alternativaMaisMarcada, bool divergeDoGabarito, bool gabaritoAlterado
+});
+
+
+
+
+}
+/// @nodoc
+class _$EstatisticaQuestaoCopyWithImpl<$Res>
+    implements $EstatisticaQuestaoCopyWith<$Res> {
+  _$EstatisticaQuestaoCopyWithImpl(this._self, this._then);
+
+  final EstatisticaQuestao _self;
+  final $Res Function(EstatisticaQuestao) _then;
+
+/// Create a copy of EstatisticaQuestao
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? questaoId = null,Object? numero = null,Object? totalRespostas = null,Object? acertos = null,Object? percentualAcerto = freezed,Object? letraDoGabarito = freezed,Object? distribuicao = null,Object? emBranco = null,Object? marcacaoMultipla = null,Object? alternativaMaisMarcada = freezed,Object? divergeDoGabarito = null,Object? gabaritoAlterado = null,}) {
+  return _then(EstatisticaQuestao(
+questaoId: null == questaoId ? _self.questaoId : questaoId // ignore: cast_nullable_to_non_nullable
+as int,numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,totalRespostas: null == totalRespostas ? _self.totalRespostas : totalRespostas // ignore: cast_nullable_to_non_nullable
+as int,acertos: null == acertos ? _self.acertos : acertos // ignore: cast_nullable_to_non_nullable
+as int,percentualAcerto: freezed == percentualAcerto ? _self.percentualAcerto : percentualAcerto // ignore: cast_nullable_to_non_nullable
+as double?,letraDoGabarito: freezed == letraDoGabarito ? _self.letraDoGabarito : letraDoGabarito // ignore: cast_nullable_to_non_nullable
+as String?,distribuicao: null == distribuicao ? _self.distribuicao : distribuicao // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,emBranco: null == emBranco ? _self.emBranco : emBranco // ignore: cast_nullable_to_non_nullable
+as int,marcacaoMultipla: null == marcacaoMultipla ? _self.marcacaoMultipla : marcacaoMultipla // ignore: cast_nullable_to_non_nullable
+as int,alternativaMaisMarcada: freezed == alternativaMaisMarcada ? _self.alternativaMaisMarcada : alternativaMaisMarcada // ignore: cast_nullable_to_non_nullable
+as String?,divergeDoGabarito: null == divergeDoGabarito ? _self.divergeDoGabarito : divergeDoGabarito // ignore: cast_nullable_to_non_nullable
+as bool,gabaritoAlterado: null == gabaritoAlterado ? _self.gabaritoAlterado : gabaritoAlterado // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [EstatisticaQuestao].
+extension EstatisticaQuestaoPatterns on EstatisticaQuestao {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _EstatisticaQuestao value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _EstatisticaQuestao() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _EstatisticaQuestao value)  $default,){
+final _that = this;
+switch (_that) {
+case _EstatisticaQuestao():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _EstatisticaQuestao value)?  $default,){
+final _that = this;
+switch (_that) {
+case _EstatisticaQuestao() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int questaoId,  int numero,  int totalRespostas,  int acertos,  double? percentualAcerto,  String? letraDoGabarito,  Map<String, int> distribuicao,  int emBranco,  int marcacaoMultipla,  String? alternativaMaisMarcada,  bool divergeDoGabarito,  bool gabaritoAlterado)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _EstatisticaQuestao() when $default != null:
+return $default(_that.questaoId,_that.numero,_that.totalRespostas,_that.acertos,_that.percentualAcerto,_that.letraDoGabarito,_that.distribuicao,_that.emBranco,_that.marcacaoMultipla,_that.alternativaMaisMarcada,_that.divergeDoGabarito,_that.gabaritoAlterado);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int questaoId,  int numero,  int totalRespostas,  int acertos,  double? percentualAcerto,  String? letraDoGabarito,  Map<String, int> distribuicao,  int emBranco,  int marcacaoMultipla,  String? alternativaMaisMarcada,  bool divergeDoGabarito,  bool gabaritoAlterado)  $default,) {final _that = this;
+switch (_that) {
+case _EstatisticaQuestao():
+return $default(_that.questaoId,_that.numero,_that.totalRespostas,_that.acertos,_that.percentualAcerto,_that.letraDoGabarito,_that.distribuicao,_that.emBranco,_that.marcacaoMultipla,_that.alternativaMaisMarcada,_that.divergeDoGabarito,_that.gabaritoAlterado);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int questaoId,  int numero,  int totalRespostas,  int acertos,  double? percentualAcerto,  String? letraDoGabarito,  Map<String, int> distribuicao,  int emBranco,  int marcacaoMultipla,  String? alternativaMaisMarcada,  bool divergeDoGabarito,  bool gabaritoAlterado)?  $default,) {final _that = this;
+switch (_that) {
+case _EstatisticaQuestao() when $default != null:
+return $default(_that.questaoId,_that.numero,_that.totalRespostas,_that.acertos,_that.percentualAcerto,_that.letraDoGabarito,_that.distribuicao,_that.emBranco,_that.marcacaoMultipla,_that.alternativaMaisMarcada,_that.divergeDoGabarito,_that.gabaritoAlterado);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _EstatisticaQuestao implements EstatisticaQuestao {
+  const _EstatisticaQuestao({required this.questaoId, required this.numero, required this.totalRespostas, required this.acertos, required this.percentualAcerto, required this.letraDoGabarito, required  Map<String, int> distribuicao, required this.emBranco, required this.marcacaoMultipla, required this.alternativaMaisMarcada, required this.divergeDoGabarito, required this.gabaritoAlterado}): _distribuicao = distribuicao;
+  
+
+@override final  int questaoId;
+@override final  int numero;
+@override final  int totalRespostas;
+@override final  int acertos;
+/// Acertos / respostas (0 a 1); `null` quando a questão não tem respostas registradas.
+@override final  double? percentualAcerto;
+/// Gabarito da correção mais recente; `null` sem respostas.
+@override final  String? letraDoGabarito;
+/// Quantos marcaram só aquela letra, em ordem alfabética, incluindo letras com 0.
+ final  Map<String, int> _distribuicao;
+/// Quantos marcaram só aquela letra, em ordem alfabética, incluindo letras com 0.
+@override Map<String, int> get distribuicao {
+  if (_distribuicao is EqualUnmodifiableMapView) return _distribuicao;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_distribuicao);
+}
+
+@override final  int emBranco;
+/// Marcaram mais de uma alternativa; não entram em nenhuma letra da [distribuicao].
+@override final  int marcacaoMultipla;
+@override final  String? alternativaMaisMarcada;
+@override final  bool divergeDoGabarito;
+/// As respostas foram corrigidas com gabaritos diferentes (gabarito editado entre correções).
+@override final  bool gabaritoAlterado;
+
+/// Create a copy of EstatisticaQuestao
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EstatisticaQuestaoCopyWith<_EstatisticaQuestao> get copyWith => __$EstatisticaQuestaoCopyWithImpl<_EstatisticaQuestao>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EstatisticaQuestao&&(identical(other.questaoId, questaoId) || other.questaoId == questaoId)&&(identical(other.numero, numero) || other.numero == numero)&&(identical(other.totalRespostas, totalRespostas) || other.totalRespostas == totalRespostas)&&(identical(other.acertos, acertos) || other.acertos == acertos)&&(identical(other.percentualAcerto, percentualAcerto) || other.percentualAcerto == percentualAcerto)&&(identical(other.letraDoGabarito, letraDoGabarito) || other.letraDoGabarito == letraDoGabarito)&&const DeepCollectionEquality().equals(other.distribuicao, _distribuicao)&&(identical(other.emBranco, emBranco) || other.emBranco == emBranco)&&(identical(other.marcacaoMultipla, marcacaoMultipla) || other.marcacaoMultipla == marcacaoMultipla)&&(identical(other.alternativaMaisMarcada, alternativaMaisMarcada) || other.alternativaMaisMarcada == alternativaMaisMarcada)&&(identical(other.divergeDoGabarito, divergeDoGabarito) || other.divergeDoGabarito == divergeDoGabarito)&&(identical(other.gabaritoAlterado, gabaritoAlterado) || other.gabaritoAlterado == gabaritoAlterado));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,questaoId,numero,totalRespostas,acertos,percentualAcerto,letraDoGabarito,const DeepCollectionEquality().hash(_distribuicao),emBranco,marcacaoMultipla,alternativaMaisMarcada,divergeDoGabarito,gabaritoAlterado);
+}
+
+@override
+String toString() {
+    return 'EstatisticaQuestao(questaoId: $questaoId, numero: $numero, totalRespostas: $totalRespostas, acertos: $acertos, percentualAcerto: $percentualAcerto, letraDoGabarito: $letraDoGabarito, distribuicao: $distribuicao, emBranco: $emBranco, marcacaoMultipla: $marcacaoMultipla, alternativaMaisMarcada: $alternativaMaisMarcada, divergeDoGabarito: $divergeDoGabarito, gabaritoAlterado: $gabaritoAlterado)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$EstatisticaQuestaoCopyWith<$Res> implements $EstatisticaQuestaoCopyWith<$Res> {
+  factory _$EstatisticaQuestaoCopyWith(_EstatisticaQuestao value, $Res Function(_EstatisticaQuestao) _then) = __$EstatisticaQuestaoCopyWithImpl;
+@override @useResult
+$Res call({
+ int questaoId, int numero, int totalRespostas, int acertos, double? percentualAcerto, String? letraDoGabarito, Map<String, int> distribuicao, int emBranco, int marcacaoMultipla, String? alternativaMaisMarcada, bool divergeDoGabarito, bool gabaritoAlterado
+});
+
+
+
+
+}
+/// @nodoc
+class __$EstatisticaQuestaoCopyWithImpl<$Res>
+    implements _$EstatisticaQuestaoCopyWith<$Res> {
+  __$EstatisticaQuestaoCopyWithImpl(this._self, this._then);
+
+  final _EstatisticaQuestao _self;
+  final $Res Function(_EstatisticaQuestao) _then;
+
+/// Create a copy of EstatisticaQuestao
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? questaoId = null,Object? numero = null,Object? totalRespostas = null,Object? acertos = null,Object? percentualAcerto = freezed,Object? letraDoGabarito = freezed,Object? distribuicao = null,Object? emBranco = null,Object? marcacaoMultipla = null,Object? alternativaMaisMarcada = freezed,Object? divergeDoGabarito = null,Object? gabaritoAlterado = null,}) {
+  return _then(_EstatisticaQuestao(
+questaoId: null == questaoId ? _self.questaoId : questaoId // ignore: cast_nullable_to_non_nullable
+as int,numero: null == numero ? _self.numero : numero // ignore: cast_nullable_to_non_nullable
+as int,totalRespostas: null == totalRespostas ? _self.totalRespostas : totalRespostas // ignore: cast_nullable_to_non_nullable
+as int,acertos: null == acertos ? _self.acertos : acertos // ignore: cast_nullable_to_non_nullable
+as int,percentualAcerto: freezed == percentualAcerto ? _self.percentualAcerto : percentualAcerto // ignore: cast_nullable_to_non_nullable
+as double?,letraDoGabarito: freezed == letraDoGabarito ? _self.letraDoGabarito : letraDoGabarito // ignore: cast_nullable_to_non_nullable
+as String?,distribuicao: null == distribuicao ? _self._distribuicao : distribuicao // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,emBranco: null == emBranco ? _self.emBranco : emBranco // ignore: cast_nullable_to_non_nullable
+as int,marcacaoMultipla: null == marcacaoMultipla ? _self.marcacaoMultipla : marcacaoMultipla // ignore: cast_nullable_to_non_nullable
+as int,alternativaMaisMarcada: freezed == alternativaMaisMarcada ? _self.alternativaMaisMarcada : alternativaMaisMarcada // ignore: cast_nullable_to_non_nullable
+as String?,divergeDoGabarito: null == divergeDoGabarito ? _self.divergeDoGabarito : divergeDoGabarito // ignore: cast_nullable_to_non_nullable
+as bool,gabaritoAlterado: null == gabaritoAlterado ? _self.gabaritoAlterado : gabaritoAlterado // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
 // dart format on
