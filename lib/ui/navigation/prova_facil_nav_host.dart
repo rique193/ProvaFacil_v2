@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/local/app_database.dart';
 import '../../data/repository/prova_repository.dart';
+import '../../data/repository/historico_repository.dart';
+import '../../data/repository/estatisticas_repository.dart';
 import '../components/tela_provisoria.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
@@ -10,6 +12,11 @@ import '../provas/gabarito/gabarito_screen.dart';
 import '../provas/gabarito/gabarito_view_model.dart';
 import '../provas/list/prova_list_screen.dart';
 import '../provas/list/prova_list_view_model.dart';
+import '../historico/historico_screen.dart';
+import '../historico/historico_view_model.dart';
+import '../estatisticas/estatisticas_screen.dart';
+import '../estatisticas/estatisticas_view_model.dart';
+import '../relatorio/relatorio_notas_screen.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
@@ -133,21 +140,47 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           builder: (context, state) => const TelaProvisoria(nome: 'Alunos'),
         ),
         GoRoute(
-          path: rotaHistorico,
-          builder: (context, state) => const TelaProvisoria(nome: 'Historico'),
-        ),
-        GoRoute(
-          path: '/estatisticas/:$_argProvaId',
+          path: '/historico',
           builder: (context, state) {
-            final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'Estatisticas', parametros: {_argProvaId: provaId});
+            final database = AppDatabase.getInstance(context);
+            return ChangeNotifierProvider(
+              create: (_) => HistoricoViewModel(
+                repository: HistoricoRepository(database),
+                enviarTudoNuvem: () async {}, // Stub temporário até o Membro 3 integrar o backup
+              ),
+              child: HistoricoScreen(
+                onVoltar: () => context.pop(),
+                onAbrirEstatisticas: (provaId) => context.push('/estatisticas/$provaId'),
+                onAbrirRelatorio: (provaId) => context.push('/relatorio/$provaId'),
+              ),
+            );
           },
         ),
         GoRoute(
-          path: '/relatorio/:$_argProvaId',
+          path: '/estatisticas/:provaId',
           builder: (context, state) {
-            final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'RelatorioNotas', parametros: {_argProvaId: provaId});
+            final provaId = int.parse(state.pathParameters['provaId']!);
+            final database = AppDatabase.getInstance(context);
+            return ChangeNotifierProvider(
+              create: (_) => EstatisticasViewModel(
+                repository: EstatisticasRepository(database),
+                provaId: provaId,
+              ),
+              child: EstatisticasScreen(
+                provaId: provaId,
+                onVoltar: () => context.pop(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/relatorio/:provaId',
+          builder: (context, state) {
+            final provaId = int.parse(state.pathParameters['provaId']!);
+            return RelatorioNotasScreen(
+              provaId: provaId,
+              onVoltar: () => context.pop(),
+            );
           },
         ),
       ],
