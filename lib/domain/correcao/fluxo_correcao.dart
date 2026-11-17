@@ -92,14 +92,16 @@ abstract final class FluxoCorrecao {
       provaDoQrId: dadosQr.provaId,
       provaEscolhidaId: provaEscolhidaId,
     );
-    if (diferente != null)
+    if (diferente != null) {
       return bloquear(MotivoBloqueio.provaDiferente, diferente);
+    }
     final prova = buscarProva(dadosQr.provaId);
-    if (prova == null)
+    if (prova == null) {
       return bloquear(
         MotivoBloqueio.provaNaoEncontrada,
         'A prova deste QR Code não está cadastrada neste aparelho.',
       );
+    }
     switch (ValidadorCorrecao.verificarGabarito(prova.gabarito())) {
       case ProvaSemQuestoes(:final mensagem):
         return bloquear(MotivoBloqueio.provaSemQuestoes, mensagem);
@@ -114,11 +116,12 @@ abstract final class FluxoCorrecao {
       respostasLidas,
       prova.estrutura(),
     );
-    if (validacao.detectadas == 0)
+    if (validacao.detectadas == 0) {
       return bloquear(
         MotivoBloqueio.nenhumaRespostaLida,
         'Nenhuma marcação foi detectada na folha. Verifique o enquadramento e a iluminação e leia de novo.',
       );
+    }
     return Pronta(dadosQr: dadosQr, prova: prova, validacao: validacao);
   }
 

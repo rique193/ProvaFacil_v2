@@ -52,10 +52,12 @@ abstract final class QrCodeProva {
   static const prefixo = 'PROVAFACIL';
   static const versao = '1';
   static String gerar(DadosQrCode dados) {
-    if (dados.provaId <= 0)
+    if (dados.provaId <= 0) {
       throw ArgumentError('O id da prova deve ser positivo.');
-    if (dados.aluno.trim().isEmpty)
+    }
+    if (dados.aluno.trim().isEmpty) {
       throw ArgumentError('Informe o nome do aluno.');
+    }
     return [
       prefixo,
       versao,
@@ -69,17 +71,22 @@ abstract final class QrCodeProva {
     final conteudo = texto?.trim() ?? '';
     if (conteudo.isEmpty) return const Invalido(MotivoQrInvalido.vazio);
     final campos = conteudo.split('|');
-    if (campos.first.trim() != prefixo)
+    if (campos.first.trim() != prefixo) {
       return const Invalido(MotivoQrInvalido.naoEDoProvafacil);
-    if (campos.length < 2)
+    }
+    if (campos.length < 2) {
       return const Invalido(MotivoQrInvalido.formatoInvalido);
-    if (campos[1].trim() != versao)
+    }
+    if (campos[1].trim() != versao) {
       return const Invalido(MotivoQrInvalido.versaoNaoSuportada);
-    if (campos.length != 5)
+    }
+    if (campos.length != 5) {
       return const Invalido(MotivoQrInvalido.formatoInvalido);
+    }
     final provaId = int.tryParse(campos[2].trim());
-    if (provaId == null || provaId <= 0)
+    if (provaId == null || provaId <= 0) {
       return const Invalido(MotivoQrInvalido.provaInvalida);
+    }
     final aluno = _limpar(campos[3]);
     if (aluno.isEmpty) return const Invalido(MotivoQrInvalido.alunoAusente);
     return Valido(

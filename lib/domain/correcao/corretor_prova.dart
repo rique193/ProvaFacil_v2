@@ -159,8 +159,9 @@ abstract final class CorretorProva {
       numerador *= BigInt.from(10).pow(-escala);
     }
     var centavos = numerador ~/ denominador;
-    if (numerador.remainder(denominador) * BigInt.two >= denominador)
+    if (numerador.remainder(denominador) * BigInt.two >= denominador) {
       centavos += BigInt.one;
+    }
     final texto = centavos.toString().padLeft(3, '0');
     return double.parse(
       '${notaMaxima.isNegative ? '-' : ''}${texto.substring(0, texto.length - 2)}.${texto.substring(texto.length - 2)}',
