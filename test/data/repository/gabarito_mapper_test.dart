@@ -3,21 +3,27 @@ import 'package:provafacil/data/local/app_database.dart';
 import 'package:provafacil/data/local/relation/questao_com_alternativas.dart';
 import 'package:provafacil/data/repository/gabarito_mapper.dart';
 
-const _aguardandoCorretor = 'Depende de CorretorProva.corrigir (Membro 4)';
+import 'package:provafacil/domain/correcao/corretor_prova.dart';
 
-QuestaoComAlternativas questao(int id, int ordem, Set<int> corretas) => QuestaoComAlternativas(
-  questao: QuestaoEntity(id: id, provaId: 1, enunciado: 'Questão $id', ordem: ordem),
-  alternativas: [
-    for (var i = 4; i >= 0; i--)
-      AlternativaEntity(
-        id: id * 10 + i,
-        questaoId: id,
-        texto: 'Alternativa $i',
-        correta: corretas.contains(i),
-        ordem: i,
+QuestaoComAlternativas questao(int id, int ordem, Set<int> corretas) =>
+    QuestaoComAlternativas(
+      questao: QuestaoEntity(
+        id: id,
+        provaId: 1,
+        enunciado: 'Questão $id',
+        ordem: ordem,
       ),
-  ],
-);
+      alternativas: [
+        for (var i = 4; i >= 0; i--)
+          AlternativaEntity(
+            id: id * 10 + i,
+            questaoId: id,
+            texto: 'Alternativa $i',
+            correta: corretas.contains(i),
+            ordem: i,
+          ),
+      ],
+    );
 
 void main() {
   test('ordena questões e alternativas antes de atribuir números e letras', () {
@@ -35,11 +41,18 @@ void main() {
     expect(gabarito.map((q) => q.letraCorreta), ['B', 'D']);
   });
 
-  test(
-    'o gabarito mapeado corrige com nota 10 quando o aluno marca B e D',
-    () {},
-    skip: _aguardandoCorretor,
-  );
+  test('o gabarito mapeado corrige com nota 10 quando o aluno marca B e D', () {
+    final gabarito = [
+      questao(20, 1, {3}),
+      questao(10, 0, {1}),
+    ].paraGabarito();
+    final correcao = CorretorProva.corrigir(gabarito, {
+      1: {'B'},
+      2: {'D'},
+    });
+    expect(correcao.nota, 10);
+    expect(correcao.acertos, 2);
+  });
 
   test('várias alternativas corretas deixam a questão sem gabarito', () {
     final gabarito = [
@@ -48,11 +61,21 @@ void main() {
     expect(gabarito.single.letraCorreta, isNull);
   });
 
-  test(
-    'várias alternativas corretas impedem a correção (GabaritoIncompletoException com [1])',
-    () {},
-    skip: _aguardandoCorretor,
-  );
+  test('várias alternativas corretas impedem a correção (GabaritoIncompletoException com [1])', () {
+    final gabarito = [
+      questao(1, 0, {0, 1}),
+    ].paraGabarito();
+    expect(
+      () => CorretorProva.corrigir(gabarito, {}),
+      throwsA(
+        isA<GabaritoIncompletoException>().having(
+          (e) => e.questoesSemGabarito,
+          'questões',
+          [1],
+        ),
+      ),
+    );
+  });
 
   test('questão nova continua sem gabarito', () {
     expect([questao(1, 0, {})].paraGabarito().single.letraCorreta, isNull);
