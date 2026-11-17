@@ -2,9 +2,11 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provafacil/data/backup/id_instalacao.dart';
 import 'package:provafacil/data/local/app_database.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Banco em memória para widget tests: fecha os streams na hora, sem deixar timers pendentes.
 AppDatabase criarBancoParaWidgetTest() =>
@@ -30,9 +32,13 @@ Future<AppDatabase> abrirApp(WidgetTester tester, String rota, {AppDatabase? dat
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.runAsync(db.close);
   });
+  SharedPreferences.setMockInitialValues({});
   await tester.pumpWidget(
-    Provider<AppDatabase>.value(
-      value: db,
+    MultiProvider(
+      providers: [
+        Provider<AppDatabase>.value(value: db),
+        Provider<IdInstalacao>(create: (_) => IdInstalacao()),
+      ],
       child: MaterialApp.router(routerConfig: provaFacilNavHost(initialLocation: rota)),
     ),
   );
