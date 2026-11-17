@@ -34,8 +34,13 @@ void main() {
     expect(find.text('provaId: null'), findsOneWidget);
   });
 
-  testWidgets('leitura das respostas recebe o texto do QR Code', (tester) async {
-    await abrir(tester, rotaScanRespostas(5, 'PROVAFACIL|1|5|Ana Souza|Turma A'));
+  testWidgets('leitura das respostas recebe o texto do QR Code', (
+    tester,
+  ) async {
+    await abrir(
+      tester,
+      rotaScanRespostas(5, 'PROVAFACIL|1|5|Ana Souza|Turma A'),
+    );
     expect(find.text('ScanRespostas'), findsWidgets);
     expect(find.text('provaId: 5'), findsOneWidget);
     expect(find.text('qr: PROVAFACIL|1|5|Ana Souza|Turma A'), findsOneWidget);
@@ -43,14 +48,19 @@ void main() {
 
   testWidgets('correção sem parâmetros', (tester) async {
     await abrir(tester, '/correcao');
-    expect(find.text('Correcao'), findsWidgets);
-    expect(find.text('provaId: null'), findsOneWidget);
+    expect(find.text('Corrigir Prova'), findsWidgets);
+    expect(
+      find.text(
+        'Nenhuma prova cadastrada. Cadastre uma prova e o gabarito antes de corrigir.',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('resultado', (tester) async {
     await abrir(tester, '/resultados/9');
     expect(find.text('Resultado'), findsWidgets);
-    expect(find.text('resultadoId: 9'), findsOneWidget);
+    expect(find.text('Resultado não encontrado.'), findsOneWidget);
   });
 
   testWidgets('alunos', (tester) async {

@@ -6,6 +6,7 @@ import '../../data/repository/prova_repository.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../data/repository/estatisticas_repository.dart';
 import '../components/tela_provisoria.dart';
+import '../correcao/correcao_rotas.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
 import '../provas/gabarito/gabarito_screen.dart';
@@ -20,10 +21,6 @@ import '../relatorio/relatorio_notas_screen.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
-const _argAluno = 'aluno';
-const _argTurma = 'turma';
-const _argRespostas = 'respostas';
-const _argResultadoId = 'resultadoId';
 
 const rotaLista = '/provas';
 const rotaAlunos = '/alunos';
@@ -113,28 +110,7 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
             );
           },
         ),
-        GoRoute(
-          path: '/correcao',
-          builder: (context, state) {
-            final parametros = state.uri.queryParameters;
-            return TelaProvisoria(
-              nome: 'Correcao',
-              parametros: {
-                _argProvaId: _idOpcional(parametros[_argProvaId]),
-                _argAluno: parametros[_argAluno] ?? '',
-                _argTurma: parametros[_argTurma] ?? '',
-                _argRespostas: parametros[_argRespostas],
-              },
-            );
-          },
-        ),
-        GoRoute(
-          path: '/resultados/:$_argResultadoId',
-          builder: (context, state) {
-            final resultadoId = int.parse(state.pathParameters[_argResultadoId]!);
-            return TelaProvisoria(nome: 'Resultado', parametros: {_argResultadoId: resultadoId});
-          },
-        ),
+        ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista)),
         GoRoute(
           path: rotaAlunos,
           builder: (context, state) => const TelaProvisoria(nome: 'Alunos'),
