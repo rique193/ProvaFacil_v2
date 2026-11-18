@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "875620379041",
+    "project_id": "provafacil-906f0",
+    "storage_bucket": "provafacil-906f0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875620379041:android:131c4ed8424361e44743e0",
+        "android_client_info": {
+          "package_name": "com.provafacil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPCHRhIUrHavTwNiIgdk8Io6cyPTpDiv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
