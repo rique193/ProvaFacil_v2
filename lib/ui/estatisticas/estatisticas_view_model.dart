@@ -12,10 +12,9 @@ import 'estatisticas_ui_state.dart';
 
 class EstatisticasViewModel extends ChangeNotifier {
   EstatisticasViewModel({
-    required EstatisticasRepository repository,
-    required int provaId,
-  }) : _repository = repository,
-        _provaId = provaId {
+    required this._repository,
+    required this._provaId,
+  }) {
     _inscricao = _repository.observarDadosDaProva(_provaId).listen(calcularEstatisticas);
   }
 

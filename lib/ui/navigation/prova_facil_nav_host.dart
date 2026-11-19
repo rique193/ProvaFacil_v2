@@ -2,9 +2,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/backup/backup_firestore.dart';
+import '../../data/backup/backup_resultados.dart';
 import '../../data/backup/id_instalacao.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/aluno_repository.dart';
+import '../../data/repository/backup_nuvem_repository.dart';
 import '../../data/repository/prova_repository.dart';
 import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
@@ -48,7 +50,9 @@ int? _idOpcional(String? valor) {
   return id == -1 ? null : id;
 }
 
-GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
+/// [backup] troca o envio para o Firestore (usado nos testes); sem ele, vale o Firestore real.
+GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados? backup}) =>
+    GoRouter(
       initialLocation: initialLocation,
       routes: [
         GoRoute(
@@ -115,7 +119,7 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
             );
           },
         ),
-        ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista)),
+        ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista), backup: backup),
         GoRoute(
           path: rotaAlunos,
           builder: (context, state) => ChangeNotifierProvider(
@@ -132,10 +136,14 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           path: '/historico',
           builder: (context, state) {
             final database = context.read<AppDatabase>();
+            final backupNuvem = BackupNuvemRepository(
+              database,
+              backup ?? BackupResultadosFirestore(context.read<IdInstalacao>()),
+            );
             return ChangeNotifierProvider(
               create: (_) => HistoricoViewModel(
                 repository: HistoricoRepository(database),
-                enviarTudoNuvem: () async {}, // Stub temporário até o Membro 3 integrar o backup
+                enviarTudoNuvem: backupNuvem.enviarTudo,
               ),
               child: HistoricoScreen(
                 onVoltar: () => context.pop(),

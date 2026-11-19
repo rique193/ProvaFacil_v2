@@ -1,29 +1,30 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../data/exportacao/exportador_relatorio.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../domain/historico/ordenacao_relatorio.dart';
 import '../../domain/historico/resumo_notas.dart';
+import '../../util/mensagem_erro.dart';
 import 'relatorio_ui_state.dart';
 
 /// ViewModel da tela de Relatório de Notas de uma prova.
 class RelatorioNotasViewModel extends ChangeNotifier {
   RelatorioNotasViewModel({
     required HistoricoRepository repository,
-    required ExportadorRelatorio exportador,
-    required int provaId,
-  })  : _exportador = exportador,
-        _provaId = provaId {
-    _inscricao = repository.observarProva(_provaId).asyncMap((prova) async {
-      final notas = await repository.observarNotasDaProva(_provaId).first;
-      return (prova, notas);
-    }).listen((par) {
+    required this._exportador,
+    required this._provaId,
+  }) {
+    _inscricao = Rx.combineLatest2(
+      repository.observarProva(_provaId),
+      repository.observarNotasDaProva(_provaId),
+      (prova, notas) => (prova, notas),
+    ).listen((par) {
       final prova = par.$1;
       final notas = par.$2;
 
@@ -107,7 +108,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
       final caminho = await salvarArquivo(nomeArquivo, bytes);
       if (caminho != null) mensagem = 'Relatório exportado: $nomeArquivo';
     } catch (e) {
-      mensagem = 'Não foi possível exportar: ${e.toString()}';
+      mensagem = 'Não foi possível exportar: ${mensagemDoErro(e) ?? e.runtimeType}';
     }
 
     _atualizar((estado) => estado.copyWith(exportando: false, mensagem: mensagem));

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provafacil/data/backup/backup_resultados.dart';
 import 'package:provafacil/data/backup/id_instalacao.dart';
 import 'package:provafacil/data/local/app_database.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
@@ -22,7 +23,12 @@ Future<void> esperarBanco(WidgetTester tester) async {
 }
 
 /// Abre o app na [rota] com um banco em memória e o devolve para o teste preparar dados.
-Future<AppDatabase> abrirApp(WidgetTester tester, String rota, {AppDatabase? database}) async {
+Future<AppDatabase> abrirApp(
+  WidgetTester tester,
+  String rota, {
+  AppDatabase? database,
+  BackupResultados? backup,
+}) async {
   final db = database ?? criarBancoParaWidgetTest();
   tester.view
     ..physicalSize = const Size(800, 3000)
@@ -39,7 +45,9 @@ Future<AppDatabase> abrirApp(WidgetTester tester, String rota, {AppDatabase? dat
         Provider<AppDatabase>.value(value: db),
         Provider<IdInstalacao>(create: (_) => IdInstalacao()),
       ],
-      child: MaterialApp.router(routerConfig: provaFacilNavHost(initialLocation: rota)),
+      child: MaterialApp.router(
+        routerConfig: provaFacilNavHost(initialLocation: rota, backup: backup),
+      ),
     ),
   );
   await esperarBanco(tester);
