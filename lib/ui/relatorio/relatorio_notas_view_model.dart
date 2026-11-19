@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../data/exportacao/exportador_relatorio.dart';
 import '../../data/local/app_database.dart';
@@ -18,10 +19,11 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     required this._exportador,
     required this._provaId,
   }) {
-    _inscricao = repository.observarProva(_provaId).asyncMap((prova) async {
-      final notas = await repository.observarNotasDaProva(_provaId).first;
-      return (prova, notas);
-    }).listen((par) {
+    _inscricao = Rx.combineLatest2(
+      repository.observarProva(_provaId),
+      repository.observarNotasDaProva(_provaId),
+      (prova, notas) => (prova, notas),
+    ).listen((par) {
       final prova = par.$1;
       final notas = par.$2;
 
