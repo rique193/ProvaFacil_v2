@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../data/exportacao/exportador_relatorio.dart';
+import '../../data/exportacao/nome_arquivo_relatorio.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../domain/historico/ordenacao_relatorio.dart';
@@ -104,7 +105,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     String? mensagem;
     try {
       final nomeArquivo = nomeSugeridoArquivo();
-      final bytes = await _exportador.gerarBytes(_provaId);
+      final bytes = await _exportador.exportar(_provaId);
       final caminho = await salvarArquivo(nomeArquivo, bytes);
       if (caminho != null) mensagem = 'Relatório exportado: $nomeArquivo';
     } catch (e) {

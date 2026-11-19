@@ -149,8 +149,33 @@ class HistoricoDao extends DatabaseAccessor<AppDatabase> with _$HistoricoDaoMixi
   );
 
   /// Resultados gravados da prova, com a turma do aluno, para o arquivo exportado (leitura pontual).
-  Future<List<ResultadoExportacao>> listarResultadosParaExportacao(int provaId) =>
-      throw UnimplementedError();
+  Future<List<ResultadoExportacao>> listarResultadosParaExportacao(int provaId) => customSelect(
+    '''
+    SELECT alunos.nome AS nome,
+           alunos.matricula AS matricula,
+           alunos.turma AS turma,
+           resultados.acertos AS acertos,
+           resultados.erros AS erros,
+           resultados.emBranco AS emBranco,
+           resultados.nota AS nota
+    FROM resultados
+    INNER JOIN alunos ON alunos.id = resultados.alunoId
+    WHERE resultados.provaId = ?
+    ORDER BY alunos.nome COLLATE NOCASE
+    ''',
+    variables: [Variable.withInt(provaId)],
+    readsFrom: {resultados, alunos},
+  ).map(
+    (linha) => ResultadoExportacao(
+      nome: linha.read<String>('nome'),
+      matricula: linha.readNullable<String>('matricula'),
+      turma: linha.read<String>('turma'),
+      acertos: linha.read<int>('acertos'),
+      erros: linha.read<int>('erros'),
+      emBranco: linha.read<int>('emBranco'),
+      nota: linha.read<double>('nota'),
+    ),
+  ).get();
 
   /// Todos os alunos, para o envio à nuvem (inclui os criados pela correção).
   Future<List<AlunoEntity>> listarAlunosParaBackup() =>
