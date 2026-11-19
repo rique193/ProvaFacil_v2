@@ -12,7 +12,6 @@ import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../data/repository/estatisticas_repository.dart';
-import '../components/tela_provisoria.dart';
 import '../correcao/correcao_rotas.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
@@ -25,6 +24,10 @@ import '../historico/historico_view_model.dart';
 import '../estatisticas/estatisticas_screen.dart';
 import '../estatisticas/estatisticas_view_model.dart';
 import '../relatorio/relatorio_notas_screen.dart';
+import '../scanner/qr_code_scanner_view_model.dart';
+import '../scanner/scan_respostas_screen.dart';
+import '../scanner/scan_respostas_view_model.dart';
+import '../scanner/scanner_screen.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
@@ -105,7 +108,18 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados
           path: '/scan_qr',
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
-            return TelaProvisoria(nome: 'Scanner', parametros: {_argProvaId: provaId});
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => QrCodeScannerViewModel(
+                ProvaRepository(database),
+                AlunoRepository(database),
+                provaIdInicial: provaId,
+              ),
+              child: QrCodeScannerScreen(
+                onVoltar: () => context.pop(),
+                onContinuar: (textoQr) => context.push(rotaScanRespostas(provaId, textoQr)),
+              ),
+            );
           },
         ),
         GoRoute(
@@ -113,9 +127,23 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
             final textoQr = state.uri.queryParameters[_argQr];
-            return TelaProvisoria(
-              nome: 'ScanRespostas',
-              parametros: {_argProvaId: provaId, _argQr: textoQr},
+            return ChangeNotifierProvider(
+              create: (context) => ScanRespostasViewModel(
+                ProvaRepository(context.read<AppDatabase>()),
+                provaEscolhidaId: provaId,
+                textoQr: textoQr,
+              ),
+              child: ScanRespostasScreen(
+                onVoltar: () => context.pop(),
+                onFinalizar: (folha) => context.push(
+                  rotaCorrecao(
+                    provaId: folha.prova.provaId,
+                    aluno: folha.dadosQr.aluno,
+                    turma: folha.dadosQr.turma,
+                    respostasLidas: folha.validacao.respostas,
+                  ),
+                ),
+              ),
             );
           },
         ),
