@@ -167,7 +167,6 @@ class _QuestaoFormCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 12,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,20 +183,22 @@ class _QuestaoFormCard extends StatelessWidget {
                   ),
               ],
             ),
+            const SizedBox(height: 12),
             ProvaFacilTextField(
               value: questao.enunciado,
               onChanged: onEnunciadoChange,
               label: 'Enunciado',
               enabled: habilitado,
             ),
+            const SizedBox(height: 12),
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: 4, bottom: 8),
               child: Text(
                 'Alternativas',
                 style: tema.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-            for (final (alternativaIndice, alternativa) in questao.alternativas.indexed)
+            for (final (alternativaIndice, alternativa) in questao.alternativas.indexed) ...[
               ProvaFacilTextField(
                 value: alternativa.texto,
                 onChanged: (valor) => onTextoAlternativaChange(alternativaIndice, valor),
@@ -205,6 +206,9 @@ class _QuestaoFormCard extends StatelessWidget {
                 singleLine: true,
                 enabled: habilitado,
               ),
+              const SizedBox(height: 8),
+            ],
+            const SizedBox(height: 4),
             Text(
               'A resposta correta é definida na tela de Gabarito.',
               style: tema.textTheme.bodySmall?.copyWith(color: tema.colorScheme.onSurfaceVariant),

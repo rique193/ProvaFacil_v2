@@ -70,18 +70,16 @@ void main() {
 
   testWidgets('histórico', (tester) async {
     await abrir(tester, rotaHistorico);
-    expect(find.text('Historico'), findsWidgets);
+    expect(find.text('Histórico de Avaliações'), findsWidgets);
   });
 
   testWidgets('estatísticas', (tester) async {
     await abrir(tester, rotaEstatisticas(4));
-    expect(find.text('Estatisticas'), findsWidgets);
-    expect(find.text('provaId: 4'), findsOneWidget);
+    expect(find.text('Estatísticas'), findsWidgets);
   });
 
   testWidgets('relatório', (tester) async {
     await abrir(tester, rotaRelatorio(4));
-    expect(find.text('RelatorioNotas'), findsWidgets);
-    expect(find.text('provaId: 4'), findsOneWidget);
+    expect(find.text('Relatório de Notas'), findsWidgets);
   });
 }

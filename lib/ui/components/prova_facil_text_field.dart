@@ -65,7 +65,7 @@ class _ProvaFacilTextFieldState extends State<ProvaFacilTextField> {
         border: OutlineInputBorder(borderRadius: forma),
         enabledBorder: OutlineInputBorder(
           borderRadius: forma,
-          borderSide: BorderSide(color: cores.outline.withValues(alpha: 0.5)),
+          borderSide: BorderSide(color: cores.outline.withOpacity(0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: forma,
