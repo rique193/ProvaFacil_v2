@@ -58,9 +58,11 @@ void main() {
     final id = await criarProva(tester, db);
 
     await tester.tap(find.text('Corrigir'));
-    await tester.pumpAndSettle();
+    await esperarBanco(tester);
 
-    expect(find.text('provaId: $id'), findsOneWidget);
+    expect(find.text('Ler QR Code'), findsOneWidget);
+    expect(find.textContaining('Nenhum aluno cadastrado'), findsOneWidget);
+    expect(id, isPositive);
   });
 
   testWidgets('alunos e histórico abrem as telas certas', (tester) async {
