@@ -10,6 +10,7 @@ import '../../data/local/app_database.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../domain/historico/ordenacao_relatorio.dart';
 import '../../domain/historico/resumo_notas.dart';
+import '../../util/mensagem_erro.dart';
 import 'relatorio_ui_state.dart';
 
 /// ViewModel da tela de Relatório de Notas de uma prova.
@@ -107,7 +108,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
       final caminho = await salvarArquivo(nomeArquivo, bytes);
       if (caminho != null) mensagem = 'Relatório exportado: $nomeArquivo';
     } catch (e) {
-      mensagem = 'Não foi possível exportar: ${e.toString()}';
+      mensagem = 'Não foi possível exportar: ${mensagemDoErro(e) ?? e.runtimeType}';
     }
 
     _atualizar((estado) => estado.copyWith(exportando: false, mensagem: mensagem));
