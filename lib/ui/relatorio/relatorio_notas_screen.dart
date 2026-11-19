@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../util/formatacao_numeros.dart';
 import 'relatorio_notas_view_model.dart';
 import 'relatorio_ui_state.dart';
 
@@ -179,9 +180,9 @@ class _PainelResumo extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _ItemResumo(label: 'Alunos', valor: '$totalAlunos'),
-            _ItemResumo(label: 'Média', valor: media.toStringAsFixed(1)),
-            _ItemResumo(label: 'Maior', valor: maiorNota.toStringAsFixed(1)),
-            _ItemResumo(label: 'Menor', valor: menorNota.toStringAsFixed(1)),
+            _ItemResumo(label: 'Média', valor: formatarMedia(media)),
+            _ItemResumo(label: 'Maior', valor: formatarNota(maiorNota)),
+            _ItemResumo(label: 'Menor', valor: formatarNota(menorNota)),
           ],
         ),
       ),
@@ -312,7 +313,7 @@ class _LinhaAluno extends StatelessWidget {
           SizedBox(
             width: 56,
             child: Text(
-              linha.nota.toStringAsFixed(1),
+              formatarNota(linha.nota),
               textAlign: TextAlign.center,
               style: tema.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,

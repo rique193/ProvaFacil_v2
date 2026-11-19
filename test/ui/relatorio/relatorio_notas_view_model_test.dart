@@ -3,6 +3,7 @@ import 'package:provafacil/data/exportacao/exportador_relatorio.dart';
 import 'package:provafacil/data/local/app_database.dart';
 import 'package:provafacil/data/repository/historico_repository.dart';
 import 'package:provafacil/ui/relatorio/relatorio_notas_view_model.dart';
+import 'package:provafacil/ui/relatorio/relatorio_ui_state.dart';
 
 import '../../ajudantes/banco_em_memoria.dart';
 import '../../ajudantes/correcao_simulada.dart';
@@ -76,5 +77,50 @@ void main() {
     expect(viewModel.uiState.mediaDaTurma, 7.5);
     expect(viewModel.uiState.maiorNota, 10);
     expect(viewModel.uiState.menorNota, 5);
+  });
+
+  group('exportar', () {
+    Future<void> prepararComUmResultado() async {
+      await gravarCorrecao(
+        db,
+        provaId: provaId,
+        nome: 'Ana',
+        turma: 'Turma A',
+        respostas: {
+          1: {'A'},
+          2: {'B'},
+        },
+      );
+      await esperarAte(() => viewModel.uiState.podeExportar);
+    }
+
+    test('mostra a mensagem do erro, e não o toString', () async {
+      await prepararComUmResultado();
+
+      await viewModel.exportar((_, _) async => throw StateError('Disco cheio'));
+
+      expect(viewModel.uiState.mensagem, 'Não foi possível exportar: Disco cheio');
+      expect(viewModel.uiState.exportando, isFalse);
+    });
+
+    test('sem mensagem, mostra o nome do tipo do erro', () async {
+      await prepararComUmResultado();
+
+      await viewModel.exportar((_, _) async => throw const FormatException());
+
+      expect(viewModel.uiState.mensagem, 'Não foi possível exportar: FormatException');
+    });
+
+    test('exportação concluída avisa o nome do arquivo', () async {
+      await prepararComUmResultado();
+      String? nomeRecebido;
+
+      await viewModel.exportar((nome, bytes) async {
+        nomeRecebido = nome;
+        return '/tmp/$nome';
+      });
+
+      expect(viewModel.uiState.mensagem, 'Relatório exportado: $nomeRecebido');
+    });
   });
 }
