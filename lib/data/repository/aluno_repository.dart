@@ -14,9 +14,8 @@ import 'regras_cadastro_aluno.dart';
 ///
 /// Depois de cada cadastro, edição ou exclusão gravada no banco, o backup é avisado (ver [BackupAlunos]).
 class AlunoRepository {
-  AlunoRepository(this._database, {BackupAlunos backup = BackupAlunos.desativado})
-      : _backup = backup,
-        _dao = _database.alunoDao;
+  AlunoRepository(this._database, {this._backup = BackupAlunos.desativado})
+    : _dao = _database.alunoDao;
 
   static const _tag = 'AlunoRepository';
 

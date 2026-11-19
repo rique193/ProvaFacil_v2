@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -16,10 +15,9 @@ import 'relatorio_ui_state.dart';
 class RelatorioNotasViewModel extends ChangeNotifier {
   RelatorioNotasViewModel({
     required HistoricoRepository repository,
-    required ExportadorRelatorio exportador,
-    required int provaId,
-  })  : _exportador = exportador,
-        _provaId = provaId {
+    required this._exportador,
+    required this._provaId,
+  }) {
     _inscricao = repository.observarProva(_provaId).asyncMap((prova) async {
       final notas = await repository.observarNotasDaProva(_provaId).first;
       return (prova, notas);
