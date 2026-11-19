@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -141,20 +139,14 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
 
   Future<void> _exportar(RelatorioNotasViewModel viewModel) async {
     await viewModel.exportar((nomeArquivo, bytes) async {
-      // No Android/iOS o file_picker exige os bytes e já grava o arquivo.
-      final caminho = await FilePicker.platform.saveFile(
+      // O file_picker 13 grava os bytes no arquivo escolhido e devolve o Uri (null se cancelar).
+      final destino = await FilePicker.saveFile(
         dialogTitle: 'Salvar relatório',
         fileName: nomeArquivo,
-        type: FileType.custom,
-        allowedExtensions: const ['csv'],
+        mimeType: 'text/csv',
         bytes: bytes,
       );
-      if (caminho == null) return null;
-      // No desktop o file_picker só devolve o caminho; a gravação fica por nossa conta.
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        await File(caminho).writeAsBytes(bytes, flush: true);
-      }
-      return caminho;
+      return destino?.toString();
     });
   }
 }
