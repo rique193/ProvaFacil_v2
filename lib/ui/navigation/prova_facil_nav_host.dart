@@ -1,8 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/backup/backup_firestore.dart';
+import '../../data/backup/id_instalacao.dart';
 import '../../data/local/app_database.dart';
+import '../../data/repository/aluno_repository.dart';
 import '../../data/repository/prova_repository.dart';
+import '../alunos/alunos_screen.dart';
+import '../alunos/alunos_view_model.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../data/repository/estatisticas_repository.dart';
 import '../components/tela_provisoria.dart';
@@ -113,7 +118,15 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
         ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista)),
         GoRoute(
           path: rotaAlunos,
-          builder: (context, state) => const TelaProvisoria(nome: 'Alunos'),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (context) => AlunosViewModel(
+              AlunoRepository(
+                context.read<AppDatabase>(),
+                backup: BackupAlunosFirestore(context.read<IdInstalacao>()),
+              ),
+            ),
+            child: AlunosScreen(onVoltar: () => context.pop()),
+          ),
         ),
         GoRoute(
           path: '/historico',

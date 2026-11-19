@@ -15,14 +15,6 @@ import 'package:provafacil/domain/scanner/qr_code_prova.dart';
 import '../../ajudantes/banco_em_memoria.dart';
 import '../../ajudantes/cenarios_correcao.dart';
 
-class BackupTeste implements BackupResultados {
-  BackupTeste(this.enviar);
-  final Future<void> Function(ResultadoParaBackup) enviar;
-  @override
-  Future<void> enviarResultado(ResultadoParaBackup resultado) =>
-      enviar(resultado);
-}
-
 void main() {
   late AppDatabase db;
   late ProvaRepository provas;
@@ -253,7 +245,10 @@ void main() {
     ResultadoParaBackup? enviado;
     resultados = ResultadoRepository(
       db,
-      backup: BackupTeste((r) async {
+      backup: BackupResultados((alunos, enviados) async {
+        final r = enviados.single;
+        expect(alunos.single.id, r.resultado.alunoId);
+        expect(alunos.single.nome, 'Ana');
         enviado = r;
         expect(
           (await resultados.observarResultadosDaProva(id).first)

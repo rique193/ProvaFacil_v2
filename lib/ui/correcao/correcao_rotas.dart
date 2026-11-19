@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/backup/backup_firestore.dart';
+import '../../data/backup/backup_resultados.dart';
+import '../../data/backup/id_instalacao.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/prova_repository.dart';
 import '../../data/repository/resultado_repository.dart';
@@ -31,6 +34,7 @@ String rotaResultado(int id) => '/resultados/$id';
 
 List<RouteBase> rotasDeCorrecao({
   required void Function(BuildContext) aoConcluir,
+  BackupResultados? backup,
 }) => [
   GoRoute(
     path: '/correcao',
@@ -40,7 +44,12 @@ List<RouteBase> rotasDeCorrecao({
       return ChangeNotifierProvider(
         create: (context) => CorrecaoViewModel(
           ProvaRepository(context.read<AppDatabase>()),
-          ResultadoRepository(context.read<AppDatabase>()),
+          ResultadoRepository(
+            context.read<AppDatabase>(),
+            backup:
+                backup ??
+                BackupResultadosFirestore(context.read<IdInstalacao>()),
+          ),
           provaIdInicial: id == -1 ? null : id,
           alunoInicial: parametros['aluno'] ?? '',
           turmaInicial: parametros['turma'] ?? '',
@@ -61,7 +70,12 @@ List<RouteBase> rotasDeCorrecao({
       final id = int.parse(state.pathParameters['resultadoId']!);
       return ChangeNotifierProvider(
         create: (context) => ResultadoViewModel(
-          ResultadoRepository(context.read<AppDatabase>()),
+          ResultadoRepository(
+            context.read<AppDatabase>(),
+            backup:
+                backup ??
+                BackupResultadosFirestore(context.read<IdInstalacao>()),
+          ),
           id,
         ),
         child: ResultadoScreen(

@@ -153,19 +153,95 @@ class HistoricoDao extends DatabaseAccessor<AppDatabase> with _$HistoricoDaoMixi
       throw UnimplementedError();
 
   /// Todos os alunos, para o envio à nuvem (inclui os criados pela correção).
-  Future<List<AlunoEntity>> listarAlunosParaBackup() => throw UnimplementedError();
+  Future<List<AlunoEntity>> listarAlunosParaBackup() =>
+      (select(alunos)..orderBy([(a) => OrderingTerm.asc(a.id)])).get();
 
   /// Todos os resultados gravados, com a prova e o aluno, para o envio à nuvem.
-  Future<List<LinhaResultadoBackup>> listarResultadosParaBackup() => throw UnimplementedError();
+  Future<List<LinhaResultadoBackup>> listarResultadosParaBackup() => customSelect(
+    '''
+    $_colunasResultadoBackup
+    ORDER BY resultados.id
+    ''',
+    readsFrom: {resultados, provas, alunos},
+  ).map(_linhaResultadoBackup).get();
 
   /// Um resultado gravado, com a prova e o aluno, para o envio à nuvem logo após a correção.
-  Future<LinhaResultadoBackup?> buscarResultadoParaBackup(int resultadoId) =>
-      throw UnimplementedError();
+  Future<LinhaResultadoBackup?> buscarResultadoParaBackup(int resultadoId) => customSelect(
+    '''
+    $_colunasResultadoBackup
+    WHERE resultados.id = ?
+    ''',
+    variables: [Variable.withInt(resultadoId)],
+    readsFrom: {resultados, provas, alunos},
+  ).map(_linhaResultadoBackup).getSingleOrNull();
 
   /// Respostas de um resultado gravado, para o envio à nuvem logo após a correção.
   Future<List<LinhaRespostaBackup>> listarRespostasDoResultadoParaBackup(int resultadoId) =>
-      throw UnimplementedError();
+      customSelect(
+        '''
+        $_colunasRespostaBackup
+        WHERE resultadoId = ?
+        ''',
+        variables: [Variable.withInt(resultadoId)],
+        readsFrom: {respostasAluno},
+      ).map(_linhaRespostaBackup).get();
 
   /// Respostas de todos os resultados gravados, para o envio à nuvem.
-  Future<List<LinhaRespostaBackup>> listarRespostasParaBackup() => throw UnimplementedError();
+  Future<List<LinhaRespostaBackup>> listarRespostasParaBackup() => customSelect(
+    _colunasRespostaBackup,
+    readsFrom: {respostasAluno},
+  ).map(_linhaRespostaBackup).get();
+
+  static const _colunasResultadoBackup = '''
+    SELECT resultados.id AS resultadoId,
+           provas.id AS provaId,
+           provas.titulo AS tituloProva,
+           provas.disciplina AS disciplina,
+           alunos.id AS alunoId,
+           alunos.nome AS nomeAluno,
+           alunos.turma AS turma,
+           alunos.matricula AS matricula,
+           resultados.totalQuestoes AS totalQuestoes,
+           resultados.acertos AS acertos,
+           resultados.erros AS erros,
+           resultados.emBranco AS emBranco,
+           resultados.nota AS nota,
+           resultados.notaMaxima AS notaMaxima,
+           resultados.corrigidoEm AS corrigidoEm
+    FROM resultados
+    INNER JOIN provas ON provas.id = resultados.provaId
+    INNER JOIN alunos ON alunos.id = resultados.alunoId
+    ''';
+
+  static const _colunasRespostaBackup = '''
+    SELECT resultadoId, questaoId, numeroQuestao, letrasMarcadas, letraCorreta, situacao
+    FROM respostas_aluno
+    ''';
+
+  static LinhaResultadoBackup _linhaResultadoBackup(QueryRow linha) => LinhaResultadoBackup(
+    resultadoId: linha.read<int>('resultadoId'),
+    provaId: linha.read<int>('provaId'),
+    tituloProva: linha.read<String>('tituloProva'),
+    disciplina: linha.read<String>('disciplina'),
+    alunoId: linha.read<int>('alunoId'),
+    nomeAluno: linha.read<String>('nomeAluno'),
+    turma: linha.read<String>('turma'),
+    matricula: linha.readNullable<String>('matricula'),
+    totalQuestoes: linha.read<int>('totalQuestoes'),
+    acertos: linha.read<int>('acertos'),
+    erros: linha.read<int>('erros'),
+    emBranco: linha.read<int>('emBranco'),
+    nota: linha.read<double>('nota'),
+    notaMaxima: linha.read<double>('notaMaxima'),
+    corrigidoEm: linha.read<int>('corrigidoEm'),
+  );
+
+  static LinhaRespostaBackup _linhaRespostaBackup(QueryRow linha) => LinhaRespostaBackup(
+    resultadoId: linha.read<int>('resultadoId'),
+    questaoId: linha.read<int>('questaoId'),
+    numeroQuestao: linha.read<int>('numeroQuestao'),
+    letrasMarcadas: linha.read<String>('letrasMarcadas'),
+    letraCorreta: linha.read<String>('letraCorreta'),
+    situacao: SituacaoQuestao.deNome(linha.read<String>('situacao')),
+  );
 }
