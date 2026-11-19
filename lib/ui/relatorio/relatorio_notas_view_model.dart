@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/exportacao/exportador_relatorio.dart';
 import '../../data/local/app_database.dart';
@@ -17,8 +18,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     required HistoricoRepository repository,
     required ExportadorRelatorio exportador,
     required int provaId,
-  })  : _repository = repository,
-        _exportador = exportador,
+  })  : _exportador = exportador,
         _provaId = provaId {
     _inscricao = repository.observarProva(_provaId).asyncMap((prova) async {
       final notas = await repository.observarNotasDaProva(_provaId).first;
@@ -56,7 +56,6 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     });
   }
 
-  final HistoricoRepository _repository;
   final ExportadorRelatorio _exportador;
   final int _provaId;
 
@@ -87,35 +86,27 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     });
   }
 
-  /// Nome sugerido no seletor de arquivos, ex.: "Prova_1_28-10-2026.xlsx".
+  /// Nome sugerido no seletor de arquivos, ex.: "Prova_1_28-10-2026.csv".
   String nomeSugeridoArquivo() =>
       nomeArquivoRelatorio(_uiState.tituloProva, DateTime.now().millisecondsSinceEpoch);
 
-  /// Exporta o relatório para o arquivo escolhido pelo professor.
+  /// Gera o relatório e entrega os bytes para [salvarArquivo], que pergunta ao professor onde
+  /// salvar e devolve o caminho escolhido (ou `null` se ele cancelar).
+  ///
+  /// Roda na isolate principal: o banco (Drift) não pode ser enviado para outra isolate.
   Future<void> exportar(
-      String nomeArquivo,
-      OutputStream? Function() abrirSaida,
-      VoidCallback descartarArquivo,
-      ) async {
+    Future<String?> Function(String nomeArquivo, Uint8List bytes) salvarArquivo,
+  ) async {
     if (!_uiState.podeExportar) return;
     _atualizar((estado) => estado.copyWith(exportando: true));
 
-    String mensagem;
+    String? mensagem;
     try {
-      await compute((_) async {
-        final saida = abrirSaida();
-        if (saida == null) throw StateError('Não foi possível abrir o arquivo.');
-        try {
-          await _exportador.exportar(_provaId, saida);
-        } finally {
-          await saida.close();
-        }
-      }, null);
-      mensagem = 'Relatório exportado: $nomeArquivo';
+      final nomeArquivo = nomeSugeridoArquivo();
+      final bytes = await _exportador.gerarBytes(_provaId);
+      final caminho = await salvarArquivo(nomeArquivo, bytes);
+      if (caminho != null) mensagem = 'Relatório exportado: $nomeArquivo';
     } catch (e) {
-      try {
-        descartarArquivo();
-      } catch (_) {}
       mensagem = 'Não foi possível exportar: ${e.toString()}';
     }
 
@@ -135,7 +126,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
 
   static ViewModelProviderFactory<RelatorioNotasViewModel> factory(int provaId) {
     return (BuildContext context) {
-      final database = AppDatabase.getInstance(context);
+      final database = context.read<AppDatabase>();
       return RelatorioNotasViewModel(
         repository: HistoricoRepository(database),
         exportador: ExportadorRelatorio(database),

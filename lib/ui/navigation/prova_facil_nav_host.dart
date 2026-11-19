@@ -155,7 +155,7 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
         GoRoute(
           path: '/historico',
           builder: (context, state) {
-            final database = AppDatabase.getInstance(context);
+            final database = context.read<AppDatabase>();
             return ChangeNotifierProvider(
               create: (_) => HistoricoViewModel(
                 repository: HistoricoRepository(database),
@@ -173,7 +173,7 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           path: '/estatisticas/:provaId',
           builder: (context, state) {
             final provaId = int.parse(state.pathParameters['provaId']!);
-            final database = AppDatabase.getInstance(context);
+            final database = context.read<AppDatabase>();
             return ChangeNotifierProvider(
               create: (_) => EstatisticasViewModel(
                 repository: EstatisticasRepository(database),

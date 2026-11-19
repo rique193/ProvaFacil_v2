@@ -166,7 +166,7 @@ class _ListaAlunos extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 96),
       itemCount: itens.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, indice) => switch (itens[indice]) {
         final AlunoEntity aluno => _AlunoCard(
           key: ValueKey(aluno.id),
@@ -264,7 +264,6 @@ class _AlunoDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 12,
         children: [
           ProvaFacilTextField(
             value: form.nome,
@@ -272,6 +271,7 @@ class _AlunoDialog extends StatelessWidget {
             label: 'Nome',
             singleLine: true,
           ),
+          const SizedBox(height: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -294,12 +294,14 @@ class _AlunoDialog extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 12),
           ProvaFacilTextField(
             value: form.matricula,
             onChanged: viewModel.atualizarMatricula,
             label: 'Matrícula (opcional)',
             singleLine: true,
           ),
+          const SizedBox(height: 12),
           ProvaFacilTextField(
             value: form.email,
             onChanged: viewModel.atualizarEmail,
@@ -307,8 +309,10 @@ class _AlunoDialog extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             singleLine: true,
           ),
-          if (erro != null)
+          if (erro != null) ...[
+            const SizedBox(height: 12),
             Text(erro, style: tema.textTheme.bodySmall?.copyWith(color: tema.colorScheme.error)),
+          ],
         ],
       ),
       actions: [
