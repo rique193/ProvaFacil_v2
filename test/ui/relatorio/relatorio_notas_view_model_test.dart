@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/data/exportacao/exportador_relatorio.dart';
 import 'package:provafacil/data/local/app_database.dart';
@@ -7,6 +9,7 @@ import 'package:provafacil/ui/relatorio/relatorio_ui_state.dart';
 
 import '../../ajudantes/banco_em_memoria.dart';
 import '../../ajudantes/correcao_simulada.dart';
+import '../../data/exportacao/leitor_xlsx.dart';
 
 void main() {
   late AppDatabase db;
@@ -109,6 +112,24 @@ void main() {
       await viewModel.exportar((_, _) async => throw const FormatException());
 
       expect(viewModel.uiState.mensagem, 'Não foi possível exportar: FormatException');
+    });
+
+    test('entrega ao seletor de arquivos um .xlsx com o nome sugerido terminando em .xlsx', () async {
+      await prepararComUmResultado();
+      String? nomeRecebido;
+      Uint8List? bytesRecebidos;
+
+      await viewModel.exportar((nome, bytes) async {
+        nomeRecebido = nome;
+        bytesRecebidos = bytes;
+        return '/tmp/$nome';
+      });
+
+      expect(nomeRecebido, matches(RegExp(r'^Prova_1_\d{2}-\d{2}-\d{4}\.xlsx$')));
+      final xlsx = LeitorXlsx(bytesRecebidos!);
+      expect(xlsx.entradas.keys, contains('xl/worksheets/sheet1.xml'));
+      expect(xlsx.valores(1)['A1'], 'Prova 1');
+      expect(xlsx.valores(1)['A7'], 'Ana');
     });
 
     test('exportação concluída avisa o nome do arquivo', () async {
