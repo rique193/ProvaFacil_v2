@@ -6,10 +6,12 @@ import '../../util/formatacao_numeros.dart';
 import 'relatorio_notas_view_model.dart';
 import 'relatorio_ui_state.dart';
 
+const _mimeXlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
 /// Tela de Relatório de Notas de uma prova.
 ///
 /// Exibe a tabela de alunos com acertos e nota, resumo estatístico e permite
-/// exportar para arquivo (CSV por enquanto; XLSX após a integração das estatísticas).
+/// exportar para Excel (.xlsx) com as abas de notas e de estatísticas.
 class RelatorioNotasScreen extends StatelessWidget {
   const RelatorioNotasScreen({
     super.key,
@@ -144,7 +146,7 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
       final destino = await FilePicker.saveFile(
         dialogTitle: 'Salvar relatório',
         fileName: nomeArquivo,
-        mimeType: 'text/csv',
+        mimeType: _mimeXlsx,
         bytes: bytes,
       );
       return destino?.toString();

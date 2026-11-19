@@ -88,7 +88,7 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     });
   }
 
-  /// Nome sugerido no seletor de arquivos, ex.: "Prova_1_28-10-2026.csv".
+  /// Nome sugerido no seletor de arquivos, ex.: "Prova_1_28-10-2026.xlsx".
   String nomeSugeridoArquivo() =>
       nomeArquivoRelatorio(_uiState.tituloProva, DateTime.now().millisecondsSinceEpoch);
 
