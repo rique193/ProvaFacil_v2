@@ -206,14 +206,15 @@ class _GabaritoQuestaoRow extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             Row(
-              spacing: 8,
               children: [
-                for (final alternativa in questao.alternativas)
+                for (final alternativa in questao.alternativas) ...[
                   _AlternativaLetraButton(
                     letra: alternativa.letra,
                     selecionada: alternativa.alternativaId == questao.alternativaCorretaId,
                     onClick: () => onSelecionar(alternativa.alternativaId),
                   ),
+                  const SizedBox(width: 8),
+                ],
               ],
             ),
           ],

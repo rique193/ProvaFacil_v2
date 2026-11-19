@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/local/app_database.dart';
 import '../../data/repository/estatisticas_repository.dart';
-import '../../domain/estatisticas/estatistica_questao.dart';
 import '../../domain/estatisticas/estatisticas_prova.dart';
 import '../../domain/historico/resumo_notas.dart';
 import '../../domain/historico/formato_turmas.dart';
@@ -97,7 +95,7 @@ class EstatisticasViewModel extends ChangeNotifier {
 
   static ViewModelProviderFactory<EstatisticasViewModel> factory(int provaId) {
     return (BuildContext context) {
-      final database = AppDatabase.getInstance(context);
+      final database = context.read<AppDatabase>();
       return EstatisticasViewModel(
         repository: EstatisticasRepository(database),
         provaId: provaId,

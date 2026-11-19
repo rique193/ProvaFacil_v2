@@ -49,6 +49,8 @@ dependencies:
   unorm_dart: ^0.3.3
   archive: ^4.7.1
   file_picker: ^13.3.3
+  pdf: ^3.11.1
+  printing: ^5.13.1
 
 dev_dependencies:
   flutter_test:

@@ -14,7 +14,7 @@ class ProvaFacilCard extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: borda),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
         elevation: 0,
         clipBehavior: Clip.antiAlias,
         child: onTap == null ? child : InkWell(onTap: onTap, borderRadius: borda, child: child),

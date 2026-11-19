@@ -100,7 +100,7 @@ void main() {
     });
     final semNuvem = BackupNuvemRepository(
       db,
-      BackupResultados((_, _) async => throw StateError('sem conexão')),
+      BackupResultados((a, r) async => throw StateError('sem conexão')),
     );
 
     await expectLater(
