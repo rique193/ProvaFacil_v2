@@ -124,7 +124,7 @@ abstract final class EstatisticasProva {
     final letras = <String>{
       for (var i = 0; i < questao.totalAlternativas; i++) String.fromCharCode(65 + i),
       ...unicas,
-      if (letraDoGabarito != null) letraDoGabarito,
+      ?letraDoGabarito,
     }.toList()..sort();
     final distribuicao = {for (final letra in letras) letra: contagemUnicas[letra] ?? 0};
 

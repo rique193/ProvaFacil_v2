@@ -12,10 +12,9 @@ import 'historico_ui_state.dart';
 /// sincroniza os alunos e resultados com a nuvem, como backup.
 class HistoricoViewModel extends ChangeNotifier {
   HistoricoViewModel({
-    required HistoricoRepository repository,
-    Future<void> Function()? enviarTudoNuvem,
-  })  : _repository = repository,
-        _enviarTudoNuvem = enviarTudoNuvem {
+    required this._repository,
+    this._enviarTudoNuvem,
+  }) {
     _inscricao = _repository.observarProvasCorrigidas().listen((provas) {
       final avaliacoes = provas
           .map(
