@@ -74,7 +74,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Histórico'));
     await tester.pumpAndSettle();
-    expect(find.text('Historico'), findsWidgets);
+    expect(find.text('Histórico de Avaliações'), findsWidgets);
   });
 
   testWidgets('nova prova abre o formulário', (tester) async {

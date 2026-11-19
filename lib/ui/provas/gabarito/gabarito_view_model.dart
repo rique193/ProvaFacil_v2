@@ -100,8 +100,10 @@ class GabaritoViewModel extends ChangeNotifier {
       _atualizar((s) => s.copyWith(erro: 'Defina a resposta correta de todas as questões.'));
       return;
     }
-    final respostas = {
-      for (final questao in estadoAtual.questoes) questao.questaoId: ?questao.alternativaCorretaId,
+    final respostas = <int, int>{
+      for (final questao in estadoAtual.questoes)
+        if (questao.alternativaCorretaId != null)
+          questao.questaoId: questao.alternativaCorretaId!,
     };
 
     _atualizar((s) => s.copyWith(carregando: true));
