@@ -28,10 +28,13 @@ void main() {
     expect(find.text('Prova não encontrada.'), findsOneWidget);
   });
 
-  testWidgets('scanner do QR Code', (tester) async {
+  testWidgets('scanner do QR Code sem provas avisa', (tester) async {
     await abrir(tester, rotaScanQr(null));
-    expect(find.text('Scanner'), findsWidgets);
-    expect(find.text('provaId: null'), findsOneWidget);
+    expect(find.text('Ler QR Code'), findsOneWidget);
+    expect(
+      find.text('Nenhuma prova cadastrada. Cadastre uma prova e o gabarito antes de corrigir.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('leitura das respostas recebe o texto do QR Code', (
@@ -41,9 +44,9 @@ void main() {
       tester,
       rotaScanRespostas(5, 'PROVAFACIL|1|5|Ana Souza|Turma A'),
     );
-    expect(find.text('ScanRespostas'), findsWidgets);
-    expect(find.text('provaId: 5'), findsOneWidget);
-    expect(find.text('qr: PROVAFACIL|1|5|Ana Souza|Turma A'), findsOneWidget);
+    expect(find.text('Ler Respostas'), findsOneWidget);
+    expect(find.text('Ana Souza'), findsOneWidget);
+    expect(find.text('Aguardando a leitura da folha'), findsOneWidget);
   });
 
   testWidgets('correção sem parâmetros', (tester) async {
