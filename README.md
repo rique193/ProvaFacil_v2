@@ -93,7 +93,7 @@ O app é usado pelo **professor**, no próprio celular Android.
 
 Telas na ordem em que o professor navega. Os prints ficam em `docs/telas/`.
 
-1. **Lista de Provas:** tela inicial, com as provas cadastradas e os atalhos para nova prova, gabarito, correção, alunos e histórico.
+1. **Lista de Provas ("Dashboard" na barra do app):** tela inicial, com as provas cadastradas e os atalhos para nova prova, gabarito, correção, alunos e histórico.
    `![Lista de provas](docs/telas/lista-provas.png)`
 2. **Formulário de Prova:** criação e edição da prova e das questões.
    `![Formulário de prova](docs/telas/formulario-prova.png)`
@@ -220,7 +220,7 @@ lib/
   data/
     local/             # banco SQLite (drift): tabelas, DAOs e relações
     backup/            # envio para o Firebase Firestore
-    exportacao/        # geração do relatório .xlsx
+    exportacao/        # relatório .xlsx e PDF da prova
     repository/        # acesso aos dados usado pelas telas
   ui/
     theme/             # cores e tipografia (tema claro e escuro)
@@ -282,14 +282,14 @@ A apresentação segue o roteiro da Avaliação N3. A tabela mostra o que já ex
 | # | Funcionalidade | Pontos | Situação | O que falta |
 |---|---|---|---|---|
 | 1 | Criar conta (cadastro de professor) | 0,5 | A fazer | Tela de cadastro com Firebase Authentication (e-mail e senha) |
-| 2 | Fazer login | 0,5 | A fazer | Tela de login e sessão do professor; cada professor vê só os próprios dados |
+| 2 | Fazer login | 0,5 | A fazer | Tela de login do professor (Firebase Authentication) como entrada do app |
 | 3 | Criar turma / disciplina | 0,75 | Parcial | Hoje turma e disciplina são campos de texto; falta o cadastro próprio e a escolha na prova e no aluno |
 | 4 | Criar questões no banco de questões | 1,0 | A fazer | Banco de questões separado da prova, com enunciado, 5 alternativas e a correta, por disciplina |
 | 5 | Gerar prova a partir do banco, com embaralhamento | 1,25 | A fazer | Selecionar questões do banco e embaralhar a ordem das questões e das alternativas, guardando o gabarito de cada versão |
-| 6 | Ver a prova gerada e editar | 0,75 | Pronto | Lista de provas e formulário de edição já funcionam |
+| 6 | Ver a prova gerada e editar | 0,75 | Parcial | A lista de provas e o formulário de edição existem, mas o card abre direto a edição; falta a tela de visualização só de leitura. A edição de prova gerada do banco depende do item 5 |
 | 7 | Exportar PDF: questões + gabarito com QR Code em página separada | 2,0 | Parcial | O PDF existe, mas o QR precisa usar o formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>` e o gabarito precisa ficar em página separada, com uma folha por aluno |
-| 8 | Corrigir a prova lendo o QR Code | 2,5 | Parcial | A correção, a nota e o salvamento já funcionam; falta ler o QR impresso com a câmera do celular (`mobile_scanner`) |
-| 9 | Status da prova após as correções (Relatório) | 0,75 | Pronto | Histórico, Estatísticas e Relatório com exportação .xlsx |
+| 8 | Corrigir a prova lendo o QR Code | 2,5 | Parcial | A correção, a nota e o salvamento já funcionam. Falta ler o QR impresso com a câmera do celular (`mobile_scanner`). O QR traz só a prova, o aluno e a turma, e não as marcações: hoje as respostas vêm do simulador ou da marcação manual na tela de Correção. A definir: leitura das bolinhas por visão computacional ou marcação na tela depois da leitura do QR (a parte mais arriscada do roteiro) |
+| 9 | Status da prova após as correções (Relatório) | 0,75 | Parcial | Histórico, Estatísticas e Relatório com exportação .xlsx já funcionam; falta um status visível da prova (Pendente, Em correção, Corrigida), calculado pelos alunos da turma com resultado salvo |
 
 **Preparação para a apresentação:**
 - [ ] Criar uma prova no app antes do dia, com questões do banco.
