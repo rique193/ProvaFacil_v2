@@ -12,6 +12,7 @@ import '../entity/questao_entity.dart';
 import '../entity/resposta_aluno_entity.dart';
 import '../entity/resultado_entity.dart';
 import '../relation/historico_relacoes.dart';
+import '../relation/progresso_prova.dart';
 
 part 'historico_dao.g.dart';
 
@@ -52,6 +53,48 @@ class HistoricoDao extends DatabaseAccessor<AppDatabase> with _$HistoricoDaoMixi
         ),
     ],
   );
+
+  /// Para cada prova, o total de resultados e o de alunos da turma dela (`provas.turma`, sem
+  /// diferenciar maiúsculas). Atualiza sozinho quando uma correção é salva ou um aluno muda.
+  Stream<List<ProgressoProva>> observarProgressoProvas() => customSelect(
+    '''
+    SELECT provas.id AS provaId,
+           (SELECT COUNT(*) FROM resultados WHERE resultados.provaId = provas.id) AS totalCorrigidos,
+           CASE WHEN TRIM(provas.turma) = '' THEN 0 ELSE
+             (SELECT COUNT(*) FROM alunos
+              WHERE TRIM(alunos.turma) = TRIM(provas.turma) COLLATE NOCASE)
+           END AS totalAlunosTurma
+    FROM provas
+    ORDER BY provas.id
+    ''',
+    readsFrom: {provas, resultados, alunos},
+  ).watch().map(
+    (linhas) => [
+      for (final linha in linhas)
+        ProgressoProva(
+          provaId: linha.read<int>('provaId'),
+          totalAlunosTurma: linha.read<int>('totalAlunosTurma'),
+          totalCorrigidos: linha.read<int>('totalCorrigidos'),
+        ),
+    ],
+  );
+
+  /// Alunos da turma da prova que ainda não têm resultado nela, em ordem alfabética.
+  Stream<List<AlunoEntity>> observarAlunosPendentes(int provaId) => customSelect(
+    '''
+    SELECT alunos.* FROM alunos
+    INNER JOIN provas ON provas.id = ?
+    WHERE TRIM(provas.turma) <> ''
+      AND TRIM(alunos.turma) = TRIM(provas.turma) COLLATE NOCASE
+      AND NOT EXISTS (
+        SELECT 1 FROM resultados
+        WHERE resultados.provaId = provas.id AND resultados.alunoId = alunos.id
+      )
+    ORDER BY alunos.nome COLLATE NOCASE
+    ''',
+    variables: [Variable.withInt(provaId)],
+    readsFrom: {provas, resultados, alunos},
+  ).watch().map((linhas) => [for (final linha in linhas) alunos.map(linha.data)]);
 
   Stream<ProvaEntity?> observarProva(int provaId) =>
       (select(provas)..where((p) => p.id.equals(provaId))).watchSingleOrNull();

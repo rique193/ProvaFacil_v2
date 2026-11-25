@@ -11,6 +11,7 @@ import '../../data/local/app_database.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../domain/historico/ordenacao_relatorio.dart';
 import '../../domain/historico/resumo_notas.dart';
+import '../../domain/prova/status_prova.dart';
 import '../../util/mensagem_erro.dart';
 import 'relatorio_ui_state.dart';
 
@@ -21,41 +22,55 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     required this._exportador,
     required this._provaId,
   }) {
-    _inscricao = Rx.combineLatest2(
-      repository.observarProva(_provaId),
-      repository.observarNotasDaProva(_provaId),
-      (prova, notas) => (prova, notas),
-    ).listen((par) {
-      final prova = par.$1;
-      final notas = par.$2;
+    _inscricao =
+        Rx.combineLatest4(
+          repository.observarProva(_provaId),
+          repository.observarNotasDaProva(_provaId),
+          repository.observarProgressoProvas(),
+          repository.observarAlunosPendentes(_provaId),
+          (prova, notas, progressos, pendentes) =>
+              (prova, notas, progressos, pendentes),
+        ).listen((par) {
+          final prova = par.$1;
+          final notas = par.$2;
+          final progresso = par.$3
+              .where((p) => p.provaId == _provaId)
+              .firstOrNull;
+          final pendentes = par.$4;
 
-      _linhasBase = notas.map((nota) {
-        return LinhaRelatorioUiState(
-          alunoId: nota.alunoId,
-          nome: nota.nome,
-          matricula: nota.matricula,
-          acertos: nota.acertos,
-          nota: nota.nota,
-        );
-      }).toList();
+          _linhasBase = notas.map((nota) {
+            return LinhaRelatorioUiState(
+              alunoId: nota.alunoId,
+              nome: nota.nome,
+              matricula: nota.matricula,
+              acertos: nota.acertos,
+              nota: nota.nota,
+            );
+          }).toList();
 
-      final resumo = ResumoNotas.de(_linhasBase.map((it) => it.nota).toList());
+          final resumo = ResumoNotas.de(
+            _linhasBase.map((it) => it.nota).toList(),
+          );
 
-      _atualizar((estado) {
-        return estado.copyWith(
-          carregando: false,
-          tituloProva: prova?.titulo ?? '',
-          linhas: ordenarLinhas(
-            _linhasBase,
-            estado.colunaOrdenacao,
-            estado.direcaoOrdenacao,
-          ),
-          mediaDaTurma: resumo.media,
-          maiorNota: resumo.maiorNota,
-          menorNota: resumo.menorNota,
-        );
-      });
-    });
+          _atualizar((estado) {
+            return estado.copyWith(
+              carregando: false,
+              tituloProva: prova?.titulo ?? '',
+              linhas: ordenarLinhas(
+                _linhasBase,
+                estado.colunaOrdenacao,
+                estado.direcaoOrdenacao,
+              ),
+              mediaDaTurma: resumo.media,
+              maiorNota: resumo.maiorNota,
+              menorNota: resumo.menorNota,
+              status: progresso?.status ?? StatusProva.pendente,
+              totalAlunosTurma: progresso?.totalAlunosTurma ?? 0,
+              totalCorrigidos: progresso?.totalCorrigidos ?? notas.length,
+              alunosPendentes: [for (final aluno in pendentes) aluno.nome],
+            );
+          });
+        });
   }
 
   final ExportadorRelatorio _exportador;
@@ -89,8 +104,10 @@ class RelatorioNotasViewModel extends ChangeNotifier {
   }
 
   /// Nome sugerido no seletor de arquivos, ex.: "Prova_1_28-10-2026.xlsx".
-  String nomeSugeridoArquivo() =>
-      nomeArquivoRelatorio(_uiState.tituloProva, DateTime.now().millisecondsSinceEpoch);
+  String nomeSugeridoArquivo() => nomeArquivoRelatorio(
+    _uiState.tituloProva,
+    DateTime.now().millisecondsSinceEpoch,
+  );
 
   /// Gera o relatório e entrega os bytes para [salvarArquivo], que pergunta ao professor onde
   /// salvar e devolve o caminho escolhido (ou `null` se ele cancelar).
@@ -109,10 +126,13 @@ class RelatorioNotasViewModel extends ChangeNotifier {
       final caminho = await salvarArquivo(nomeArquivo, bytes);
       if (caminho != null) mensagem = 'Relatório exportado: $nomeArquivo';
     } catch (e) {
-      mensagem = 'Não foi possível exportar: ${mensagemDoErro(e) ?? e.runtimeType}';
+      mensagem =
+          'Não foi possível exportar: ${mensagemDoErro(e) ?? e.runtimeType}';
     }
 
-    _atualizar((estado) => estado.copyWith(exportando: false, mensagem: mensagem));
+    _atualizar(
+      (estado) => estado.copyWith(exportando: false, mensagem: mensagem),
+    );
   }
 
   void mensagemExibida() {
@@ -126,7 +146,9 @@ class RelatorioNotasViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  static ViewModelProviderFactory<RelatorioNotasViewModel> factory(int provaId) {
+  static ViewModelProviderFactory<RelatorioNotasViewModel> factory(
+    int provaId,
+  ) {
     return (BuildContext context) {
       final database = context.read<AppDatabase>();
       return RelatorioNotasViewModel(
@@ -138,4 +160,6 @@ class RelatorioNotasViewModel extends ChangeNotifier {
   }
 }
 
-typedef ViewModelProviderFactory<T extends ChangeNotifier> = T Function(BuildContext context);
+typedef ViewModelProviderFactory<T extends ChangeNotifier> = T Function(
+  BuildContext context,
+);

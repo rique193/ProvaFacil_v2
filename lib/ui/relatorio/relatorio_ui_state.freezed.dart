@@ -293,7 +293,8 @@ as double,
 /// @nodoc
 mixin _$RelatorioNotasUiState {
 
- bool get carregando; String get tituloProva; List<LinhaRelatorioUiState> get linhas; ColunaOrdenacao get colunaOrdenacao; DirecaoOrdenacao get direcaoOrdenacao; double get mediaDaTurma; double get maiorNota; double get menorNota; bool get exportando;/// Resultado da última exportação, para o snackbar; volta a `null` depois de exibido.
+ bool get carregando; String get tituloProva; List<LinhaRelatorioUiState> get linhas; ColunaOrdenacao get colunaOrdenacao; DirecaoOrdenacao get direcaoOrdenacao; double get mediaDaTurma; double get maiorNota; double get menorNota; StatusProva get status; int get totalAlunosTurma; int get totalCorrigidos;/// Nomes dos alunos da turma da prova que ainda não foram corrigidos.
+ List<String> get alunosPendentes; bool get exportando;/// Resultado da última exportação, para o snackbar; volta a `null` depois de exibido.
  String? get mensagem;
 /// Create a copy of RelatorioNotasUiState
 /// with the given fields replaced by the non-null parameter values.
@@ -306,20 +307,20 @@ $RelatorioNotasUiStateCopyWith<RelatorioNotasUiState> get copyWith => _$Relatori
 @override
 bool operator ==(Object other) {
   final _this = this as RelatorioNotasUiState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RelatorioNotasUiState&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.tituloProva, _this.tituloProva) || other.tituloProva == _this.tituloProva)&&const DeepCollectionEquality().equals(other.linhas, _this.linhas)&&(identical(other.colunaOrdenacao, _this.colunaOrdenacao) || other.colunaOrdenacao == _this.colunaOrdenacao)&&(identical(other.direcaoOrdenacao, _this.direcaoOrdenacao) || other.direcaoOrdenacao == _this.direcaoOrdenacao)&&(identical(other.mediaDaTurma, _this.mediaDaTurma) || other.mediaDaTurma == _this.mediaDaTurma)&&(identical(other.maiorNota, _this.maiorNota) || other.maiorNota == _this.maiorNota)&&(identical(other.menorNota, _this.menorNota) || other.menorNota == _this.menorNota)&&(identical(other.exportando, _this.exportando) || other.exportando == _this.exportando)&&(identical(other.mensagem, _this.mensagem) || other.mensagem == _this.mensagem));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RelatorioNotasUiState&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.tituloProva, _this.tituloProva) || other.tituloProva == _this.tituloProva)&&const DeepCollectionEquality().equals(other.linhas, _this.linhas)&&(identical(other.colunaOrdenacao, _this.colunaOrdenacao) || other.colunaOrdenacao == _this.colunaOrdenacao)&&(identical(other.direcaoOrdenacao, _this.direcaoOrdenacao) || other.direcaoOrdenacao == _this.direcaoOrdenacao)&&(identical(other.mediaDaTurma, _this.mediaDaTurma) || other.mediaDaTurma == _this.mediaDaTurma)&&(identical(other.maiorNota, _this.maiorNota) || other.maiorNota == _this.maiorNota)&&(identical(other.menorNota, _this.menorNota) || other.menorNota == _this.menorNota)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.totalAlunosTurma, _this.totalAlunosTurma) || other.totalAlunosTurma == _this.totalAlunosTurma)&&(identical(other.totalCorrigidos, _this.totalCorrigidos) || other.totalCorrigidos == _this.totalCorrigidos)&&const DeepCollectionEquality().equals(other.alunosPendentes, _this.alunosPendentes)&&(identical(other.exportando, _this.exportando) || other.exportando == _this.exportando)&&(identical(other.mensagem, _this.mensagem) || other.mensagem == _this.mensagem));
 }
 
 
 @override
 int get hashCode {
   final _this = this as RelatorioNotasUiState;
-  return Object.hash(runtimeType,_this.carregando,_this.tituloProva,const DeepCollectionEquality().hash(_this.linhas),_this.colunaOrdenacao,_this.direcaoOrdenacao,_this.mediaDaTurma,_this.maiorNota,_this.menorNota,_this.exportando,_this.mensagem);
+  return Object.hash(runtimeType,_this.carregando,_this.tituloProva,const DeepCollectionEquality().hash(_this.linhas),_this.colunaOrdenacao,_this.direcaoOrdenacao,_this.mediaDaTurma,_this.maiorNota,_this.menorNota,_this.status,_this.totalAlunosTurma,_this.totalCorrigidos,const DeepCollectionEquality().hash(_this.alunosPendentes),_this.exportando,_this.mensagem);
 }
 
 @override
 String toString() {
   final _this = this as RelatorioNotasUiState;
-  return 'RelatorioNotasUiState(carregando: ${_this.carregando}, tituloProva: ${_this.tituloProva}, linhas: ${_this.linhas}, colunaOrdenacao: ${_this.colunaOrdenacao}, direcaoOrdenacao: ${_this.direcaoOrdenacao}, mediaDaTurma: ${_this.mediaDaTurma}, maiorNota: ${_this.maiorNota}, menorNota: ${_this.menorNota}, exportando: ${_this.exportando}, mensagem: ${_this.mensagem})';
+  return 'RelatorioNotasUiState(carregando: ${_this.carregando}, tituloProva: ${_this.tituloProva}, linhas: ${_this.linhas}, colunaOrdenacao: ${_this.colunaOrdenacao}, direcaoOrdenacao: ${_this.direcaoOrdenacao}, mediaDaTurma: ${_this.mediaDaTurma}, maiorNota: ${_this.maiorNota}, menorNota: ${_this.menorNota}, status: ${_this.status}, totalAlunosTurma: ${_this.totalAlunosTurma}, totalCorrigidos: ${_this.totalCorrigidos}, alunosPendentes: ${_this.alunosPendentes}, exportando: ${_this.exportando}, mensagem: ${_this.mensagem})';
 }
 
 
@@ -330,7 +331,7 @@ abstract mixin class $RelatorioNotasUiStateCopyWith<$Res>  {
   factory $RelatorioNotasUiStateCopyWith(RelatorioNotasUiState value, $Res Function(RelatorioNotasUiState) _then) = _$RelatorioNotasUiStateCopyWithImpl;
 @useResult
 $Res call({
- bool carregando, String tituloProva, List<LinhaRelatorioUiState> linhas, ColunaOrdenacao colunaOrdenacao, DirecaoOrdenacao direcaoOrdenacao, double mediaDaTurma, double maiorNota, double menorNota, bool exportando, String? mensagem
+ bool carregando, String tituloProva, List<LinhaRelatorioUiState> linhas, ColunaOrdenacao colunaOrdenacao, DirecaoOrdenacao direcaoOrdenacao, double mediaDaTurma, double maiorNota, double menorNota, StatusProva status, int totalAlunosTurma, int totalCorrigidos, List<String> alunosPendentes, bool exportando, String? mensagem
 });
 
 
@@ -347,7 +348,7 @@ class _$RelatorioNotasUiStateCopyWithImpl<$Res>
 
 /// Create a copy of RelatorioNotasUiState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? carregando = null,Object? tituloProva = null,Object? linhas = null,Object? colunaOrdenacao = null,Object? direcaoOrdenacao = null,Object? mediaDaTurma = null,Object? maiorNota = null,Object? menorNota = null,Object? exportando = null,Object? mensagem = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? carregando = null,Object? tituloProva = null,Object? linhas = null,Object? colunaOrdenacao = null,Object? direcaoOrdenacao = null,Object? mediaDaTurma = null,Object? maiorNota = null,Object? menorNota = null,Object? status = null,Object? totalAlunosTurma = null,Object? totalCorrigidos = null,Object? alunosPendentes = null,Object? exportando = null,Object? mensagem = freezed,}) {
   return _then(RelatorioNotasUiState(
 carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,tituloProva: null == tituloProva ? _self.tituloProva : tituloProva // ignore: cast_nullable_to_non_nullable
@@ -357,7 +358,11 @@ as ColunaOrdenacao,direcaoOrdenacao: null == direcaoOrdenacao ? _self.direcaoOrd
 as DirecaoOrdenacao,mediaDaTurma: null == mediaDaTurma ? _self.mediaDaTurma : mediaDaTurma // ignore: cast_nullable_to_non_nullable
 as double,maiorNota: null == maiorNota ? _self.maiorNota : maiorNota // ignore: cast_nullable_to_non_nullable
 as double,menorNota: null == menorNota ? _self.menorNota : menorNota // ignore: cast_nullable_to_non_nullable
-as double,exportando: null == exportando ? _self.exportando : exportando // ignore: cast_nullable_to_non_nullable
+as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as StatusProva,totalAlunosTurma: null == totalAlunosTurma ? _self.totalAlunosTurma : totalAlunosTurma // ignore: cast_nullable_to_non_nullable
+as int,totalCorrigidos: null == totalCorrigidos ? _self.totalCorrigidos : totalCorrigidos // ignore: cast_nullable_to_non_nullable
+as int,alunosPendentes: null == alunosPendentes ? _self.alunosPendentes : alunosPendentes // ignore: cast_nullable_to_non_nullable
+as List<String>,exportando: null == exportando ? _self.exportando : exportando // ignore: cast_nullable_to_non_nullable
 as bool,mensagem: freezed == mensagem ? _self.mensagem : mensagem // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -444,10 +449,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  bool exportando,  String? mensagem)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  StatusProva status,  int totalAlunosTurma,  int totalCorrigidos,  List<String> alunosPendentes,  bool exportando,  String? mensagem)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RelatorioNotasUiState() when $default != null:
-return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.exportando,_that.mensagem);case _:
+return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.status,_that.totalAlunosTurma,_that.totalCorrigidos,_that.alunosPendentes,_that.exportando,_that.mensagem);case _:
   return orElse();
 
 }
@@ -465,10 +470,10 @@ return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrde
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  bool exportando,  String? mensagem)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  StatusProva status,  int totalAlunosTurma,  int totalCorrigidos,  List<String> alunosPendentes,  bool exportando,  String? mensagem)  $default,) {final _that = this;
 switch (_that) {
 case _RelatorioNotasUiState():
-return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.exportando,_that.mensagem);case _:
+return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.status,_that.totalAlunosTurma,_that.totalCorrigidos,_that.alunosPendentes,_that.exportando,_that.mensagem);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -485,10 +490,10 @@ return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrde
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  bool exportando,  String? mensagem)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool carregando,  String tituloProva,  List<LinhaRelatorioUiState> linhas,  ColunaOrdenacao colunaOrdenacao,  DirecaoOrdenacao direcaoOrdenacao,  double mediaDaTurma,  double maiorNota,  double menorNota,  StatusProva status,  int totalAlunosTurma,  int totalCorrigidos,  List<String> alunosPendentes,  bool exportando,  String? mensagem)?  $default,) {final _that = this;
 switch (_that) {
 case _RelatorioNotasUiState() when $default != null:
-return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.exportando,_that.mensagem);case _:
+return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrdenacao,_that.direcaoOrdenacao,_that.mediaDaTurma,_that.maiorNota,_that.menorNota,_that.status,_that.totalAlunosTurma,_that.totalCorrigidos,_that.alunosPendentes,_that.exportando,_that.mensagem);case _:
   return null;
 
 }
@@ -500,7 +505,7 @@ return $default(_that.carregando,_that.tituloProva,_that.linhas,_that.colunaOrde
 
 
 class _RelatorioNotasUiState implements RelatorioNotasUiState {
-  const _RelatorioNotasUiState({this.carregando = true, this.tituloProva = '',  List<LinhaRelatorioUiState> linhas = const <LinhaRelatorioUiState>[], this.colunaOrdenacao = ColunaOrdenacao.aluno, this.direcaoOrdenacao = DirecaoOrdenacao.ascendente, this.mediaDaTurma = 0.0, this.maiorNota = 0.0, this.menorNota = 0.0, this.exportando = false, this.mensagem}): _linhas = linhas;
+  const _RelatorioNotasUiState({this.carregando = true, this.tituloProva = '',  List<LinhaRelatorioUiState> linhas = const <LinhaRelatorioUiState>[], this.colunaOrdenacao = ColunaOrdenacao.aluno, this.direcaoOrdenacao = DirecaoOrdenacao.ascendente, this.mediaDaTurma = 0.0, this.maiorNota = 0.0, this.menorNota = 0.0, this.status = StatusProva.pendente, this.totalAlunosTurma = 0, this.totalCorrigidos = 0,  List<String> alunosPendentes = const <String>[], this.exportando = false, this.mensagem}): _linhas = linhas,_alunosPendentes = alunosPendentes;
   
 
 @override@JsonKey() final  bool carregando;
@@ -517,6 +522,18 @@ class _RelatorioNotasUiState implements RelatorioNotasUiState {
 @override@JsonKey() final  double mediaDaTurma;
 @override@JsonKey() final  double maiorNota;
 @override@JsonKey() final  double menorNota;
+@override@JsonKey() final  StatusProva status;
+@override@JsonKey() final  int totalAlunosTurma;
+@override@JsonKey() final  int totalCorrigidos;
+/// Nomes dos alunos da turma da prova que ainda não foram corrigidos.
+ final  List<String> _alunosPendentes;
+/// Nomes dos alunos da turma da prova que ainda não foram corrigidos.
+@override@JsonKey() List<String> get alunosPendentes {
+  if (_alunosPendentes is EqualUnmodifiableListView) return _alunosPendentes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_alunosPendentes);
+}
+
 @override@JsonKey() final  bool exportando;
 /// Resultado da última exportação, para o snackbar; volta a `null` depois de exibido.
 @override final  String? mensagem;
@@ -531,18 +548,18 @@ _$RelatorioNotasUiStateCopyWith<_RelatorioNotasUiState> get copyWith => __$Relat
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RelatorioNotasUiState&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.tituloProva, tituloProva) || other.tituloProva == tituloProva)&&const DeepCollectionEquality().equals(other.linhas, _linhas)&&(identical(other.colunaOrdenacao, colunaOrdenacao) || other.colunaOrdenacao == colunaOrdenacao)&&(identical(other.direcaoOrdenacao, direcaoOrdenacao) || other.direcaoOrdenacao == direcaoOrdenacao)&&(identical(other.mediaDaTurma, mediaDaTurma) || other.mediaDaTurma == mediaDaTurma)&&(identical(other.maiorNota, maiorNota) || other.maiorNota == maiorNota)&&(identical(other.menorNota, menorNota) || other.menorNota == menorNota)&&(identical(other.exportando, exportando) || other.exportando == exportando)&&(identical(other.mensagem, mensagem) || other.mensagem == mensagem));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RelatorioNotasUiState&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.tituloProva, tituloProva) || other.tituloProva == tituloProva)&&const DeepCollectionEquality().equals(other.linhas, _linhas)&&(identical(other.colunaOrdenacao, colunaOrdenacao) || other.colunaOrdenacao == colunaOrdenacao)&&(identical(other.direcaoOrdenacao, direcaoOrdenacao) || other.direcaoOrdenacao == direcaoOrdenacao)&&(identical(other.mediaDaTurma, mediaDaTurma) || other.mediaDaTurma == mediaDaTurma)&&(identical(other.maiorNota, maiorNota) || other.maiorNota == maiorNota)&&(identical(other.menorNota, menorNota) || other.menorNota == menorNota)&&(identical(other.status, status) || other.status == status)&&(identical(other.totalAlunosTurma, totalAlunosTurma) || other.totalAlunosTurma == totalAlunosTurma)&&(identical(other.totalCorrigidos, totalCorrigidos) || other.totalCorrigidos == totalCorrigidos)&&const DeepCollectionEquality().equals(other.alunosPendentes, _alunosPendentes)&&(identical(other.exportando, exportando) || other.exportando == exportando)&&(identical(other.mensagem, mensagem) || other.mensagem == mensagem));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,carregando,tituloProva,const DeepCollectionEquality().hash(_linhas),colunaOrdenacao,direcaoOrdenacao,mediaDaTurma,maiorNota,menorNota,exportando,mensagem);
+    return Object.hash(runtimeType,carregando,tituloProva,const DeepCollectionEquality().hash(_linhas),colunaOrdenacao,direcaoOrdenacao,mediaDaTurma,maiorNota,menorNota,status,totalAlunosTurma,totalCorrigidos,const DeepCollectionEquality().hash(_alunosPendentes),exportando,mensagem);
 }
 
 @override
 String toString() {
-    return 'RelatorioNotasUiState(carregando: $carregando, tituloProva: $tituloProva, linhas: $linhas, colunaOrdenacao: $colunaOrdenacao, direcaoOrdenacao: $direcaoOrdenacao, mediaDaTurma: $mediaDaTurma, maiorNota: $maiorNota, menorNota: $menorNota, exportando: $exportando, mensagem: $mensagem)';
+    return 'RelatorioNotasUiState(carregando: $carregando, tituloProva: $tituloProva, linhas: $linhas, colunaOrdenacao: $colunaOrdenacao, direcaoOrdenacao: $direcaoOrdenacao, mediaDaTurma: $mediaDaTurma, maiorNota: $maiorNota, menorNota: $menorNota, status: $status, totalAlunosTurma: $totalAlunosTurma, totalCorrigidos: $totalCorrigidos, alunosPendentes: $alunosPendentes, exportando: $exportando, mensagem: $mensagem)';
 }
 
 
@@ -553,7 +570,7 @@ abstract mixin class _$RelatorioNotasUiStateCopyWith<$Res> implements $Relatorio
   factory _$RelatorioNotasUiStateCopyWith(_RelatorioNotasUiState value, $Res Function(_RelatorioNotasUiState) _then) = __$RelatorioNotasUiStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool carregando, String tituloProva, List<LinhaRelatorioUiState> linhas, ColunaOrdenacao colunaOrdenacao, DirecaoOrdenacao direcaoOrdenacao, double mediaDaTurma, double maiorNota, double menorNota, bool exportando, String? mensagem
+ bool carregando, String tituloProva, List<LinhaRelatorioUiState> linhas, ColunaOrdenacao colunaOrdenacao, DirecaoOrdenacao direcaoOrdenacao, double mediaDaTurma, double maiorNota, double menorNota, StatusProva status, int totalAlunosTurma, int totalCorrigidos, List<String> alunosPendentes, bool exportando, String? mensagem
 });
 
 
@@ -570,7 +587,7 @@ class __$RelatorioNotasUiStateCopyWithImpl<$Res>
 
 /// Create a copy of RelatorioNotasUiState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? carregando = null,Object? tituloProva = null,Object? linhas = null,Object? colunaOrdenacao = null,Object? direcaoOrdenacao = null,Object? mediaDaTurma = null,Object? maiorNota = null,Object? menorNota = null,Object? exportando = null,Object? mensagem = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? carregando = null,Object? tituloProva = null,Object? linhas = null,Object? colunaOrdenacao = null,Object? direcaoOrdenacao = null,Object? mediaDaTurma = null,Object? maiorNota = null,Object? menorNota = null,Object? status = null,Object? totalAlunosTurma = null,Object? totalCorrigidos = null,Object? alunosPendentes = null,Object? exportando = null,Object? mensagem = freezed,}) {
   return _then(_RelatorioNotasUiState(
 carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,tituloProva: null == tituloProva ? _self.tituloProva : tituloProva // ignore: cast_nullable_to_non_nullable
@@ -580,7 +597,11 @@ as ColunaOrdenacao,direcaoOrdenacao: null == direcaoOrdenacao ? _self.direcaoOrd
 as DirecaoOrdenacao,mediaDaTurma: null == mediaDaTurma ? _self.mediaDaTurma : mediaDaTurma // ignore: cast_nullable_to_non_nullable
 as double,maiorNota: null == maiorNota ? _self.maiorNota : maiorNota // ignore: cast_nullable_to_non_nullable
 as double,menorNota: null == menorNota ? _self.menorNota : menorNota // ignore: cast_nullable_to_non_nullable
-as double,exportando: null == exportando ? _self.exportando : exportando // ignore: cast_nullable_to_non_nullable
+as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as StatusProva,totalAlunosTurma: null == totalAlunosTurma ? _self.totalAlunosTurma : totalAlunosTurma // ignore: cast_nullable_to_non_nullable
+as int,totalCorrigidos: null == totalCorrigidos ? _self.totalCorrigidos : totalCorrigidos // ignore: cast_nullable_to_non_nullable
+as int,alunosPendentes: null == alunosPendentes ? _self._alunosPendentes : alunosPendentes // ignore: cast_nullable_to_non_nullable
+as List<String>,exportando: null == exportando ? _self.exportando : exportando // ignore: cast_nullable_to_non_nullable
 as bool,mensagem: freezed == mensagem ? _self.mensagem : mensagem // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/local/relation/progresso_prova.dart';
 import '../../../data/local/relation/prova_com_questoes.dart';
+import '../../../domain/prova/status_prova.dart';
 import '../../components/prova_facil_card.dart';
+import '../../../data/local/app_database.dart';
+import '../../../data/repository/aluno_repository.dart';
 import '../pdf/pdf_prova_view_model.dart';
+import '../pdf/selecao_alunos_pdf_dialog.dart';
 import 'prova_list_view_model.dart';
 
 class ProvaListScreen extends StatelessWidget {
@@ -31,7 +36,7 @@ class ProvaListScreen extends StatelessWidget {
     final tema = Theme.of(context);
 
     return ChangeNotifierProvider(
-      create: (_) => PdfProvaViewModel(),
+      create: (_) => PdfProvaViewModel(AlunoRepository(context.read<AppDatabase>())),
       child: Builder(
         builder: (context) {
           // Exibe snackbar quando há erro de geração de PDF
@@ -115,13 +120,12 @@ class ProvaListScreen extends StatelessWidget {
                             return _ProvaListItem(
                               key: ValueKey(provaId),
                               provaComQuestoes: provaComQuestoes,
+                              progresso: viewModel.progressoDe(provaId),
                               onClick: () => onEditarProva(provaId),
                               onAbrirGabarito: () => onAbrirGabarito(provaId),
                               onCorrigir: () => onCorrigirProva(provaId),
                               onExcluir: () => viewModel.excluirProva(provaComQuestoes.prova),
-                              onGerarPdf: () => context
-                                  .read<PdfProvaViewModel>()
-                                  .gerarECompartilhar(provaComQuestoes),
+                              onGerarPdf: () => _gerarPdf(context, provaComQuestoes),
                             );
                           },
                         ),
@@ -135,10 +139,25 @@ class ProvaListScreen extends StatelessWidget {
   }
 }
 
+Future<void> _gerarPdf(BuildContext context, ProvaComQuestoes prova) async {
+  final viewModel = context.read<PdfProvaViewModel>();
+  final alunos = await viewModel.alunosDaProva(prova.prova);
+  if (!context.mounted) return;
+  final escolha = await escolherAlunosDoPdf(context, alunos: alunos, turma: prova.prova.turma);
+  if (escolha == null) return;
+  switch (escolha.acao) {
+    case AcaoPdf.visualizar:
+      await viewModel.visualizar(prova, escolha.alunos);
+    case AcaoPdf.compartilhar:
+      await viewModel.compartilhar(prova, escolha.alunos);
+  }
+}
+
 class _ProvaListItem extends StatelessWidget {
   const _ProvaListItem({
     super.key,
     required this.provaComQuestoes,
+    required this.progresso,
     required this.onClick,
     required this.onAbrirGabarito,
     required this.onCorrigir,
@@ -147,6 +166,7 @@ class _ProvaListItem extends StatelessWidget {
   });
 
   final ProvaComQuestoes provaComQuestoes;
+  final ProgressoProva? progresso;
   final VoidCallback onClick;
   final VoidCallback onAbrirGabarito;
   final VoidCallback onCorrigir;
@@ -189,6 +209,10 @@ class _ProvaListItem extends StatelessWidget {
                             color: tema.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (progresso != null) ...[
+                          const SizedBox(height: 8),
+                          _ChipStatusProva(progresso: progresso!),
+                        ],
                       ],
                     ),
                   ),
@@ -217,6 +241,32 @@ class _ProvaListItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Chip com o status da prova e "X de Y corrigidos".
+class _ChipStatusProva extends StatelessWidget {
+  const _ChipStatusProva({required this.progresso});
+
+  final ProgressoProva progresso;
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+    final status = progresso.status;
+    final (fundo, texto) = switch (status) {
+      StatusProva.pendente => (cores.surfaceContainerHighest, cores.onSurfaceVariant),
+      StatusProva.emCorrecao => (cores.tertiaryContainer, cores.onTertiaryContainer),
+      StatusProva.corrigida => (cores.primaryContainer, cores.onPrimaryContainer),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: fundo, borderRadius: BorderRadius.circular(16)),
+      child: Text(
+        '${status.rotulo} · ${progresso.textoProgresso}',
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: texto),
       ),
     );
   }
