@@ -1,22 +1,36 @@
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/backup/backup_firestore.dart';
+import '../../data/backup/backup_resultados.dart';
+import '../../data/backup/id_instalacao.dart';
 import '../../data/local/app_database.dart';
+import '../../data/repository/aluno_repository.dart';
+import '../../data/repository/backup_nuvem_repository.dart';
 import '../../data/repository/prova_repository.dart';
-import '../components/tela_provisoria.dart';
+import '../alunos/alunos_screen.dart';
+import '../alunos/alunos_view_model.dart';
+import '../../data/repository/historico_repository.dart';
+import '../../data/repository/estatisticas_repository.dart';
+import '../correcao/correcao_rotas.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
 import '../provas/gabarito/gabarito_screen.dart';
 import '../provas/gabarito/gabarito_view_model.dart';
 import '../provas/list/prova_list_screen.dart';
 import '../provas/list/prova_list_view_model.dart';
+import '../historico/historico_screen.dart';
+import '../historico/historico_view_model.dart';
+import '../estatisticas/estatisticas_screen.dart';
+import '../estatisticas/estatisticas_view_model.dart';
+import '../relatorio/relatorio_notas_screen.dart';
+import '../scanner/qr_code_scanner_view_model.dart';
+import '../scanner/scan_respostas_screen.dart';
+import '../scanner/scan_respostas_view_model.dart';
+import '../scanner/scanner_screen.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
-const _argAluno = 'aluno';
-const _argTurma = 'turma';
-const _argRespostas = 'respostas';
-const _argResultadoId = 'resultadoId';
 
 const rotaLista = '/provas';
 const rotaAlunos = '/alunos';
@@ -39,7 +53,9 @@ int? _idOpcional(String? valor) {
   return id == -1 ? null : id;
 }
 
-GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
+/// [backup] troca o envio para o Firestore (usado nos testes); sem ele, vale o Firestore real.
+GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados? backup}) =>
+    GoRouter(
       initialLocation: initialLocation,
       routes: [
         GoRoute(
@@ -92,7 +108,18 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           path: '/scan_qr',
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
-            return TelaProvisoria(nome: 'Scanner', parametros: {_argProvaId: provaId});
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => QrCodeScannerViewModel(
+                ProvaRepository(database),
+                AlunoRepository(database),
+                provaIdInicial: provaId,
+              ),
+              child: QrCodeScannerScreen(
+                onVoltar: () => context.pop(),
+                onContinuar: (textoQr) => context.push(rotaScanRespostas(provaId, textoQr)),
+              ),
+            );
           },
         ),
         GoRoute(
@@ -100,54 +127,85 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista}) => GoRouter(
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
             final textoQr = state.uri.queryParameters[_argQr];
-            return TelaProvisoria(
-              nome: 'ScanRespostas',
-              parametros: {_argProvaId: provaId, _argQr: textoQr},
+            return ChangeNotifierProvider(
+              create: (context) => ScanRespostasViewModel(
+                ProvaRepository(context.read<AppDatabase>()),
+                provaEscolhidaId: provaId,
+                textoQr: textoQr,
+              ),
+              child: ScanRespostasScreen(
+                onVoltar: () => context.pop(),
+                onFinalizar: (folha) => context.push(
+                  rotaCorrecao(
+                    provaId: folha.prova.provaId,
+                    aluno: folha.dadosQr.aluno,
+                    turma: folha.dadosQr.turma,
+                    respostasLidas: folha.validacao.respostas,
+                  ),
+                ),
+              ),
             );
           },
         ),
-        GoRoute(
-          path: '/correcao',
-          builder: (context, state) {
-            final parametros = state.uri.queryParameters;
-            return TelaProvisoria(
-              nome: 'Correcao',
-              parametros: {
-                _argProvaId: _idOpcional(parametros[_argProvaId]),
-                _argAluno: parametros[_argAluno] ?? '',
-                _argTurma: parametros[_argTurma] ?? '',
-                _argRespostas: parametros[_argRespostas],
-              },
-            );
-          },
-        ),
-        GoRoute(
-          path: '/resultados/:$_argResultadoId',
-          builder: (context, state) {
-            final resultadoId = int.parse(state.pathParameters[_argResultadoId]!);
-            return TelaProvisoria(nome: 'Resultado', parametros: {_argResultadoId: resultadoId});
-          },
-        ),
+        ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista), backup: backup),
         GoRoute(
           path: rotaAlunos,
-          builder: (context, state) => const TelaProvisoria(nome: 'Alunos'),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (context) => AlunosViewModel(
+              AlunoRepository(
+                context.read<AppDatabase>(),
+                backup: BackupAlunosFirestore(context.read<IdInstalacao>()),
+              ),
+            ),
+            child: AlunosScreen(onVoltar: () => context.pop()),
+          ),
         ),
         GoRoute(
-          path: rotaHistorico,
-          builder: (context, state) => const TelaProvisoria(nome: 'Historico'),
-        ),
-        GoRoute(
-          path: '/estatisticas/:$_argProvaId',
+          path: '/historico',
           builder: (context, state) {
-            final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'Estatisticas', parametros: {_argProvaId: provaId});
+            final database = context.read<AppDatabase>();
+            final backupNuvem = BackupNuvemRepository(
+              database,
+              backup ?? BackupResultadosFirestore(context.read<IdInstalacao>()),
+            );
+            return ChangeNotifierProvider(
+              create: (_) => HistoricoViewModel(
+                repository: HistoricoRepository(database),
+                enviarTudoNuvem: backupNuvem.enviarTudo,
+              ),
+              child: HistoricoScreen(
+                onVoltar: () => context.pop(),
+                onAbrirEstatisticas: (provaId) => context.push('/estatisticas/$provaId'),
+                onAbrirRelatorio: (provaId) => context.push('/relatorio/$provaId'),
+              ),
+            );
           },
         ),
         GoRoute(
-          path: '/relatorio/:$_argProvaId',
+          path: '/estatisticas/:provaId',
           builder: (context, state) {
-            final provaId = int.parse(state.pathParameters[_argProvaId]!);
-            return TelaProvisoria(nome: 'RelatorioNotas', parametros: {_argProvaId: provaId});
+            final provaId = int.parse(state.pathParameters['provaId']!);
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => EstatisticasViewModel(
+                repository: EstatisticasRepository(database),
+                provaId: provaId,
+              ),
+              child: EstatisticasScreen(
+                provaId: provaId,
+                onVoltar: () => context.pop(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/relatorio/:provaId',
+          builder: (context, state) {
+            final provaId = int.parse(state.pathParameters['provaId']!);
+            return RelatorioNotasScreen(
+              provaId: provaId,
+              onVoltar: () => context.pop(),
+            );
           },
         ),
       ],

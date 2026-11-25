@@ -6,7 +6,6 @@ import 'data/local/app_database.dart';
 import 'ui/navigation/prova_facil_nav_host.dart';
 import 'ui/theme/theme.dart';
 
-void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProvaFacilApp());
 }
@@ -29,7 +28,6 @@ class _ProvaFacilAppState extends State<ProvaFacilApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<AppDatabase>(
       create: (_) => AppDatabase(),
       dispose: (_, database) => database.close(),
       child: MaterialApp.router(
