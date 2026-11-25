@@ -3,7 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../../../data/local/relation/prova_com_questoes.dart';
 import '../../components/prova_facil_card.dart';
+import '../../../data/local/app_database.dart';
+import '../../../data/repository/aluno_repository.dart';
 import '../pdf/pdf_prova_view_model.dart';
+import '../pdf/selecao_alunos_pdf_dialog.dart';
 import 'prova_list_view_model.dart';
 
 class ProvaListScreen extends StatelessWidget {
@@ -31,7 +34,7 @@ class ProvaListScreen extends StatelessWidget {
     final tema = Theme.of(context);
 
     return ChangeNotifierProvider(
-      create: (_) => PdfProvaViewModel(),
+      create: (_) => PdfProvaViewModel(AlunoRepository(context.read<AppDatabase>())),
       child: Builder(
         builder: (context) {
           // Exibe snackbar quando há erro de geração de PDF
@@ -119,9 +122,7 @@ class ProvaListScreen extends StatelessWidget {
                               onAbrirGabarito: () => onAbrirGabarito(provaId),
                               onCorrigir: () => onCorrigirProva(provaId),
                               onExcluir: () => viewModel.excluirProva(provaComQuestoes.prova),
-                              onGerarPdf: () => context
-                                  .read<PdfProvaViewModel>()
-                                  .gerarECompartilhar(provaComQuestoes),
+                              onGerarPdf: () => _gerarPdf(context, provaComQuestoes),
                             );
                           },
                         ),
@@ -132,6 +133,20 @@ class ProvaListScreen extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+Future<void> _gerarPdf(BuildContext context, ProvaComQuestoes prova) async {
+  final viewModel = context.read<PdfProvaViewModel>();
+  final alunos = await viewModel.alunosDaProva(prova.prova);
+  if (!context.mounted) return;
+  final escolha = await escolherAlunosDoPdf(context, alunos: alunos, turma: prova.prova.turma);
+  if (escolha == null) return;
+  switch (escolha.acao) {
+    case AcaoPdf.visualizar:
+      await viewModel.visualizar(prova, escolha.alunos);
+    case AcaoPdf.compartilhar:
+      await viewModel.compartilhar(prova, escolha.alunos);
   }
 }
 
