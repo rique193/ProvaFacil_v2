@@ -61,7 +61,10 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados
         GoRoute(
           path: rotaLista,
           builder: (context, state) => ChangeNotifierProvider(
-            create: (context) => ProvaListViewModel(ProvaRepository(context.read<AppDatabase>())),
+            create: (context) => ProvaListViewModel(
+              ProvaRepository(context.read<AppDatabase>()),
+              HistoricoRepository(context.read<AppDatabase>()),
+            ),
             child: ProvaListScreen(
               onNovaProva: () => context.push(rotaFormulario(null)),
               onEditarProva: (provaId) => context.push(rotaFormulario(provaId)),

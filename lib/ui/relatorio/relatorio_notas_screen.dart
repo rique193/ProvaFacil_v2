@@ -2,11 +2,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/prova/status_prova.dart';
 import '../../util/formatacao_numeros.dart';
 import 'relatorio_notas_view_model.dart';
 import 'relatorio_ui_state.dart';
 
-const _mimeXlsx = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+const _mimeXlsx =
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 /// Tela de Relatório de Notas de uma prova.
 ///
@@ -51,9 +53,8 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
     if (uiState.mensagem != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(uiState.mensagem!)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(uiState.mensagem!)));
         viewModel.mensagemExibida();
       });
     }
@@ -76,9 +77,7 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
         actions: [
           if (uiState.podeExportar)
             IconButton(
-              onPressed: uiState.exportando
-                  ? null
-                  : () => _exportar(viewModel),
+              onPressed: uiState.exportando ? null : () => _exportar(viewModel),
               tooltip: 'Exportar relatório',
               icon: const Icon(Icons.download),
             ),
@@ -89,6 +88,12 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                _PainelStatus(
+                  status: uiState.status,
+                  totalCorrigidos: uiState.totalCorrigidos,
+                  totalAlunosTurma: uiState.totalAlunosTurma,
+                  pendentes: uiState.alunosPendentes,
+                ),
                 // Painel de resumo estatístico
                 _PainelResumo(
                   totalAlunos: uiState.linhas.length,
@@ -126,15 +131,12 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
                           separatorBuilder: (context, index) =>
                               const Divider(height: 1),
                           itemBuilder: (context, indice) {
-                            return _LinhaAluno(
-                              linha: uiState.linhas[indice],
-                            );
+                            return _LinhaAluno(linha: uiState.linhas[indice]);
                           },
                         ),
                 ),
                 // Barra de progresso de exportação
-                if (uiState.exportando)
-                  const LinearProgressIndicator(),
+                if (uiState.exportando) const LinearProgressIndicator(),
               ],
             ),
     );
@@ -157,6 +159,74 @@ class _RelatorioNotasViewState extends State<_RelatorioNotasView> {
 // ---------------------------------------------------------------------------
 // Widgets auxiliares da tela
 // ---------------------------------------------------------------------------
+
+/// Status da prova, "X de Y alunos corrigidos" e os alunos da turma ainda não corrigidos.
+class _PainelStatus extends StatelessWidget {
+  const _PainelStatus({
+    required this.status,
+    required this.totalCorrigidos,
+    required this.totalAlunosTurma,
+    required this.pendentes,
+  });
+
+  final StatusProva status;
+  final int totalCorrigidos;
+  final int totalAlunosTurma;
+  final List<String> pendentes;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final progresso = totalAlunosTurma == 0
+        ? '$totalCorrigidos aluno${totalCorrigidos == 1 ? '' : 's'} corrigido${totalCorrigidos == 1 ? '' : 's'}'
+        : '$totalCorrigidos de $totalAlunosTurma alunos corrigidos';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Chip(
+                label: Text(status.rotulo),
+                visualDensity: VisualDensity.compact,
+                backgroundColor: switch (status) {
+                  StatusProva.pendente =>
+                    tema.colorScheme.surfaceContainerHighest,
+                  StatusProva.emCorrecao => tema.colorScheme.tertiaryContainer,
+                  StatusProva.corrigida => tema.colorScheme.primaryContainer,
+                },
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(progresso, style: tema.textTheme.bodyMedium),
+              ),
+            ],
+          ),
+          if (pendentes.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Ainda não corrigidos (${pendentes.length}):',
+              style: tema.textTheme.labelLarge,
+            ),
+            const SizedBox(height: 4),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 96),
+              child: SingleChildScrollView(
+                child: Text(
+                  pendentes.join(', '),
+                  style: tema.textTheme.bodySmall?.copyWith(
+                    color: tema.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
 
 class _PainelResumo extends StatelessWidget {
   const _PainelResumo({
@@ -205,7 +275,9 @@ class _ItemResumo extends StatelessWidget {
       children: [
         Text(
           valor,
-          style: tema.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: tema.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
@@ -235,7 +307,9 @@ class _CabecalhoTabela extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    final estilo = tema.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600);
+    final estilo = tema.textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
 
     IconData iconeOrdenacao(ColunaOrdenacao coluna) {
       if (colunaOrdenacao != coluna) return Icons.unfold_more;

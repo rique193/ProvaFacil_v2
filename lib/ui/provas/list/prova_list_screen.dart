@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/local/relation/progresso_prova.dart';
 import '../../../data/local/relation/prova_com_questoes.dart';
+import '../../../domain/prova/status_prova.dart';
 import '../../components/prova_facil_card.dart';
 import '../../../data/local/app_database.dart';
 import '../../../data/repository/aluno_repository.dart';
@@ -118,6 +120,7 @@ class ProvaListScreen extends StatelessWidget {
                             return _ProvaListItem(
                               key: ValueKey(provaId),
                               provaComQuestoes: provaComQuestoes,
+                              progresso: viewModel.progressoDe(provaId),
                               onClick: () => onEditarProva(provaId),
                               onAbrirGabarito: () => onAbrirGabarito(provaId),
                               onCorrigir: () => onCorrigirProva(provaId),
@@ -154,6 +157,7 @@ class _ProvaListItem extends StatelessWidget {
   const _ProvaListItem({
     super.key,
     required this.provaComQuestoes,
+    required this.progresso,
     required this.onClick,
     required this.onAbrirGabarito,
     required this.onCorrigir,
@@ -162,6 +166,7 @@ class _ProvaListItem extends StatelessWidget {
   });
 
   final ProvaComQuestoes provaComQuestoes;
+  final ProgressoProva? progresso;
   final VoidCallback onClick;
   final VoidCallback onAbrirGabarito;
   final VoidCallback onCorrigir;
@@ -204,6 +209,10 @@ class _ProvaListItem extends StatelessWidget {
                             color: tema.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (progresso != null) ...[
+                          const SizedBox(height: 8),
+                          _ChipStatusProva(progresso: progresso!),
+                        ],
                       ],
                     ),
                   ),
@@ -232,6 +241,32 @@ class _ProvaListItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Chip com o status da prova e "X de Y corrigidos".
+class _ChipStatusProva extends StatelessWidget {
+  const _ChipStatusProva({required this.progresso});
+
+  final ProgressoProva progresso;
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+    final status = progresso.status;
+    final (fundo, texto) = switch (status) {
+      StatusProva.pendente => (cores.surfaceContainerHighest, cores.onSurfaceVariant),
+      StatusProva.emCorrecao => (cores.tertiaryContainer, cores.onTertiaryContainer),
+      StatusProva.corrigida => (cores.primaryContainer, cores.onPrimaryContainer),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: fundo, borderRadius: BorderRadius.circular(16)),
+      child: Text(
+        '${status.rotulo} · ${progresso.textoProgresso}',
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: texto),
       ),
     );
   }
