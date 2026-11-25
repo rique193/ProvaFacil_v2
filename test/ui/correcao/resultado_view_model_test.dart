@@ -43,6 +43,7 @@ ResultadoComDetalhes detalhesTeste() => ResultadoComDetalhes(
     titulo: 'Prova',
     disciplina: 'Matemática',
     descricao: '',
+    turma: '',
     criadaEm: 0,
   ),
   respostas: [

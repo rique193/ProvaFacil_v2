@@ -65,6 +65,16 @@ class $ProvasTable extends Provas with TableInfo<$ProvasTable, ProvaEntity> {
     requiredDuringInsert: false,
     clientDefault: () => DateTime.now().millisecondsSinceEpoch,
   );
+  static const VerificationMeta _turmaMeta = const VerificationMeta('turma');
+  @override
+  late final GeneratedColumn<String> turma = GeneratedColumn<String>(
+    'turma',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -72,6 +82,7 @@ class $ProvasTable extends Provas with TableInfo<$ProvasTable, ProvaEntity> {
     disciplina,
     descricao,
     criadaEm,
+    turma,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -116,6 +127,12 @@ class $ProvasTable extends Provas with TableInfo<$ProvasTable, ProvaEntity> {
         criadaEm.isAcceptableOrUnknown(data['criadaEm']!, _criadaEmMeta),
       );
     }
+    if (data.containsKey('turma')) {
+      context.handle(
+        _turmaMeta,
+        turma.isAcceptableOrUnknown(data['turma']!, _turmaMeta),
+      );
+    }
     return context;
   }
 
@@ -145,6 +162,10 @@ class $ProvasTable extends Provas with TableInfo<$ProvasTable, ProvaEntity> {
         DriftSqlType.int,
         data['${effectivePrefix}criadaEm'],
       )!,
+      turma: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}turma'],
+      )!,
     );
   }
 
@@ -160,12 +181,14 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
   final String disciplina;
   final String descricao;
   final int criadaEm;
+  final String turma;
   const ProvaEntity({
     required this.id,
     required this.titulo,
     required this.disciplina,
     required this.descricao,
     required this.criadaEm,
+    required this.turma,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -175,6 +198,7 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
     map['disciplina'] = Variable<String>(disciplina);
     map['descricao'] = Variable<String>(descricao);
     map['criadaEm'] = Variable<int>(criadaEm);
+    map['turma'] = Variable<String>(turma);
     return map;
   }
 
@@ -185,6 +209,7 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
       disciplina: Value(disciplina),
       descricao: Value(descricao),
       criadaEm: Value(criadaEm),
+      turma: Value(turma),
     );
   }
 
@@ -199,6 +224,7 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
       disciplina: serializer.fromJson<String>(json['disciplina']),
       descricao: serializer.fromJson<String>(json['descricao']),
       criadaEm: serializer.fromJson<int>(json['criadaEm']),
+      turma: serializer.fromJson<String>(json['turma']),
     );
   }
   @override
@@ -210,6 +236,7 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
       'disciplina': serializer.toJson<String>(disciplina),
       'descricao': serializer.toJson<String>(descricao),
       'criadaEm': serializer.toJson<int>(criadaEm),
+      'turma': serializer.toJson<String>(turma),
     };
   }
 
@@ -219,12 +246,14 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
     String? disciplina,
     String? descricao,
     int? criadaEm,
+    String? turma,
   }) => ProvaEntity(
     id: id ?? this.id,
     titulo: titulo ?? this.titulo,
     disciplina: disciplina ?? this.disciplina,
     descricao: descricao ?? this.descricao,
     criadaEm: criadaEm ?? this.criadaEm,
+    turma: turma ?? this.turma,
   );
   ProvaEntity copyWithCompanion(ProvasCompanion data) {
     return ProvaEntity(
@@ -235,6 +264,7 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
           : this.disciplina,
       descricao: data.descricao.present ? data.descricao.value : this.descricao,
       criadaEm: data.criadaEm.present ? data.criadaEm.value : this.criadaEm,
+      turma: data.turma.present ? data.turma.value : this.turma,
     );
   }
 
@@ -245,13 +275,15 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
           ..write('titulo: $titulo, ')
           ..write('disciplina: $disciplina, ')
           ..write('descricao: $descricao, ')
-          ..write('criadaEm: $criadaEm')
+          ..write('criadaEm: $criadaEm, ')
+          ..write('turma: $turma')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, titulo, disciplina, descricao, criadaEm);
+  int get hashCode =>
+      Object.hash(id, titulo, disciplina, descricao, criadaEm, turma);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -260,7 +292,8 @@ class ProvaEntity extends DataClass implements Insertable<ProvaEntity> {
           other.titulo == this.titulo &&
           other.disciplina == this.disciplina &&
           other.descricao == this.descricao &&
-          other.criadaEm == this.criadaEm);
+          other.criadaEm == this.criadaEm &&
+          other.turma == this.turma);
 }
 
 class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
@@ -269,12 +302,14 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
   final Value<String> disciplina;
   final Value<String> descricao;
   final Value<int> criadaEm;
+  final Value<String> turma;
   const ProvasCompanion({
     this.id = const Value.absent(),
     this.titulo = const Value.absent(),
     this.disciplina = const Value.absent(),
     this.descricao = const Value.absent(),
     this.criadaEm = const Value.absent(),
+    this.turma = const Value.absent(),
   });
   ProvasCompanion.insert({
     this.id = const Value.absent(),
@@ -282,6 +317,7 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
     required String disciplina,
     this.descricao = const Value.absent(),
     this.criadaEm = const Value.absent(),
+    this.turma = const Value.absent(),
   }) : titulo = Value(titulo),
        disciplina = Value(disciplina);
   static Insertable<ProvaEntity> custom({
@@ -290,6 +326,7 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
     Expression<String>? disciplina,
     Expression<String>? descricao,
     Expression<int>? criadaEm,
+    Expression<String>? turma,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -297,6 +334,7 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
       if (disciplina != null) 'disciplina': disciplina,
       if (descricao != null) 'descricao': descricao,
       if (criadaEm != null) 'criadaEm': criadaEm,
+      if (turma != null) 'turma': turma,
     });
   }
 
@@ -306,6 +344,7 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
     Value<String>? disciplina,
     Value<String>? descricao,
     Value<int>? criadaEm,
+    Value<String>? turma,
   }) {
     return ProvasCompanion(
       id: id ?? this.id,
@@ -313,6 +352,7 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
       disciplina: disciplina ?? this.disciplina,
       descricao: descricao ?? this.descricao,
       criadaEm: criadaEm ?? this.criadaEm,
+      turma: turma ?? this.turma,
     );
   }
 
@@ -334,6 +374,9 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
     if (criadaEm.present) {
       map['criadaEm'] = Variable<int>(criadaEm.value);
     }
+    if (turma.present) {
+      map['turma'] = Variable<String>(turma.value);
+    }
     return map;
   }
 
@@ -344,7 +387,8 @@ class ProvasCompanion extends UpdateCompanion<ProvaEntity> {
           ..write('titulo: $titulo, ')
           ..write('disciplina: $disciplina, ')
           ..write('descricao: $descricao, ')
-          ..write('criadaEm: $criadaEm')
+          ..write('criadaEm: $criadaEm, ')
+          ..write('turma: $turma')
           ..write(')'))
         .toString();
   }
@@ -2438,6 +2482,1161 @@ class RespostasAlunoCompanion extends UpdateCompanion<RespostaAlunoEntity> {
   }
 }
 
+class $TurmasTable extends Turmas with TableInfo<$TurmasTable, TurmaEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TurmasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
+  @override
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE COLLATE NOCASE',
+  );
+  static const VerificationMeta _criadaEmMeta = const VerificationMeta(
+    'criadaEm',
+  );
+  @override
+  late final GeneratedColumn<int> criadaEm = GeneratedColumn<int>(
+    'criadaEm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now().millisecondsSinceEpoch,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nome, criadaEm];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'turmas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TurmaEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nome')) {
+      context.handle(
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('criadaEm')) {
+      context.handle(
+        _criadaEmMeta,
+        criadaEm.isAcceptableOrUnknown(data['criadaEm']!, _criadaEmMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TurmaEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TurmaEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      criadaEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}criadaEm'],
+      )!,
+    );
+  }
+
+  @override
+  $TurmasTable createAlias(String alias) {
+    return $TurmasTable(attachedDatabase, alias);
+  }
+}
+
+class TurmaEntity extends DataClass implements Insertable<TurmaEntity> {
+  final int id;
+  final String nome;
+  final int criadaEm;
+  const TurmaEntity({
+    required this.id,
+    required this.nome,
+    required this.criadaEm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nome'] = Variable<String>(nome);
+    map['criadaEm'] = Variable<int>(criadaEm);
+    return map;
+  }
+
+  TurmasCompanion toCompanion(bool nullToAbsent) {
+    return TurmasCompanion(
+      id: Value(id),
+      nome: Value(nome),
+      criadaEm: Value(criadaEm),
+    );
+  }
+
+  factory TurmaEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TurmaEntity(
+      id: serializer.fromJson<int>(json['id']),
+      nome: serializer.fromJson<String>(json['nome']),
+      criadaEm: serializer.fromJson<int>(json['criadaEm']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nome': serializer.toJson<String>(nome),
+      'criadaEm': serializer.toJson<int>(criadaEm),
+    };
+  }
+
+  TurmaEntity copyWith({int? id, String? nome, int? criadaEm}) => TurmaEntity(
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    criadaEm: criadaEm ?? this.criadaEm,
+  );
+  TurmaEntity copyWithCompanion(TurmasCompanion data) {
+    return TurmaEntity(
+      id: data.id.present ? data.id.value : this.id,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      criadaEm: data.criadaEm.present ? data.criadaEm.value : this.criadaEm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TurmaEntity(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nome, criadaEm);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TurmaEntity &&
+          other.id == this.id &&
+          other.nome == this.nome &&
+          other.criadaEm == this.criadaEm);
+}
+
+class TurmasCompanion extends UpdateCompanion<TurmaEntity> {
+  final Value<int> id;
+  final Value<String> nome;
+  final Value<int> criadaEm;
+  const TurmasCompanion({
+    this.id = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.criadaEm = const Value.absent(),
+  });
+  TurmasCompanion.insert({
+    this.id = const Value.absent(),
+    required String nome,
+    this.criadaEm = const Value.absent(),
+  }) : nome = Value(nome);
+  static Insertable<TurmaEntity> custom({
+    Expression<int>? id,
+    Expression<String>? nome,
+    Expression<int>? criadaEm,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nome != null) 'nome': nome,
+      if (criadaEm != null) 'criadaEm': criadaEm,
+    });
+  }
+
+  TurmasCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nome,
+    Value<int>? criadaEm,
+  }) {
+    return TurmasCompanion(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      criadaEm: criadaEm ?? this.criadaEm,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (criadaEm.present) {
+      map['criadaEm'] = Variable<int>(criadaEm.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TurmasCompanion(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DisciplinasTable extends Disciplinas
+    with TableInfo<$DisciplinasTable, DisciplinaEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DisciplinasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
+  @override
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE COLLATE NOCASE',
+  );
+  static const VerificationMeta _criadaEmMeta = const VerificationMeta(
+    'criadaEm',
+  );
+  @override
+  late final GeneratedColumn<int> criadaEm = GeneratedColumn<int>(
+    'criadaEm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now().millisecondsSinceEpoch,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nome, criadaEm];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'disciplinas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DisciplinaEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nome')) {
+      context.handle(
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('criadaEm')) {
+      context.handle(
+        _criadaEmMeta,
+        criadaEm.isAcceptableOrUnknown(data['criadaEm']!, _criadaEmMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DisciplinaEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DisciplinaEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      criadaEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}criadaEm'],
+      )!,
+    );
+  }
+
+  @override
+  $DisciplinasTable createAlias(String alias) {
+    return $DisciplinasTable(attachedDatabase, alias);
+  }
+}
+
+class DisciplinaEntity extends DataClass
+    implements Insertable<DisciplinaEntity> {
+  final int id;
+  final String nome;
+  final int criadaEm;
+  const DisciplinaEntity({
+    required this.id,
+    required this.nome,
+    required this.criadaEm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nome'] = Variable<String>(nome);
+    map['criadaEm'] = Variable<int>(criadaEm);
+    return map;
+  }
+
+  DisciplinasCompanion toCompanion(bool nullToAbsent) {
+    return DisciplinasCompanion(
+      id: Value(id),
+      nome: Value(nome),
+      criadaEm: Value(criadaEm),
+    );
+  }
+
+  factory DisciplinaEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DisciplinaEntity(
+      id: serializer.fromJson<int>(json['id']),
+      nome: serializer.fromJson<String>(json['nome']),
+      criadaEm: serializer.fromJson<int>(json['criadaEm']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nome': serializer.toJson<String>(nome),
+      'criadaEm': serializer.toJson<int>(criadaEm),
+    };
+  }
+
+  DisciplinaEntity copyWith({int? id, String? nome, int? criadaEm}) =>
+      DisciplinaEntity(
+        id: id ?? this.id,
+        nome: nome ?? this.nome,
+        criadaEm: criadaEm ?? this.criadaEm,
+      );
+  DisciplinaEntity copyWithCompanion(DisciplinasCompanion data) {
+    return DisciplinaEntity(
+      id: data.id.present ? data.id.value : this.id,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      criadaEm: data.criadaEm.present ? data.criadaEm.value : this.criadaEm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DisciplinaEntity(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nome, criadaEm);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DisciplinaEntity &&
+          other.id == this.id &&
+          other.nome == this.nome &&
+          other.criadaEm == this.criadaEm);
+}
+
+class DisciplinasCompanion extends UpdateCompanion<DisciplinaEntity> {
+  final Value<int> id;
+  final Value<String> nome;
+  final Value<int> criadaEm;
+  const DisciplinasCompanion({
+    this.id = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.criadaEm = const Value.absent(),
+  });
+  DisciplinasCompanion.insert({
+    this.id = const Value.absent(),
+    required String nome,
+    this.criadaEm = const Value.absent(),
+  }) : nome = Value(nome);
+  static Insertable<DisciplinaEntity> custom({
+    Expression<int>? id,
+    Expression<String>? nome,
+    Expression<int>? criadaEm,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nome != null) 'nome': nome,
+      if (criadaEm != null) 'criadaEm': criadaEm,
+    });
+  }
+
+  DisciplinasCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nome,
+    Value<int>? criadaEm,
+  }) {
+    return DisciplinasCompanion(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      criadaEm: criadaEm ?? this.criadaEm,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (criadaEm.present) {
+      map['criadaEm'] = Variable<int>(criadaEm.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DisciplinasCompanion(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BancoQuestoesTable extends BancoQuestoes
+    with TableInfo<$BancoQuestoesTable, BancoQuestaoEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BancoQuestoesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _disciplinaMeta = const VerificationMeta(
+    'disciplina',
+  );
+  @override
+  late final GeneratedColumn<String> disciplina = GeneratedColumn<String>(
+    'disciplina',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _enunciadoMeta = const VerificationMeta(
+    'enunciado',
+  );
+  @override
+  late final GeneratedColumn<String> enunciado = GeneratedColumn<String>(
+    'enunciado',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _criadaEmMeta = const VerificationMeta(
+    'criadaEm',
+  );
+  @override
+  late final GeneratedColumn<int> criadaEm = GeneratedColumn<int>(
+    'criadaEm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now().millisecondsSinceEpoch,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, disciplina, enunciado, criadaEm];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'banco_questoes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BancoQuestaoEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('disciplina')) {
+      context.handle(
+        _disciplinaMeta,
+        disciplina.isAcceptableOrUnknown(data['disciplina']!, _disciplinaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_disciplinaMeta);
+    }
+    if (data.containsKey('enunciado')) {
+      context.handle(
+        _enunciadoMeta,
+        enunciado.isAcceptableOrUnknown(data['enunciado']!, _enunciadoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_enunciadoMeta);
+    }
+    if (data.containsKey('criadaEm')) {
+      context.handle(
+        _criadaEmMeta,
+        criadaEm.isAcceptableOrUnknown(data['criadaEm']!, _criadaEmMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BancoQuestaoEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BancoQuestaoEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      disciplina: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}disciplina'],
+      )!,
+      enunciado: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}enunciado'],
+      )!,
+      criadaEm: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}criadaEm'],
+      )!,
+    );
+  }
+
+  @override
+  $BancoQuestoesTable createAlias(String alias) {
+    return $BancoQuestoesTable(attachedDatabase, alias);
+  }
+}
+
+class BancoQuestaoEntity extends DataClass
+    implements Insertable<BancoQuestaoEntity> {
+  final int id;
+  final String disciplina;
+  final String enunciado;
+  final int criadaEm;
+  const BancoQuestaoEntity({
+    required this.id,
+    required this.disciplina,
+    required this.enunciado,
+    required this.criadaEm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['disciplina'] = Variable<String>(disciplina);
+    map['enunciado'] = Variable<String>(enunciado);
+    map['criadaEm'] = Variable<int>(criadaEm);
+    return map;
+  }
+
+  BancoQuestoesCompanion toCompanion(bool nullToAbsent) {
+    return BancoQuestoesCompanion(
+      id: Value(id),
+      disciplina: Value(disciplina),
+      enunciado: Value(enunciado),
+      criadaEm: Value(criadaEm),
+    );
+  }
+
+  factory BancoQuestaoEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BancoQuestaoEntity(
+      id: serializer.fromJson<int>(json['id']),
+      disciplina: serializer.fromJson<String>(json['disciplina']),
+      enunciado: serializer.fromJson<String>(json['enunciado']),
+      criadaEm: serializer.fromJson<int>(json['criadaEm']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'disciplina': serializer.toJson<String>(disciplina),
+      'enunciado': serializer.toJson<String>(enunciado),
+      'criadaEm': serializer.toJson<int>(criadaEm),
+    };
+  }
+
+  BancoQuestaoEntity copyWith({
+    int? id,
+    String? disciplina,
+    String? enunciado,
+    int? criadaEm,
+  }) => BancoQuestaoEntity(
+    id: id ?? this.id,
+    disciplina: disciplina ?? this.disciplina,
+    enunciado: enunciado ?? this.enunciado,
+    criadaEm: criadaEm ?? this.criadaEm,
+  );
+  BancoQuestaoEntity copyWithCompanion(BancoQuestoesCompanion data) {
+    return BancoQuestaoEntity(
+      id: data.id.present ? data.id.value : this.id,
+      disciplina: data.disciplina.present
+          ? data.disciplina.value
+          : this.disciplina,
+      enunciado: data.enunciado.present ? data.enunciado.value : this.enunciado,
+      criadaEm: data.criadaEm.present ? data.criadaEm.value : this.criadaEm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BancoQuestaoEntity(')
+          ..write('id: $id, ')
+          ..write('disciplina: $disciplina, ')
+          ..write('enunciado: $enunciado, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, disciplina, enunciado, criadaEm);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BancoQuestaoEntity &&
+          other.id == this.id &&
+          other.disciplina == this.disciplina &&
+          other.enunciado == this.enunciado &&
+          other.criadaEm == this.criadaEm);
+}
+
+class BancoQuestoesCompanion extends UpdateCompanion<BancoQuestaoEntity> {
+  final Value<int> id;
+  final Value<String> disciplina;
+  final Value<String> enunciado;
+  final Value<int> criadaEm;
+  const BancoQuestoesCompanion({
+    this.id = const Value.absent(),
+    this.disciplina = const Value.absent(),
+    this.enunciado = const Value.absent(),
+    this.criadaEm = const Value.absent(),
+  });
+  BancoQuestoesCompanion.insert({
+    this.id = const Value.absent(),
+    required String disciplina,
+    required String enunciado,
+    this.criadaEm = const Value.absent(),
+  }) : disciplina = Value(disciplina),
+       enunciado = Value(enunciado);
+  static Insertable<BancoQuestaoEntity> custom({
+    Expression<int>? id,
+    Expression<String>? disciplina,
+    Expression<String>? enunciado,
+    Expression<int>? criadaEm,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (disciplina != null) 'disciplina': disciplina,
+      if (enunciado != null) 'enunciado': enunciado,
+      if (criadaEm != null) 'criadaEm': criadaEm,
+    });
+  }
+
+  BancoQuestoesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? disciplina,
+    Value<String>? enunciado,
+    Value<int>? criadaEm,
+  }) {
+    return BancoQuestoesCompanion(
+      id: id ?? this.id,
+      disciplina: disciplina ?? this.disciplina,
+      enunciado: enunciado ?? this.enunciado,
+      criadaEm: criadaEm ?? this.criadaEm,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (disciplina.present) {
+      map['disciplina'] = Variable<String>(disciplina.value);
+    }
+    if (enunciado.present) {
+      map['enunciado'] = Variable<String>(enunciado.value);
+    }
+    if (criadaEm.present) {
+      map['criadaEm'] = Variable<int>(criadaEm.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BancoQuestoesCompanion(')
+          ..write('id: $id, ')
+          ..write('disciplina: $disciplina, ')
+          ..write('enunciado: $enunciado, ')
+          ..write('criadaEm: $criadaEm')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BancoAlternativasTable extends BancoAlternativas
+    with TableInfo<$BancoAlternativasTable, BancoAlternativaEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BancoAlternativasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _bancoQuestaoIdMeta = const VerificationMeta(
+    'bancoQuestaoId',
+  );
+  @override
+  late final GeneratedColumn<int> bancoQuestaoId = GeneratedColumn<int>(
+    'bancoQuestaoId',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES banco_questoes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _textoMeta = const VerificationMeta('texto');
+  @override
+  late final GeneratedColumn<String> texto = GeneratedColumn<String>(
+    'texto',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _corretaMeta = const VerificationMeta(
+    'correta',
+  );
+  @override
+  late final GeneratedColumn<bool> correta = GeneratedColumn<bool>(
+    'correta',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("correta" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _ordemMeta = const VerificationMeta('ordem');
+  @override
+  late final GeneratedColumn<int> ordem = GeneratedColumn<int>(
+    'ordem',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    bancoQuestaoId,
+    texto,
+    correta,
+    ordem,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'banco_alternativas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BancoAlternativaEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bancoQuestaoId')) {
+      context.handle(
+        _bancoQuestaoIdMeta,
+        bancoQuestaoId.isAcceptableOrUnknown(
+          data['bancoQuestaoId']!,
+          _bancoQuestaoIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_bancoQuestaoIdMeta);
+    }
+    if (data.containsKey('texto')) {
+      context.handle(
+        _textoMeta,
+        texto.isAcceptableOrUnknown(data['texto']!, _textoMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textoMeta);
+    }
+    if (data.containsKey('correta')) {
+      context.handle(
+        _corretaMeta,
+        correta.isAcceptableOrUnknown(data['correta']!, _corretaMeta),
+      );
+    }
+    if (data.containsKey('ordem')) {
+      context.handle(
+        _ordemMeta,
+        ordem.isAcceptableOrUnknown(data['ordem']!, _ordemMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ordemMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BancoAlternativaEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BancoAlternativaEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      bancoQuestaoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bancoQuestaoId'],
+      )!,
+      texto: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}texto'],
+      )!,
+      correta: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}correta'],
+      )!,
+      ordem: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ordem'],
+      )!,
+    );
+  }
+
+  @override
+  $BancoAlternativasTable createAlias(String alias) {
+    return $BancoAlternativasTable(attachedDatabase, alias);
+  }
+}
+
+class BancoAlternativaEntity extends DataClass
+    implements Insertable<BancoAlternativaEntity> {
+  final int id;
+  final int bancoQuestaoId;
+  final String texto;
+  final bool correta;
+  final int ordem;
+  const BancoAlternativaEntity({
+    required this.id,
+    required this.bancoQuestaoId,
+    required this.texto,
+    required this.correta,
+    required this.ordem,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bancoQuestaoId'] = Variable<int>(bancoQuestaoId);
+    map['texto'] = Variable<String>(texto);
+    map['correta'] = Variable<bool>(correta);
+    map['ordem'] = Variable<int>(ordem);
+    return map;
+  }
+
+  BancoAlternativasCompanion toCompanion(bool nullToAbsent) {
+    return BancoAlternativasCompanion(
+      id: Value(id),
+      bancoQuestaoId: Value(bancoQuestaoId),
+      texto: Value(texto),
+      correta: Value(correta),
+      ordem: Value(ordem),
+    );
+  }
+
+  factory BancoAlternativaEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BancoAlternativaEntity(
+      id: serializer.fromJson<int>(json['id']),
+      bancoQuestaoId: serializer.fromJson<int>(json['bancoQuestaoId']),
+      texto: serializer.fromJson<String>(json['texto']),
+      correta: serializer.fromJson<bool>(json['correta']),
+      ordem: serializer.fromJson<int>(json['ordem']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bancoQuestaoId': serializer.toJson<int>(bancoQuestaoId),
+      'texto': serializer.toJson<String>(texto),
+      'correta': serializer.toJson<bool>(correta),
+      'ordem': serializer.toJson<int>(ordem),
+    };
+  }
+
+  BancoAlternativaEntity copyWith({
+    int? id,
+    int? bancoQuestaoId,
+    String? texto,
+    bool? correta,
+    int? ordem,
+  }) => BancoAlternativaEntity(
+    id: id ?? this.id,
+    bancoQuestaoId: bancoQuestaoId ?? this.bancoQuestaoId,
+    texto: texto ?? this.texto,
+    correta: correta ?? this.correta,
+    ordem: ordem ?? this.ordem,
+  );
+  BancoAlternativaEntity copyWithCompanion(BancoAlternativasCompanion data) {
+    return BancoAlternativaEntity(
+      id: data.id.present ? data.id.value : this.id,
+      bancoQuestaoId: data.bancoQuestaoId.present
+          ? data.bancoQuestaoId.value
+          : this.bancoQuestaoId,
+      texto: data.texto.present ? data.texto.value : this.texto,
+      correta: data.correta.present ? data.correta.value : this.correta,
+      ordem: data.ordem.present ? data.ordem.value : this.ordem,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BancoAlternativaEntity(')
+          ..write('id: $id, ')
+          ..write('bancoQuestaoId: $bancoQuestaoId, ')
+          ..write('texto: $texto, ')
+          ..write('correta: $correta, ')
+          ..write('ordem: $ordem')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, bancoQuestaoId, texto, correta, ordem);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BancoAlternativaEntity &&
+          other.id == this.id &&
+          other.bancoQuestaoId == this.bancoQuestaoId &&
+          other.texto == this.texto &&
+          other.correta == this.correta &&
+          other.ordem == this.ordem);
+}
+
+class BancoAlternativasCompanion
+    extends UpdateCompanion<BancoAlternativaEntity> {
+  final Value<int> id;
+  final Value<int> bancoQuestaoId;
+  final Value<String> texto;
+  final Value<bool> correta;
+  final Value<int> ordem;
+  const BancoAlternativasCompanion({
+    this.id = const Value.absent(),
+    this.bancoQuestaoId = const Value.absent(),
+    this.texto = const Value.absent(),
+    this.correta = const Value.absent(),
+    this.ordem = const Value.absent(),
+  });
+  BancoAlternativasCompanion.insert({
+    this.id = const Value.absent(),
+    required int bancoQuestaoId,
+    required String texto,
+    this.correta = const Value.absent(),
+    required int ordem,
+  }) : bancoQuestaoId = Value(bancoQuestaoId),
+       texto = Value(texto),
+       ordem = Value(ordem);
+  static Insertable<BancoAlternativaEntity> custom({
+    Expression<int>? id,
+    Expression<int>? bancoQuestaoId,
+    Expression<String>? texto,
+    Expression<bool>? correta,
+    Expression<int>? ordem,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bancoQuestaoId != null) 'bancoQuestaoId': bancoQuestaoId,
+      if (texto != null) 'texto': texto,
+      if (correta != null) 'correta': correta,
+      if (ordem != null) 'ordem': ordem,
+    });
+  }
+
+  BancoAlternativasCompanion copyWith({
+    Value<int>? id,
+    Value<int>? bancoQuestaoId,
+    Value<String>? texto,
+    Value<bool>? correta,
+    Value<int>? ordem,
+  }) {
+    return BancoAlternativasCompanion(
+      id: id ?? this.id,
+      bancoQuestaoId: bancoQuestaoId ?? this.bancoQuestaoId,
+      texto: texto ?? this.texto,
+      correta: correta ?? this.correta,
+      ordem: ordem ?? this.ordem,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bancoQuestaoId.present) {
+      map['bancoQuestaoId'] = Variable<int>(bancoQuestaoId.value);
+    }
+    if (texto.present) {
+      map['texto'] = Variable<String>(texto.value);
+    }
+    if (correta.present) {
+      map['correta'] = Variable<bool>(correta.value);
+    }
+    if (ordem.present) {
+      map['ordem'] = Variable<int>(ordem.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BancoAlternativasCompanion(')
+          ..write('id: $id, ')
+          ..write('bancoQuestaoId: $bancoQuestaoId, ')
+          ..write('texto: $texto, ')
+          ..write('correta: $correta, ')
+          ..write('ordem: $ordem')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2447,6 +3646,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AlunosTable alunos = $AlunosTable(this);
   late final $ResultadosTable resultados = $ResultadosTable(this);
   late final $RespostasAlunoTable respostasAluno = $RespostasAlunoTable(this);
+  late final $TurmasTable turmas = $TurmasTable(this);
+  late final $DisciplinasTable disciplinas = $DisciplinasTable(this);
+  late final $BancoQuestoesTable bancoQuestoes = $BancoQuestoesTable(this);
+  late final $BancoAlternativasTable bancoAlternativas =
+      $BancoAlternativasTable(this);
   late final Index indexQuestoesProvaId = Index(
     'index_questoes_provaId',
     'CREATE INDEX index_questoes_provaId ON questoes (provaId)',
@@ -2479,10 +3683,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'index_respostas_aluno_questaoId',
     'CREATE INDEX index_respostas_aluno_questaoId ON respostas_aluno (questaoId)',
   );
+  late final Index idxBancoAlternativasQuestao = Index(
+    'idx_banco_alternativas_questao',
+    'CREATE INDEX idx_banco_alternativas_questao ON banco_alternativas (bancoQuestaoId)',
+  );
   late final ProvaDao provaDao = ProvaDao(this as AppDatabase);
   late final ResultadoDao resultadoDao = ResultadoDao(this as AppDatabase);
   late final AlunoDao alunoDao = AlunoDao(this as AppDatabase);
   late final HistoricoDao historicoDao = HistoricoDao(this as AppDatabase);
+  late final TurmaDao turmaDao = TurmaDao(this as AppDatabase);
+  late final DisciplinaDao disciplinaDao = DisciplinaDao(this as AppDatabase);
+  late final BancoQuestaoDao bancoQuestaoDao = BancoQuestaoDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2494,6 +3707,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     alunos,
     resultados,
     respostasAluno,
+    turmas,
+    disciplinas,
+    bancoQuestoes,
+    bancoAlternativas,
     indexQuestoesProvaId,
     indexAlternativasQuestaoId,
     indexAlunosNomeTurma,
@@ -2502,6 +3719,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     indexResultadosAlunoId,
     indexRespostasAlunoResultadoId,
     indexRespostasAlunoQuestaoId,
+    idxBancoAlternativasQuestao,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2547,6 +3765,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ),
       result: [TableUpdate('respostas_aluno', kind: UpdateKind.delete)],
     ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'banco_questoes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('banco_alternativas', kind: UpdateKind.delete)],
+    ),
   ]);
 }
 
@@ -2556,6 +3781,7 @@ typedef $$ProvasTableCreateCompanionBuilder = ProvasCompanion Function({
   required String disciplina,
   Value<String> descricao,
   Value<int> criadaEm,
+  Value<String> turma,
 });
 typedef $$ProvasTableUpdateCompanionBuilder = ProvasCompanion Function({
   Value<int> id,
@@ -2563,6 +3789,7 @@ typedef $$ProvasTableUpdateCompanionBuilder = ProvasCompanion Function({
   Value<String> disciplina,
   Value<String> descricao,
   Value<int> criadaEm,
+  Value<String> turma,
 });
 
 final class $$ProvasTableReferences
@@ -2637,6 +3864,11 @@ class $$ProvasTableFilterComposer
 
   ColumnFilters<int> get criadaEm => $composableBuilder(
     column: $table.criadaEm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get turma => $composableBuilder(
+    column: $table.turma,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2724,6 +3956,11 @@ class $$ProvasTableOrderingComposer
     column: $table.criadaEm,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get turma => $composableBuilder(
+    column: $table.turma,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProvasTableAnnotationComposer
@@ -2751,6 +3988,9 @@ class $$ProvasTableAnnotationComposer
 
   GeneratedColumn<int> get criadaEm =>
       $composableBuilder(column: $table.criadaEm, builder: (column) => column);
+
+  GeneratedColumn<String> get turma =>
+      $composableBuilder(column: $table.turma, builder: (column) => column);
 
   Expression<T> questoesRefs<T extends Object>(
     Expression<T> Function($$QuestoesTableAnnotationComposer a) f,
@@ -2836,12 +4076,14 @@ class $$ProvasTableTableManager
                 Value<String> disciplina = const Value.absent(),
                 Value<String> descricao = const Value.absent(),
                 Value<int> criadaEm = const Value.absent(),
+                Value<String> turma = const Value.absent(),
               }) => ProvasCompanion(
                 id: id,
                 titulo: titulo,
                 disciplina: disciplina,
                 descricao: descricao,
                 criadaEm: criadaEm,
+                turma: turma,
               ),
           createCompanionCallback:
               ({
@@ -2850,12 +4092,14 @@ class $$ProvasTableTableManager
                 required String disciplina,
                 Value<String> descricao = const Value.absent(),
                 Value<int> criadaEm = const Value.absent(),
+                Value<String> turma = const Value.absent(),
               }) => ProvasCompanion.insert(
                 id: id,
                 titulo: titulo,
                 disciplina: disciplina,
                 descricao: descricao,
                 criadaEm: criadaEm,
+                turma: turma,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5060,6 +6304,935 @@ typedef $$RespostasAlunoTableProcessedTableManager =
       RespostaAlunoEntity,
       PrefetchHooks Function({bool resultadoId, bool questaoId})
     >;
+typedef $$TurmasTableCreateCompanionBuilder = TurmasCompanion Function({
+  Value<int> id,
+  required String nome,
+  Value<int> criadaEm,
+});
+typedef $$TurmasTableUpdateCompanionBuilder = TurmasCompanion Function({
+  Value<int> id,
+  Value<String> nome,
+  Value<int> criadaEm,
+});
+
+class $$TurmasTableFilterComposer
+    extends Composer<_$AppDatabase, $TurmasTable> {
+  $$TurmasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TurmasTableOrderingComposer
+    extends Composer<_$AppDatabase, $TurmasTable> {
+  $$TurmasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TurmasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TurmasTable> {
+  $$TurmasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<int> get criadaEm =>
+      $composableBuilder(column: $table.criadaEm, builder: (column) => column);
+}
+
+class $$TurmasTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TurmasTable,
+          TurmaEntity,
+          $$TurmasTableFilterComposer,
+          $$TurmasTableOrderingComposer,
+          $$TurmasTableAnnotationComposer,
+          $$TurmasTableCreateCompanionBuilder,
+          $$TurmasTableUpdateCompanionBuilder,
+          (
+            TurmaEntity,
+            BaseReferences<_$AppDatabase, $TurmasTable, TurmaEntity>,
+          ),
+          TurmaEntity,
+          PrefetchHooks Function()
+        > {
+  $$TurmasTableTableManager(_$AppDatabase db, $TurmasTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TurmasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TurmasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TurmasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> nome = const Value.absent(),
+            Value<int> criadaEm = const Value.absent(),
+          }) => TurmasCompanion(id: id, nome: nome, criadaEm: criadaEm),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String nome,
+            Value<int> criadaEm = const Value.absent(),
+          }) => TurmasCompanion.insert(id: id, nome: nome, criadaEm: criadaEm),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TurmasTable, TurmaEntity>(table),
+                  BaseReferences<_$AppDatabase, $TurmasTable, TurmaEntity>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TurmasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TurmasTable,
+      TurmaEntity,
+      $$TurmasTableFilterComposer,
+      $$TurmasTableOrderingComposer,
+      $$TurmasTableAnnotationComposer,
+      $$TurmasTableCreateCompanionBuilder,
+      $$TurmasTableUpdateCompanionBuilder,
+      (TurmaEntity, BaseReferences<_$AppDatabase, $TurmasTable, TurmaEntity>),
+      TurmaEntity,
+      PrefetchHooks Function()
+    >;
+typedef $$DisciplinasTableCreateCompanionBuilder =
+    DisciplinasCompanion Function({
+      Value<int> id,
+      required String nome,
+      Value<int> criadaEm,
+    });
+typedef $$DisciplinasTableUpdateCompanionBuilder =
+    DisciplinasCompanion Function({
+      Value<int> id,
+      Value<String> nome,
+      Value<int> criadaEm,
+    });
+
+class $$DisciplinasTableFilterComposer
+    extends Composer<_$AppDatabase, $DisciplinasTable> {
+  $$DisciplinasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DisciplinasTableOrderingComposer
+    extends Composer<_$AppDatabase, $DisciplinasTable> {
+  $$DisciplinasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DisciplinasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DisciplinasTable> {
+  $$DisciplinasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<int> get criadaEm =>
+      $composableBuilder(column: $table.criadaEm, builder: (column) => column);
+}
+
+class $$DisciplinasTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DisciplinasTable,
+          DisciplinaEntity,
+          $$DisciplinasTableFilterComposer,
+          $$DisciplinasTableOrderingComposer,
+          $$DisciplinasTableAnnotationComposer,
+          $$DisciplinasTableCreateCompanionBuilder,
+          $$DisciplinasTableUpdateCompanionBuilder,
+          (
+            DisciplinaEntity,
+            BaseReferences<_$AppDatabase, $DisciplinasTable, DisciplinaEntity>,
+          ),
+          DisciplinaEntity,
+          PrefetchHooks Function()
+        > {
+  $$DisciplinasTableTableManager(_$AppDatabase db, $DisciplinasTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DisciplinasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DisciplinasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DisciplinasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> nome = const Value.absent(),
+            Value<int> criadaEm = const Value.absent(),
+          }) => DisciplinasCompanion(id: id, nome: nome, criadaEm: criadaEm),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nome,
+                Value<int> criadaEm = const Value.absent(),
+              }) => DisciplinasCompanion.insert(
+                id: id,
+                nome: nome,
+                criadaEm: criadaEm,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DisciplinasTable, DisciplinaEntity>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DisciplinasTable,
+                    DisciplinaEntity
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DisciplinasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DisciplinasTable,
+      DisciplinaEntity,
+      $$DisciplinasTableFilterComposer,
+      $$DisciplinasTableOrderingComposer,
+      $$DisciplinasTableAnnotationComposer,
+      $$DisciplinasTableCreateCompanionBuilder,
+      $$DisciplinasTableUpdateCompanionBuilder,
+      (
+        DisciplinaEntity,
+        BaseReferences<_$AppDatabase, $DisciplinasTable, DisciplinaEntity>,
+      ),
+      DisciplinaEntity,
+      PrefetchHooks Function()
+    >;
+typedef $$BancoQuestoesTableCreateCompanionBuilder =
+    BancoQuestoesCompanion Function({
+      Value<int> id,
+      required String disciplina,
+      required String enunciado,
+      Value<int> criadaEm,
+    });
+typedef $$BancoQuestoesTableUpdateCompanionBuilder =
+    BancoQuestoesCompanion Function({
+      Value<int> id,
+      Value<String> disciplina,
+      Value<String> enunciado,
+      Value<int> criadaEm,
+    });
+
+final class $$BancoQuestoesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $BancoQuestoesTable, BancoQuestaoEntity> {
+  $$BancoQuestoesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $BancoAlternativasTable,
+    List<BancoAlternativaEntity>
+  >
+  _bancoAlternativasRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.bancoAlternativas,
+        aliasName: 'banco_questoes__id__banco_alternativas__bancoQuestaoId',
+      );
+
+  $$BancoAlternativasTableProcessedTableManager get bancoAlternativasRefs {
+    final manager = $$BancoAlternativasTableTableManager(
+      $_db,
+      $_db.bancoAlternativas,
+    ).filter((f) => f.bancoQuestaoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _bancoAlternativasRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$BancoQuestoesTableFilterComposer
+    extends Composer<_$AppDatabase, $BancoQuestoesTable> {
+  $$BancoQuestoesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get disciplina => $composableBuilder(
+    column: $table.disciplina,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get enunciado => $composableBuilder(
+    column: $table.enunciado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> bancoAlternativasRefs(
+    Expression<bool> Function($$BancoAlternativasTableFilterComposer f) f,
+  ) {
+    final $$BancoAlternativasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.bancoAlternativas,
+      getReferencedColumn: (t) => t.bancoQuestaoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BancoAlternativasTableFilterComposer(
+            $db: $db,
+            $table: $db.bancoAlternativas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$BancoQuestoesTableOrderingComposer
+    extends Composer<_$AppDatabase, $BancoQuestoesTable> {
+  $$BancoQuestoesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get disciplina => $composableBuilder(
+    column: $table.disciplina,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get enunciado => $composableBuilder(
+    column: $table.enunciado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get criadaEm => $composableBuilder(
+    column: $table.criadaEm,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BancoQuestoesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BancoQuestoesTable> {
+  $$BancoQuestoesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get disciplina => $composableBuilder(
+    column: $table.disciplina,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get enunciado =>
+      $composableBuilder(column: $table.enunciado, builder: (column) => column);
+
+  GeneratedColumn<int> get criadaEm =>
+      $composableBuilder(column: $table.criadaEm, builder: (column) => column);
+
+  Expression<T> bancoAlternativasRefs<T extends Object>(
+    Expression<T> Function($$BancoAlternativasTableAnnotationComposer a) f,
+  ) {
+    final $$BancoAlternativasTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.bancoAlternativas,
+          getReferencedColumn: (t) => t.bancoQuestaoId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$BancoAlternativasTableAnnotationComposer(
+                $db: $db,
+                $table: $db.bancoAlternativas,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$BancoQuestoesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BancoQuestoesTable,
+          BancoQuestaoEntity,
+          $$BancoQuestoesTableFilterComposer,
+          $$BancoQuestoesTableOrderingComposer,
+          $$BancoQuestoesTableAnnotationComposer,
+          $$BancoQuestoesTableCreateCompanionBuilder,
+          $$BancoQuestoesTableUpdateCompanionBuilder,
+          (BancoQuestaoEntity, $$BancoQuestoesTableReferences),
+          BancoQuestaoEntity,
+          PrefetchHooks Function({bool bancoAlternativasRefs})
+        > {
+  $$BancoQuestoesTableTableManager(_$AppDatabase db, $BancoQuestoesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BancoQuestoesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BancoQuestoesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BancoQuestoesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> disciplina = const Value.absent(),
+                Value<String> enunciado = const Value.absent(),
+                Value<int> criadaEm = const Value.absent(),
+              }) => BancoQuestoesCompanion(
+                id: id,
+                disciplina: disciplina,
+                enunciado: enunciado,
+                criadaEm: criadaEm,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String disciplina,
+                required String enunciado,
+                Value<int> criadaEm = const Value.absent(),
+              }) => BancoQuestoesCompanion.insert(
+                id: id,
+                disciplina: disciplina,
+                enunciado: enunciado,
+                criadaEm: criadaEm,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BancoQuestoesTable, BancoQuestaoEntity>(table),
+                  $$BancoQuestoesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({bancoAlternativasRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (bancoAlternativasRefs) db.bancoAlternativas,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (bancoAlternativasRefs)
+                    await $_getPrefetchedDataByColumns<
+                      BancoQuestaoEntity,
+                      $BancoQuestoesTable,
+                      BancoAlternativaEntity,
+                      $BancoAlternativasTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$BancoQuestoesTableReferences
+                          ._bancoAlternativasRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$BancoQuestoesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).bancoAlternativasRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'bancoQuestaoId',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BancoQuestoesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BancoQuestoesTable,
+      BancoQuestaoEntity,
+      $$BancoQuestoesTableFilterComposer,
+      $$BancoQuestoesTableOrderingComposer,
+      $$BancoQuestoesTableAnnotationComposer,
+      $$BancoQuestoesTableCreateCompanionBuilder,
+      $$BancoQuestoesTableUpdateCompanionBuilder,
+      (BancoQuestaoEntity, $$BancoQuestoesTableReferences),
+      BancoQuestaoEntity,
+      PrefetchHooks Function({bool bancoAlternativasRefs})
+    >;
+typedef $$BancoAlternativasTableCreateCompanionBuilder =
+    BancoAlternativasCompanion Function({
+      Value<int> id,
+      required int bancoQuestaoId,
+      required String texto,
+      Value<bool> correta,
+      required int ordem,
+    });
+typedef $$BancoAlternativasTableUpdateCompanionBuilder =
+    BancoAlternativasCompanion Function({
+      Value<int> id,
+      Value<int> bancoQuestaoId,
+      Value<String> texto,
+      Value<bool> correta,
+      Value<int> ordem,
+    });
+
+final class $$BancoAlternativasTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $BancoAlternativasTable,
+          BancoAlternativaEntity
+        > {
+  $$BancoAlternativasTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $BancoQuestoesTable _bancoQuestaoIdTable(_$AppDatabase db) => db
+      .bancoQuestoes
+      .createAlias('banco_alternativas__bancoQuestaoId__banco_questoes__id');
+
+  $$BancoQuestoesTableProcessedTableManager get bancoQuestaoId {
+    final $_column = $_itemColumn<int>('bancoQuestaoId')!;
+
+    final manager = $$BancoQuestoesTableTableManager(
+      $_db,
+      $_db.bancoQuestoes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_bancoQuestaoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$BancoAlternativasTableFilterComposer
+    extends Composer<_$AppDatabase, $BancoAlternativasTable> {
+  $$BancoAlternativasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get texto => $composableBuilder(
+    column: $table.texto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get correta => $composableBuilder(
+    column: $table.correta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ordem => $composableBuilder(
+    column: $table.ordem,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BancoQuestoesTableFilterComposer get bancoQuestaoId {
+    final $$BancoQuestoesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bancoQuestaoId,
+      referencedTable: $db.bancoQuestoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BancoQuestoesTableFilterComposer(
+            $db: $db,
+            $table: $db.bancoQuestoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BancoAlternativasTableOrderingComposer
+    extends Composer<_$AppDatabase, $BancoAlternativasTable> {
+  $$BancoAlternativasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get texto => $composableBuilder(
+    column: $table.texto,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get correta => $composableBuilder(
+    column: $table.correta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ordem => $composableBuilder(
+    column: $table.ordem,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BancoQuestoesTableOrderingComposer get bancoQuestaoId {
+    final $$BancoQuestoesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bancoQuestaoId,
+      referencedTable: $db.bancoQuestoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BancoQuestoesTableOrderingComposer(
+            $db: $db,
+            $table: $db.bancoQuestoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BancoAlternativasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BancoAlternativasTable> {
+  $$BancoAlternativasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get texto =>
+      $composableBuilder(column: $table.texto, builder: (column) => column);
+
+  GeneratedColumn<bool> get correta =>
+      $composableBuilder(column: $table.correta, builder: (column) => column);
+
+  GeneratedColumn<int> get ordem =>
+      $composableBuilder(column: $table.ordem, builder: (column) => column);
+
+  $$BancoQuestoesTableAnnotationComposer get bancoQuestaoId {
+    final $$BancoQuestoesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bancoQuestaoId,
+      referencedTable: $db.bancoQuestoes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BancoQuestoesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.bancoQuestoes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BancoAlternativasTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BancoAlternativasTable,
+          BancoAlternativaEntity,
+          $$BancoAlternativasTableFilterComposer,
+          $$BancoAlternativasTableOrderingComposer,
+          $$BancoAlternativasTableAnnotationComposer,
+          $$BancoAlternativasTableCreateCompanionBuilder,
+          $$BancoAlternativasTableUpdateCompanionBuilder,
+          (BancoAlternativaEntity, $$BancoAlternativasTableReferences),
+          BancoAlternativaEntity,
+          PrefetchHooks Function({bool bancoQuestaoId})
+        > {
+  $$BancoAlternativasTableTableManager(
+    _$AppDatabase db,
+    $BancoAlternativasTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BancoAlternativasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BancoAlternativasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BancoAlternativasTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> bancoQuestaoId = const Value.absent(),
+                Value<String> texto = const Value.absent(),
+                Value<bool> correta = const Value.absent(),
+                Value<int> ordem = const Value.absent(),
+              }) => BancoAlternativasCompanion(
+                id: id,
+                bancoQuestaoId: bancoQuestaoId,
+                texto: texto,
+                correta: correta,
+                ordem: ordem,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int bancoQuestaoId,
+                required String texto,
+                Value<bool> correta = const Value.absent(),
+                required int ordem,
+              }) => BancoAlternativasCompanion.insert(
+                id: id,
+                bancoQuestaoId: bancoQuestaoId,
+                texto: texto,
+                correta: correta,
+                ordem: ordem,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BancoAlternativasTable, BancoAlternativaEntity>(
+                    table,
+                  ),
+                  $$BancoAlternativasTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({bancoQuestaoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (bancoQuestaoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.bancoQuestaoId,
+                        referencedTable: $$BancoAlternativasTableReferences
+                            ._bancoQuestaoIdTable(db),
+                        referencedColumn: $$BancoAlternativasTableReferences
+                            ._bancoQuestaoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BancoAlternativasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BancoAlternativasTable,
+      BancoAlternativaEntity,
+      $$BancoAlternativasTableFilterComposer,
+      $$BancoAlternativasTableOrderingComposer,
+      $$BancoAlternativasTableAnnotationComposer,
+      $$BancoAlternativasTableCreateCompanionBuilder,
+      $$BancoAlternativasTableUpdateCompanionBuilder,
+      (BancoAlternativaEntity, $$BancoAlternativasTableReferences),
+      BancoAlternativaEntity,
+      PrefetchHooks Function({bool bancoQuestaoId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5076,4 +7249,12 @@ class $AppDatabaseManager {
       $$ResultadosTableTableManager(_db, _db.resultados);
   $$RespostasAlunoTableTableManager get respostasAluno =>
       $$RespostasAlunoTableTableManager(_db, _db.respostasAluno);
+  $$TurmasTableTableManager get turmas =>
+      $$TurmasTableTableManager(_db, _db.turmas);
+  $$DisciplinasTableTableManager get disciplinas =>
+      $$DisciplinasTableTableManager(_db, _db.disciplinas);
+  $$BancoQuestoesTableTableManager get bancoQuestoes =>
+      $$BancoQuestoesTableTableManager(_db, _db.bancoQuestoes);
+  $$BancoAlternativasTableTableManager get bancoAlternativas =>
+      $$BancoAlternativasTableTableManager(_db, _db.bancoAlternativas);
 }

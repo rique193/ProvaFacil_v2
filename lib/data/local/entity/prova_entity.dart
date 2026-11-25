@@ -10,4 +10,5 @@ class Provas extends Table {
   TextColumn get disciplina => text()();
   TextColumn get descricao => text().withDefault(const Constant(''))();
   IntColumn get criadaEm => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
+  TextColumn get turma => text().withDefault(const Constant(''))();
 }

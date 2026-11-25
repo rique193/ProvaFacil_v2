@@ -50,6 +50,7 @@ ProvaComQuestoes provaTeste(
     titulo: 'Prova $id',
     disciplina: 'Matemática',
     descricao: '',
+    turma: '',
     criadaEm: 0,
   ),
   questoes: [
