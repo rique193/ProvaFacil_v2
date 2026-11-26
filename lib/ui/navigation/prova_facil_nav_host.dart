@@ -6,10 +6,13 @@ import '../../data/backup/backup_resultados.dart';
 import '../../data/backup/id_instalacao.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/aluno_repository.dart';
+import '../../data/repository/auth_repository.dart';
 import '../../data/repository/backup_nuvem_repository.dart';
 import '../../data/repository/prova_repository.dart';
 import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
+import '../auth/auth_rotas.dart';
+import '../auth/menu_professor.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../data/repository/estatisticas_repository.dart';
 import '../correcao/correcao_rotas.dart';
@@ -54,10 +57,25 @@ int? _idOpcional(String? valor) {
 }
 
 /// [backup] troca o envio para o Firestore (usado nos testes); sem ele, vale o Firestore real.
-GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados? backup}) =>
+/// [auth] liga o login: sem professor logado, só abrem as telas de login e de cadastro. Sem ele
+/// (nos testes que não tratam de login), o app abre direto.
+GoRouter provaFacilNavHost({
+  String initialLocation = rotaLista,
+  BackupResultados? backup,
+  AuthRepository? auth,
+}) =>
     GoRouter(
       initialLocation: initialLocation,
+      refreshListenable: auth,
+      redirect: auth == null
+          ? null
+          : (context, state) => redirecionarPorLogin(
+              logado: auth.logado,
+              local: state.uri.path,
+              aposEntrar: rotaLista,
+            ),
       routes: [
+        if (auth != null) ...rotasDeAutenticacao(auth),
         GoRoute(
           path: rotaLista,
           builder: (context, state) => ChangeNotifierProvider(
@@ -72,6 +90,7 @@ GoRouter provaFacilNavHost({String initialLocation = rotaLista, BackupResultados
               onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
               onAbrirAlunos: () => context.push(rotaAlunos),
               onAbrirHistorico: () => context.push(rotaHistorico),
+              menuConta: auth == null ? null : MenuProfessor(auth: auth),
             ),
           ),
         ),
