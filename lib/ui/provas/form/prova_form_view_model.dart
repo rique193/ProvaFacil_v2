@@ -1,22 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../data/local/app_database.dart';
+import '../../../data/repository/disciplina_repository.dart';
 import '../../../data/repository/prova_repository.dart';
+import '../../../data/repository/turma_repository.dart';
 import '../../../domain/model/questao_input.dart';
 import '../../../util/mensagem_erro.dart';
 import 'prova_form_ui_state.dart';
 
 const _erroPadrao = 'Não foi possível carregar ou salvar a prova.';
 
-/// ViewModel da tela de conteúdo da prova: título, disciplina, descrição, enunciados e texto
-/// das alternativas. Não define qual alternativa é a correta — isso é feito na tela de
+/// ViewModel da tela de conteúdo da prova: título, disciplina, turma, descrição, enunciados e
+/// texto das alternativas. Não define qual alternativa é a correta — isso é feito na tela de
 /// Gabarito (`GabaritoViewModel`).
 class ProvaFormViewModel extends ChangeNotifier {
-  ProvaFormViewModel(this._repository, int? provaId)
-    : _uiState = ProvaFormUiState(provaId: provaId) {
+  ProvaFormViewModel(
+      this._repository,
+      int? provaId, {
+        DisciplinaRepository? disciplinaRepository,
+        TurmaRepository? turmaRepository,
+      }) : _uiState = ProvaFormUiState(provaId: provaId) {
+    _assinaturaDisciplinas = disciplinaRepository?.observarTodas().listen(
+          (disciplinas) => _atualizar((s) => s.copyWith(disciplinas: disciplinas)),
+    );
+    _assinaturaTurmas = turmaRepository?.observarTodas().listen(
+          (turmas) => _atualizar((s) => s.copyWith(turmas: turmas)),
+    );
     if (provaId != null) _carregarProva(provaId);
   }
 
   final ProvaRepository _repository;
+  StreamSubscription<List<DisciplinaEntity>>? _assinaturaDisciplinas;
+  StreamSubscription<List<TurmaEntity>>? _assinaturaTurmas;
   ProvaFormUiState _uiState;
   bool _descartado = false;
 
@@ -37,10 +54,11 @@ class ProvaFormViewModel extends ChangeNotifier {
           return porOrdem != 0 ? porOrdem : a.questao.id.compareTo(b.questao.id);
         });
       _atualizar(
-        (s) => s.copyWith(
+            (s) => s.copyWith(
           carregando: false,
           titulo: provaComQuestoes.prova.titulo,
           disciplina: provaComQuestoes.prova.disciplina,
+          turma: provaComQuestoes.prova.turma,
           descricao: provaComQuestoes.prova.descricao,
           questoes: [
             for (final questaoComAlternativas in questoes)
@@ -68,14 +86,17 @@ class ProvaFormViewModel extends ChangeNotifier {
   void atualizarDisciplina(String valor) =>
       _atualizarFormulario((s) => s.copyWith(disciplina: valor, erro: null));
 
+  void atualizarTurma(String valor) =>
+      _atualizarFormulario((s) => s.copyWith(turma: valor, erro: null));
+
   void atualizarDescricao(String valor) => _atualizarFormulario((s) => s.copyWith(descricao: valor));
 
   void adicionarQuestao() => _atualizarFormulario(
-    (s) => s.copyWith(questoes: [...s.questoes, const QuestaoFormState()], erro: null),
+        (s) => s.copyWith(questoes: [...s.questoes, const QuestaoFormState()], erro: null),
   );
 
   void removerQuestao(int questaoIndice) => _atualizarFormulario(
-    (s) => s.copyWith(questoes: [...s.questoes]..removeAt(questaoIndice)),
+        (s) => s.copyWith(questoes: [...s.questoes]..removeAt(questaoIndice)),
   );
 
   void atualizarEnunciado(int questaoIndice, String valor) =>
@@ -84,7 +105,7 @@ class ProvaFormViewModel extends ChangeNotifier {
   void atualizarTextoAlternativa(int questaoIndice, int alternativaIndice, String valor) =>
       _atualizarQuestao(
         questaoIndice,
-        (q) => q.copyWith(
+            (q) => q.copyWith(
           alternativas: [...q.alternativas]
             ..[alternativaIndice] = q.alternativas[alternativaIndice].copyWith(texto: valor),
         ),
@@ -105,6 +126,7 @@ class ProvaFormViewModel extends ChangeNotifier {
         provaId: estadoAtual.provaId,
         titulo: estadoAtual.titulo.trim(),
         disciplina: estadoAtual.disciplina.trim(),
+        turma: estadoAtual.turma.trim(),
         descricao: estadoAtual.descricao.trim(),
         questoes: [
           for (final questao in estadoAtual.questoes)
@@ -128,7 +150,7 @@ class ProvaFormViewModel extends ChangeNotifier {
 
   void _atualizarQuestao(int questaoIndice, QuestaoFormState Function(QuestaoFormState) f) =>
       _atualizarFormulario(
-        (s) => s.copyWith(
+            (s) => s.copyWith(
           questoes: [...s.questoes]..[questaoIndice] = f(s.questoes[questaoIndice]),
           erro: null,
         ),
@@ -156,6 +178,7 @@ class ProvaFormViewModel extends ChangeNotifier {
   }
 
   void _atualizar(ProvaFormUiState Function(ProvaFormUiState) f) {
+    if (_descartado) return;
     _uiState = f(_uiState);
     notifyListeners();
   }
@@ -163,6 +186,8 @@ class ProvaFormViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _descartado = true;
+    _assinaturaDisciplinas?.cancel();
+    _assinaturaTurmas?.cancel();
     super.dispose();
   }
 }

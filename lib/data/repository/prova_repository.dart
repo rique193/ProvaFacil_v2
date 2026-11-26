@@ -22,6 +22,7 @@ class ProvaRepository {
     required int? provaId,
     required String titulo,
     required String disciplina,
+    String turma = '',
     required String descricao,
     required List<QuestaoInput> questoes,
   }) => _database.transaction(() async {
@@ -45,6 +46,7 @@ class ProvaRepository {
         ProvasCompanion.insert(
           titulo: titulo.trim(),
           disciplina: disciplina.trim(),
+          turma: Value(turma.trim()),
           descricao: Value(descricao.trim()),
         ),
       );
@@ -54,6 +56,7 @@ class ProvaRepository {
         titulo.trim(),
         disciplina.trim(),
         descricao.trim(),
+        turma: turma.trim(),
       );
       _exigir(alteradas == 1, 'Prova não encontrada.');
       idFinal = provaId;
@@ -119,7 +122,7 @@ class ProvaRepository {
   /// Define, para cada questão informada, qual alternativa é a correta. [respostas] mapeia
   /// o id da questão para o id da alternativa marcada como certa.
   Future<void> salvarGabarito(int provaId, Map<int, int> respostas) => _database.transaction(
-    () async {
+        () async {
       final questoes = await _dao.listarQuestoesComAlternativas(provaId);
       _exigir(questoes.isNotEmpty, 'Prova não encontrada ou sem questões.');
       final idsDaProva = questoes.map((q) => q.questao.id).toSet();

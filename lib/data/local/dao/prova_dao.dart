@@ -46,11 +46,18 @@ class ProvaDao extends DatabaseAccessor<AppDatabase> with _$ProvaDaoMixin {
 
   Future<int> inserirProva(Insertable<ProvaEntity> prova) => into(provas).insert(prova);
 
-  Future<int> atualizarProva(int provaId, String titulo, String disciplina, String descricao) =>
+  Future<int> atualizarProva(
+      int provaId,
+      String titulo,
+      String disciplina,
+      String descricao, {
+        String turma = '',
+      }) =>
       (update(provas)..where((p) => p.id.equals(provaId))).write(
         ProvasCompanion(
           titulo: Value(titulo),
           disciplina: Value(disciplina),
+          turma: Value(turma),
           descricao: Value(descricao),
         ),
       );

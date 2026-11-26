@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../data/repository/turma_repository.dart';
 import '../../data/local/app_database.dart';
 import '../../data/repository/aluno_repository.dart';
 import '../../util/mensagem_erro.dart';
@@ -10,14 +11,18 @@ import 'alunos_ui_state.dart';
 /// ViewModel da tela de Alunos: observa os alunos salvos no banco e cadastra, edita e exclui pelo
 /// [AlunoRepository], que aplica as regras de turma, matrícula e e-mail.
 class AlunosViewModel extends ChangeNotifier {
-  AlunosViewModel(this._repository) {
+  AlunosViewModel(this._repository, {TurmaRepository? turmaRepository}) {
     _assinatura = _repository.observarAlunos().listen(
-      (alunos) => _atualizar((s) => s.copyWith(alunos: alunos, carregando: false)),
+          (alunos) => _atualizar((s) => s.copyWith(alunos: alunos, carregando: false)),
+    );
+    _assinaturaTurmas = turmaRepository?.observarTodas().listen(
+          (turmas) => _atualizar((s) => s.copyWith(turmas: turmas)),
     );
   }
 
   final AlunoRepository _repository;
   late final StreamSubscription<List<AlunoEntity>> _assinatura;
+  StreamSubscription<List<TurmaEntity>>? _assinaturaTurmas;
   bool _descartado = false;
 
   AlunosUiState _uiState = const AlunosUiState();
@@ -140,6 +145,7 @@ class AlunosViewModel extends ChangeNotifier {
   void dispose() {
     _descartado = true;
     _assinatura.cancel();
+    _assinaturaTurmas?.cancel();
     super.dispose();
   }
 }
