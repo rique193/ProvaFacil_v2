@@ -12,6 +12,8 @@ class ProvaFacilTextField extends StatefulWidget {
     this.keyboardType,
     this.singleLine = false,
     this.enabled = true,
+    this.obscureText = false,
+    this.suffixIcon,
   });
 
   final TextEditingController? controller;
@@ -21,6 +23,10 @@ class ProvaFacilTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool singleLine;
   final bool enabled;
+
+  /// Esconde o texto digitado (senha). O campo fica com uma linha só.
+  final bool obscureText;
+  final Widget? suffixIcon;
 
   @override
   State<ProvaFacilTextField> createState() => _ProvaFacilTextFieldState();
@@ -59,9 +65,11 @@ class _ProvaFacilTextFieldState extends State<ProvaFacilTextField> {
       onChanged: widget.onChanged,
       enabled: widget.enabled,
       keyboardType: widget.keyboardType,
-      maxLines: widget.singleLine ? 1 : null,
+      obscureText: widget.obscureText,
+      maxLines: widget.singleLine || widget.obscureText ? 1 : null,
       decoration: InputDecoration(
         labelText: widget.label,
+        suffixIcon: widget.suffixIcon,
         border: OutlineInputBorder(borderRadius: forma),
         enabledBorder: OutlineInputBorder(
           borderRadius: forma,
