@@ -157,7 +157,7 @@ GoRouter provaFacilNavHost({
                 onVoltar: () => context.pop(),
                 onGerada: (id) => context.pushReplacement(rotaVisualizarProva(id)),
                 // Contrato do Membro 1: rotaBancoQuestoes() => '/banco-questoes'.
-                onAbrirBancoQuestoes: () => context.push('/banco-questoes'),
+                onAbrirBancoQuestoes: () => context.push(rotaBancoQuestoes()),
               ),
             );
           },
