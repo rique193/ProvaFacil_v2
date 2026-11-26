@@ -71,8 +71,9 @@ class LoginScreen extends StatelessWidget {
                     onPressed: viewModel.entrar,
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text('Ainda não tem conta?'),
                       TextButton(

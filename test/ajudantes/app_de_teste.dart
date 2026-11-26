@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/data/backup/backup_resultados.dart';
 import 'package:provafacil/data/backup/id_instalacao.dart';
 import 'package:provafacil/data/local/app_database.dart';
+import 'package:provafacil/data/repository/auth_repository.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,11 +24,13 @@ Future<void> esperarBanco(WidgetTester tester) async {
 }
 
 /// Abre o app na [rota] com um banco em memória e o devolve para o teste preparar dados.
+/// Sem [auth], o app abre sem pedir login.
 Future<AppDatabase> abrirApp(
   WidgetTester tester,
   String rota, {
   AppDatabase? database,
   BackupResultados? backup,
+  AuthRepository? auth,
 }) async {
   final db = database ?? criarBancoParaWidgetTest();
   tester.view
@@ -46,7 +49,7 @@ Future<AppDatabase> abrirApp(
         Provider<IdInstalacao>(create: (_) => IdInstalacao()),
       ],
       child: MaterialApp.router(
-        routerConfig: provaFacilNavHost(initialLocation: rota, backup: backup),
+        routerConfig: provaFacilNavHost(initialLocation: rota, backup: backup, auth: auth),
       ),
     ),
   );
