@@ -14,6 +14,7 @@ class HistoricoViewModel extends ChangeNotifier {
   HistoricoViewModel({
     required this._repository,
     this._enviarTudoNuvem,
+    this._contaId,
   }) {
     _inscricao = _repository.observarProvasCorrigidas().listen((provas) {
       final avaliacoes = provas
@@ -41,13 +42,17 @@ class HistoricoViewModel extends ChangeNotifier {
 
   static const String _tag = 'HistoricoViewModel';
 
-  /// Se a sincronização desta execução do app já foi feita.
-  static bool _sincronizado = false;
+  /// Contas (uid) cuja sincronização desta execução do app já foi feita. Sem conta (testes), vale `''`.
+  static final Set<String> _sincronizadas = {};
 
   @visibleForTesting
   static void resetarSincronizacaoParaTeste() {
-    _sincronizado = false;
+    _sincronizadas.clear();
   }
+
+  /// Uid da conta dona do banco; a sincronização vale uma vez por conta, não uma por app.
+  final String? _contaId;
+  String get _chaveConta => _contaId ?? '';
 
   final HistoricoRepository _repository;
   final Future<void> Function()? _enviarTudoNuvem;
@@ -64,11 +69,11 @@ class HistoricoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Envia todos os alunos e resultados para a nuvem, uma vez por execução do app, para cobrir as
+  /// Envia todos os alunos e resultados para a nuvem, uma vez por conta a cada execução do app, para cobrir as
   /// correções feitas antes do backup existir. Silencioso: não espera a rede nem mostra mensagem.
   void sincronizarComNuvem() {
-    if (_sincronizado) return;
-    _sincronizado = true;
+    if (_sincronizadas.contains(_chaveConta)) return;
+    _sincronizadas.add(_chaveConta);
 
     final enviar = _enviarTudoNuvem;
     if (enviar == null) return;
@@ -77,7 +82,7 @@ class HistoricoViewModel extends ChangeNotifier {
       try {
         await enviar();
       } catch (e) {
-        _sincronizado = false; // tenta de novo na próxima vez que o Histórico abrir
+        _sincronizadas.remove(_chaveConta); // tenta de novo na próxima vez que o Histórico abrir
         log(
           'Falha na sincronização com a nuvem; os dados locais não mudaram.',
           name: _tag,

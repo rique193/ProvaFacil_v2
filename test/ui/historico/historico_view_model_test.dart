@@ -24,10 +24,14 @@ void main() {
     await db.close();
   });
 
-  Future<HistoricoViewModel> abrirHistorico(Future<void> Function() enviarTudoNuvem) async {
+  Future<HistoricoViewModel> abrirHistorico(
+    Future<void> Function() enviarTudoNuvem, {
+    String? contaId,
+  }) async {
     final viewModel = HistoricoViewModel(
       repository: HistoricoRepository(db),
       enviarTudoNuvem: enviarTudoNuvem,
+      contaId: contaId,
     );
     abertos.add(viewModel);
     for (var i = 0; i < 200 && viewModel.uiState.carregando; i++) {
@@ -48,6 +52,18 @@ void main() {
     await abrirHistorico(enviar);
     await abrirHistorico(enviar);
     expect(envios, 1);
+  });
+
+  test('a sincronização vale por conta: outra conta envia, a mesma não repete', () async {
+    var envios = <String>[];
+    Future<void> enviarComo(String conta) async => envios.add(conta);
+
+    await abrirHistorico(() => enviarComo('A'), contaId: 'uidA');
+    await abrirHistorico(() => enviarComo('B'), contaId: 'uidB');
+    await abrirHistorico(() => enviarComo('A'), contaId: 'uidA');
+    await abrirHistorico(() => enviarComo('B'), contaId: 'uidB');
+
+    expect(envios, ['A', 'B']);
   });
 
   test('falha no envio não aparece na tela e a próxima abertura tenta de novo', () async {

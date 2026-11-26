@@ -278,6 +278,7 @@ GoRouter provaFacilNavHost({
               create: (_) => HistoricoViewModel(
                 repository: HistoricoRepository(database),
                 enviarTudoNuvem: backupNuvem.enviarTudo,
+                contaId: auth?.usuario?.uid,
               ),
               child: HistoricoScreen(
                 onVoltar: () => context.pop(),
