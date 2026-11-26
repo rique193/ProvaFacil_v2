@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../../domain/scanner/layout_folha_respostas.dart';
 import '../../domain/scanner/qr_code_prova.dart';
 import '../local/app_database.dart';
 import '../local/relation/prova_com_questoes.dart';
@@ -16,6 +17,9 @@ abstract final class GeradorPdfProva {
   /// Tamanho do QR Code da folha de respostas: 5 cm.
   static const tamanhoQr = 5 * PdfPageFormat.cm;
 
+  /// Margem branca em volta do QR Code (mais de 4 módulos), recomendada para a leitura.
+  static const _margemQr = 12.0;
+
   /// Quantas questões ficam em cada bloco da grade de respostas.
   static const _questoesPorBloco = 20;
 
@@ -23,9 +27,8 @@ abstract final class GeradorPdfProva {
   static const _blocosPorFaixa = 3;
 
   /// Texto do QR Code da folha do [aluno] nesta prova. Sempre vem de [QrCodeProva.gerar].
-  static String textoQr(int provaId, AlunoEntity aluno) => QrCodeProva.gerar(
-    DadosQrCode(provaId: provaId, aluno: aluno.nome, turma: aluno.turma),
-  );
+  static String textoQr(int provaId, AlunoEntity aluno) =>
+      QrCodeProva.gerar(DadosQrCode(provaId: provaId, aluno: aluno.nome, turma: aluno.turma));
 
   /// Gera e retorna os bytes do PDF da [provaComQuestoes], com uma folha de respostas para cada
   /// aluno de [alunos].
@@ -52,8 +55,7 @@ abstract final class GeradorPdfProva {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.symmetric(horizontal: 48, vertical: 56),
-        header: (context) =>
-            _construirCabecalho(prova.titulo, prova.disciplina, prova.turma),
+        header: (context) => _construirCabecalho(prova.titulo, prova.disciplina, prova.turma),
         footer: (context) => _construirRodape(context),
         build: (context) => [
           pw.SizedBox(height: 12),
@@ -72,6 +74,18 @@ abstract final class GeradorPdfProva {
     );
 
     for (final aluno in alunos) {
+      // Até 60 questões a folha tem posições fixas e quadrados nos cantos, para a câmera ler.
+      if (questoes.length <= LayoutFolhaRespostas.maxQuestoes) {
+        doc.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: pw.EdgeInsets.zero,
+            build: (context) =>
+                _construirFolhaLegivel(prova: prova, aluno: aluno, totalQuestoes: questoes.length),
+          ),
+        );
+        continue;
+      }
       doc.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -88,27 +102,14 @@ abstract final class GeradorPdfProva {
     return doc.save();
   }
 
-  static pw.Widget _construirCabecalho(
-    String titulo,
-    String disciplina,
-    String turma,
-  ) {
-    final detalhes = [
-      disciplina,
-      if (turma.trim().isNotEmpty) turma.trim(),
-    ].join('  -  ');
+  static pw.Widget _construirCabecalho(String titulo, String disciplina, String turma) {
+    final detalhes = [disciplina, if (turma.trim().isNotEmpty) turma.trim()].join('  -  ');
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: [
-        pw.Text(
-          titulo,
-          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-        ),
+        pw.Text(titulo, style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 4),
-        pw.Text(
-          detalhes,
-          style: const pw.TextStyle(fontSize: 13, color: PdfColors.grey700),
-        ),
+        pw.Text(detalhes, style: const pw.TextStyle(fontSize: 13, color: PdfColors.grey700)),
         pw.SizedBox(height: 10),
         pw.Divider(color: PdfColors.grey400),
       ],
@@ -125,9 +126,7 @@ abstract final class GeradorPdfProva {
           child: pw.Container(
             height: 14,
             decoration: const pw.BoxDecoration(
-              border: pw.Border(
-                bottom: pw.BorderSide(color: PdfColors.grey700),
-              ),
+              border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey700)),
             ),
           ),
         ),
@@ -152,10 +151,7 @@ abstract final class GeradorPdfProva {
     );
   }
 
-  static pw.Widget _construirBlocoQuestao(
-    int numero,
-    QuestaoComAlternativas questaoComAlts,
-  ) {
+  static pw.Widget _construirBlocoQuestao(int numero, QuestaoComAlternativas questaoComAlts) {
     final questao = questaoComAlts.questao;
     final alternativas = [...questaoComAlts.alternativas]
       ..sort((a, b) => a.ordem.compareTo(b.ordem));
@@ -168,15 +164,9 @@ abstract final class GeradorPdfProva {
             children: [
               pw.TextSpan(
                 text: '$numero. ',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 12,
-                ),
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
               ),
-              pw.TextSpan(
-                text: questao.enunciado,
-                style: const pw.TextStyle(fontSize: 12),
-              ),
+              pw.TextSpan(text: questao.enunciado, style: const pw.TextStyle(fontSize: 12)),
             ],
           ),
         ),
@@ -200,15 +190,9 @@ abstract final class GeradorPdfProva {
   }) {
     final turma = aluno.turma.trim();
     return [
-      pw.Text(
-        prova.titulo,
-        style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-      ),
+      pw.Text(prova.titulo, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
       pw.SizedBox(height: 2),
-      pw.Text(
-        prova.disciplina,
-        style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
-      ),
+      pw.Text(prova.disciplina, style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
       pw.SizedBox(height: 10),
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -217,17 +201,11 @@ abstract final class GeradorPdfProva {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Folha de respostas',
-                  style: const pw.TextStyle(fontSize: 11),
-                ),
+                pw.Text('Folha de respostas', style: const pw.TextStyle(fontSize: 11)),
                 pw.SizedBox(height: 6),
                 pw.Text(
                   aluno.nome,
-                  style: pw.TextStyle(
-                    fontSize: 16,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                  style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
                 ),
                 if (turma.isNotEmpty) ...[
                   pw.SizedBox(height: 2),
@@ -242,11 +220,15 @@ abstract final class GeradorPdfProva {
             ),
           ),
           pw.SizedBox(width: 12),
+          // Margem branca (zona de silêncio) em volta do QR Code, para a câmera achá-lo com
+          // facilidade. O símbolo continua com [tamanhoQr].
           pw.BarcodeWidget(
             barcode: pw.Barcode.qrCode(),
             data: textoQr(prova.id, aluno),
-            width: tamanhoQr,
-            height: tamanhoQr,
+            width: tamanhoQr + 2 * _margemQr,
+            height: tamanhoQr + 2 * _margemQr,
+            padding: const pw.EdgeInsets.all(_margemQr),
+            backgroundColor: PdfColors.white,
             drawText: false,
           ),
         ],
@@ -256,11 +238,7 @@ abstract final class GeradorPdfProva {
       pw.SizedBox(height: 8),
       // Blocos de 20 questões lado a lado (até 3 por faixa, o que cabe na largura da página).
       // Cada faixa é um widget próprio, então provas longas quebram de página entre faixas.
-      for (
-        var faixa = 1;
-        faixa <= totalQuestoes;
-        faixa += _questoesPorBloco * _blocosPorFaixa
-      )
+      for (var faixa = 1; faixa <= totalQuestoes; faixa += _questoesPorBloco * _blocosPorFaixa)
         pw.Padding(
           padding: const pw.EdgeInsets.only(bottom: 8),
           child: pw.Row(
@@ -273,8 +251,7 @@ abstract final class GeradorPdfProva {
                     children: [
                       for (
                         var n = faixa + b * _questoesPorBloco;
-                        n < faixa + (b + 1) * _questoesPorBloco &&
-                            n <= totalQuestoes;
+                        n < faixa + (b + 1) * _questoesPorBloco && n <= totalQuestoes;
                         n++
                       )
                         _construirLinhaGrade(n),
@@ -285,6 +262,131 @@ abstract final class GeradorPdfProva {
           ),
         ),
     ];
+  }
+
+  /// Folha de respostas que a câmera do app consegue ler: quadrados pretos nos cantos e bolinhas
+  /// nas posições de [LayoutFolhaRespostas].
+  static pw.Widget _construirFolhaLegivel({
+    required ProvaEntity prova,
+    required AlunoEntity aluno,
+    required int totalQuestoes,
+  }) {
+    final turma = aluno.turma.trim();
+    const ladoQr = tamanhoQr + 2 * _margemQr;
+    const topoQr = LayoutFolhaRespostas.margemMarcador + LayoutFolhaRespostas.ladoMarcador + 6;
+    const esquerdaQr =
+        LayoutFolhaRespostas.larguraPagina -
+        LayoutFolhaRespostas.margemMarcador -
+        LayoutFolhaRespostas.ladoMarcador -
+        6 -
+        ladoQr;
+    return pw.SizedBox(
+      width: LayoutFolhaRespostas.larguraPagina,
+      height: LayoutFolhaRespostas.alturaPagina,
+      child: pw.Stack(
+        children: [
+          for (final (x, y) in LayoutFolhaRespostas.cantosMarcadores)
+            pw.Positioned(
+              left: x,
+              top: y,
+              child: pw.Container(
+                width: LayoutFolhaRespostas.ladoMarcador,
+                height: LayoutFolhaRespostas.ladoMarcador,
+                color: PdfColors.black,
+              ),
+            ),
+          pw.Positioned(
+            left: LayoutFolhaRespostas.xPrimeiraColuna,
+            top: topoQr + 8,
+            child: pw.SizedBox(
+              width: esquerdaQr - LayoutFolhaRespostas.xPrimeiraColuna - 12,
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    prova.titulo,
+                    style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+                    maxLines: 2,
+                  ),
+                  pw.SizedBox(height: 2),
+                  pw.Text(
+                    prova.disciplina,
+                    style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+                  ),
+                  pw.SizedBox(height: 10),
+                  pw.Text('Folha de respostas', style: const pw.TextStyle(fontSize: 11)),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    aluno.nome,
+                    style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold),
+                    maxLines: 2,
+                  ),
+                  if (turma.isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(turma, style: const pw.TextStyle(fontSize: 12)),
+                  ],
+                  pw.SizedBox(height: 10),
+                  pw.Text(
+                    'Pinte por inteiro uma bolinha por questão, com caneta preta ou azul escura. '
+                    'Não risque os quadrados pretos dos cantos.',
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          pw.Positioned(
+            left: esquerdaQr,
+            top: topoQr,
+            child: pw.BarcodeWidget(
+              barcode: pw.Barcode.qrCode(),
+              data: textoQr(prova.id, aluno),
+              width: ladoQr,
+              height: ladoQr,
+              padding: const pw.EdgeInsets.all(_margemQr),
+              backgroundColor: PdfColors.white,
+              drawText: false,
+            ),
+          ),
+          for (var numero = 1; numero <= totalQuestoes; numero++) ...[
+            pw.Positioned(
+              left: LayoutFolhaRespostas.origemLinha(numero).$1,
+              top: LayoutFolhaRespostas.origemLinha(numero).$2 - 7,
+              child: pw.SizedBox(
+                width: LayoutFolhaRespostas.larguraNumero,
+                child: pw.Text(
+                  '$numero',
+                  textAlign: pw.TextAlign.right,
+                  style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+                ),
+              ),
+            ),
+            for (var i = 0; i < 5; i++)
+              pw.Positioned(
+                left:
+                    LayoutFolhaRespostas.centroBolinha(numero, i).$1 -
+                    LayoutFolhaRespostas.raioBolinha,
+                top:
+                    LayoutFolhaRespostas.centroBolinha(numero, i).$2 -
+                    LayoutFolhaRespostas.raioBolinha,
+                child: pw.Container(
+                  width: LayoutFolhaRespostas.diametroBolinha,
+                  height: LayoutFolhaRespostas.diametroBolinha,
+                  alignment: pw.Alignment.center,
+                  decoration: pw.BoxDecoration(
+                    shape: pw.BoxShape.circle,
+                    border: pw.Border.all(color: PdfColors.black, width: 0.8),
+                  ),
+                  child: pw.Text(
+                    String.fromCharCode(65 + i),
+                    style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
+                  ),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
   }
 
   static pw.Widget _construirLinhaGrade(int numero) {
@@ -312,10 +414,7 @@ abstract final class GeradorPdfProva {
               ),
               child: pw.Text(
                 String.fromCharCode(65 + i),
-                style: const pw.TextStyle(
-                  fontSize: 8,
-                  color: PdfColors.grey700,
-                ),
+                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
               ),
             ),
             if (i < 4) pw.SizedBox(width: 6),

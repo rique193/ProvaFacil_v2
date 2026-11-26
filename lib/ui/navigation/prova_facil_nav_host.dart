@@ -40,6 +40,7 @@ import '../provas/visualizar/visualizar_prova_screen.dart';
 import '../provas/visualizar/visualizar_prova_view_model.dart';
 import '../relatorio/relatorio_notas_screen.dart';
 import '../scanner/qr_code_scanner_view_model.dart';
+import '../scanner/fotografar_folha.dart';
 import '../scanner/scan_respostas_screen.dart';
 import '../scanner/scan_respostas_view_model.dart';
 import '../scanner/scanner_screen.dart';
@@ -79,10 +80,14 @@ int? _idOpcional(String? valor) {
 /// [backup] troca o envio para o Firestore (usado nos testes); sem ele, vale o Firestore real.
 /// [auth] liga o login: sem professor logado, só abrem as telas de login e de cadastro. Sem ele
 /// (nos testes que não tratam de login), o app abre direto.
+///
+/// [usarCamera] liga a câmera de verdade na leitura do QR Code; os testes passam `false` para
+/// usar o modo simulação.
 GoRouter provaFacilNavHost({
   String initialLocation = rotaLista,
   BackupResultados? backup,
   AuthRepository? auth,
+  bool usarCamera = true,
 }) =>
     GoRouter(
       initialLocation: initialLocation,
@@ -205,6 +210,7 @@ GoRouter provaFacilNavHost({
                 ProvaRepository(database),
                 AlunoRepository(database),
                 provaIdInicial: provaId,
+                usarCamera: usarCamera,
               ),
               child: QrCodeScannerScreen(
                 onVoltar: () => context.pop(),
@@ -223,6 +229,8 @@ GoRouter provaFacilNavHost({
                 ProvaRepository(context.read<AppDatabase>()),
                 provaEscolhidaId: provaId,
                 textoQr: textoQr,
+                usarCamera: usarCamera,
+                fotografar: usarCamera ? fotografarFolhaComCamera : null,
               ),
               child: ScanRespostasScreen(
                 onVoltar: () => context.pop(),

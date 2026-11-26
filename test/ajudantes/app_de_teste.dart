@@ -49,7 +49,12 @@ Future<AppDatabase> abrirApp(
         Provider<IdInstalacao>(create: (_) => IdInstalacao()),
       ],
       child: MaterialApp.router(
-        routerConfig: provaFacilNavHost(initialLocation: rota, backup: backup, auth: auth),
+        routerConfig: provaFacilNavHost(
+          initialLocation: rota,
+          backup: backup,
+          auth: auth,
+          usarCamera: false,
+        ),
       ),
     ),
   );
