@@ -61,7 +61,7 @@ O app é usado pelo **professor**, no próprio celular Android.
 | RF01 | O sistema deve permitir cadastrar, listar, editar e excluir provas (título, disciplina e questões com 5 alternativas, de A a E). | Implementado |
 | RF02 | O sistema deve permitir definir a alternativa correta (gabarito) de cada questão. | Implementado |
 | RF03 | O sistema deve permitir cadastrar, listar, editar e excluir alunos (nome, turma, matrícula e e-mail). | Implementado |
-| RF04 | O sistema deve identificar a prova, o aluno e a turma pela leitura de um QR Code no formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>`. | Parcial: leitura simulada; câmera real na N3 |
+| RF04 | O sistema deve identificar a prova, o aluno e a turma pela leitura de um QR Code no formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>`. | Pronto: QR Code lido pela câmera do celular; modo simulação para aparelho sem câmera |
 | RF05 | O sistema deve conferir as respostas da folha com o gabarito, avisando sobre questões em branco, marcações múltiplas (anuladas) e letras inexistentes, e pedir confirmação antes de corrigir uma folha incompleta. | Implementado |
 | RF06 | O sistema deve calcular a nota de 0 a 10 proporcional aos acertos e salvar o resultado de cada aluno. | Implementado |
 | RF07 | O sistema deve mostrar o resultado individual (nota, percentual, acertos, erros e em branco), com filtro por situação da questão. | Implementado |
@@ -74,7 +74,7 @@ O app é usado pelo **professor**, no próprio celular Android.
 | RF14 | O sistema deve manter um banco de questões reutilizáveis. | Previsto para a N3 |
 | RF15 | O sistema deve gerar uma prova selecionando questões do banco, com embaralhamento de questões e de alternativas. | Previsto para a N3 |
 | RF16 | O sistema deve exportar a prova em PDF: folha de questões e, em página separada, o gabarito com QR Code. | Previsto para a N3 |
-| RF17 | O sistema deve corrigir a prova impressa lendo o QR Code com a câmera do celular. | Previsto para a N3 |
+| RF17 | O sistema deve corrigir a prova impressa lendo o QR Code com a câmera do celular. | Parcial: QR Code lido pela câmera; marcações das respostas ainda simuladas |
 
 ### 2.2 Não Funcionais (RNF)
 
@@ -99,9 +99,9 @@ Telas na ordem em que o professor navega. Os prints ficam em `docs/telas/`.
    `![Formulário de prova](docs/telas/formulario-prova.png)`
 3. **Gabarito:** marcação da alternativa correta de cada questão, com o progresso.
    `![Gabarito](docs/telas/gabarito.png)`
-4. **Ler QR Code:** identificação da prova, do aluno e da turma.
+4. **Ler QR Code:** pela câmera do celular, identifica a prova, o aluno e a turma (com modo simulação, sem câmera).
    `![Ler QR Code](docs/telas/ler-qr.png)`
-5. **Ler Respostas:** marcações lidas da folha do aluno.
+5. **Ler Respostas (simulada):** marcações da folha do aluno; a leitura das bolinhas ainda não usa a câmera.
    `![Ler respostas](docs/telas/ler-respostas.png)`
 6. **Correção:** conferência das marcações e confirmação da correção.
    `![Correção](docs/telas/correcao.png)`
@@ -288,7 +288,7 @@ A apresentação segue o roteiro da Avaliação N3. A tabela mostra o que já ex
 | 5 | Gerar prova a partir do banco, com embaralhamento | 1,25 | A fazer | Selecionar questões do banco e embaralhar a ordem das questões e das alternativas, guardando o gabarito de cada versão |
 | 6 | Ver a prova gerada e editar | 0,75 | Pronto | Lista de provas e formulário de edição já funcionam |
 | 7 | Exportar PDF: questões + gabarito com QR Code em página separada | 2,0 | Parcial | O PDF existe, mas o QR precisa usar o formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>` e o gabarito precisa ficar em página separada, com uma folha por aluno |
-| 8 | Corrigir a prova lendo o QR Code | 2,5 | Parcial | A correção, a nota e o salvamento já funcionam; falta ler o QR impresso com a câmera do celular (`mobile_scanner`) |
+| 8 | Corrigir a prova lendo o QR Code | 2,5 | Pronto | O QR Code impresso é lido pela câmera do celular (`mobile_scanner`), com lanterna e aviso de folha de outra prova; sem câmera, a tela tem um modo simulação. As marcações das respostas ainda são simuladas e podem ser ajustadas na tela de correção |
 | 9 | Status da prova após as correções (Relatório) | 0,75 | Pronto | Histórico, Estatísticas e Relatório com exportação .xlsx |
 
 **Preparação para a apresentação:**

@@ -6,9 +6,10 @@ import 'cenario_folha.dart';
 import 'componentes_scanner.dart';
 import 'scan_respostas_view_model.dart';
 
-/// Tela "Ler Respostas" (simulada). O botão redondo "fotografa" a folha; a leitura é conferida com
-/// a prova (gabarito, número de questões, alternativas) e, se estiver tudo certo, segue para a
-/// tela de correção já com a prova, o aluno e as respostas preenchidos.
+/// Tela "Ler Respostas". O botão redondo abre a câmera para fotografar a folha; as bolinhas
+/// pintadas são lidas da foto e conferidas com a prova (gabarito, número de questões,
+/// alternativas). Se estiver tudo certo, segue para a tela de correção já com a prova, o aluno e
+/// as respostas preenchidos. Sem câmera, há um modo simulação.
 ///
 /// [onFinalizar] recebe a folha conferida, com o aluno do QR Code e as respostas lidas.
 class ScanRespostasScreen extends StatelessWidget {
@@ -35,29 +36,39 @@ class ScanRespostasScreen extends StatelessWidget {
             ),
             _SeloStatus(conferencia: conferencia),
             const SizedBox(height: 12),
-            // Cenário da simulação.
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  for (final cenario in CenarioFolha.values)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(cenario.descricao),
-                        selected: cenario == uiState.cenario,
-                        onSelected: (_) => vm.selecionarCenario(cenario),
-                        showCheckmark: false,
-                        backgroundColor: corFundoCamera,
-                        selectedColor: corAzul,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+            // Cenário da simulação (só sem câmera).
+            if (!uiState.usarCamera)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    for (final cenario in CenarioFolha.values)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: Text(cenario.descricao),
+                          selected: cenario == uiState.cenario,
+                          onSelected: (_) => vm.selecionarCenario(cenario),
+                          showCheckmark: false,
+                          backgroundColor: corFundoCamera,
+                          selectedColor: corAzul,
+                          labelStyle: const TextStyle(color: Colors.white),
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            if (vm.cameraDisponivel)
+              TextButton.icon(
+                onPressed: () => vm.alternarCamera(!uiState.usarCamera),
+                icon: Icon(
+                  uiState.usarCamera ? Icons.science_outlined : Icons.photo_camera_outlined,
+                  size: 18,
+                ),
+                label: Text(uiState.usarCamera ? 'Sem câmera? Usar a simulação' : 'Usar a câmera'),
+              ),
             const SizedBox(height: 12),
             Expanded(
               child: conferencia == null
@@ -97,7 +108,16 @@ class _Camera extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: uiState.lendo
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(color: Colors.white),
+                        SizedBox(height: 12),
+                        Text('Lendo as marcações…', style: TextStyle(color: Colors.white)),
+                      ],
+                    )
+                  : uiState.usarCamera
+                  ? const _GuiaFolha()
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -112,7 +132,11 @@ class _Camera extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
-            uiState.erro ?? 'Alinhe a folha de respostas dentro da moldura e\nmantenha o celular parado',
+            uiState.erro ??
+                (uiState.usarCamera
+                    ? 'Toque no botão e fotografe a folha inteira, de cima, com boa luz. Os 4 '
+                          'quadrados pretos dos cantos precisam aparecer na foto.'
+                    : 'Alinhe a folha de respostas dentro da moldura e\nmantenha o celular parado'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: uiState.erro != null ? corErroScanner : Colors.white,
@@ -155,6 +179,33 @@ class _Camera extends StatelessWidget {
   }
 }
 
+/// Desenho da folha com os quatro quadrados dos cantos, para mostrar como enquadrar a foto.
+class _GuiaFolha extends StatelessWidget {
+  const _GuiaFolha();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget quadrado() => Container(width: 18, height: 18, color: Colors.white);
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [quadrado(), quadrado()],
+          ),
+          const Icon(Icons.photo_camera_outlined, color: Colors.white70, size: 48),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [quadrado(), quadrado()],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SeloStatus extends StatelessWidget {
   const _SeloStatus({required this.conferencia});
 
@@ -187,7 +238,11 @@ class _SeloStatus extends StatelessWidget {
             Flexible(
               child: Text(
                 texto,
-                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -237,7 +292,10 @@ class _PainelResultadoLeitura extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
         ),
         const SizedBox(height: 8),
-        LinhaDado(titulo: 'Prova', valor: titulo.isEmpty ? 'Prova nº ${pronta.prova.provaId}' : titulo),
+        LinhaDado(
+          titulo: 'Prova',
+          valor: titulo.isEmpty ? 'Prova nº ${pronta.prova.provaId}' : titulo,
+        ),
         LinhaDado(titulo: 'Aluno', valor: pronta.dadosQr.aluno),
         LinhaDado(
           titulo: 'Lidas',
