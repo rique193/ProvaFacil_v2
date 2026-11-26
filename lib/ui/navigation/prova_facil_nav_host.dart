@@ -12,6 +12,7 @@ import '../../data/repository/prova_repository.dart';
 import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
 import '../auth/auth_rotas.dart';
+import '../auth/menu_professor.dart';
 import '../../data/repository/historico_repository.dart';
 import '../../data/repository/estatisticas_repository.dart';
 import '../correcao/correcao_rotas.dart';
@@ -89,6 +90,7 @@ GoRouter provaFacilNavHost({
               onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
               onAbrirAlunos: () => context.push(rotaAlunos),
               onAbrirHistorico: () => context.push(rotaHistorico),
+              menuConta: auth == null ? null : MenuProfessor(auth: auth),
             ),
           ),
         ),

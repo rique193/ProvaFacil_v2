@@ -20,6 +20,7 @@ class ProvaListScreen extends StatelessWidget {
     required this.onCorrigirProva,
     required this.onAbrirAlunos,
     required this.onAbrirHistorico,
+    this.menuConta,
   });
 
   final VoidCallback onNovaProva;
@@ -28,6 +29,9 @@ class ProvaListScreen extends StatelessWidget {
   final ValueChanged<int> onCorrigirProva;
   final VoidCallback onAbrirAlunos;
   final VoidCallback onAbrirHistorico;
+
+  /// Botão da conta do professor (com o "Sair"), no fim da barra.
+  final Widget? menuConta;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +71,7 @@ class ProvaListScreen extends StatelessWidget {
                   tooltip: 'Histórico',
                   icon: const Icon(Icons.date_range),
                 ),
+                ?menuConta,
               ],
             ),
             floatingActionButton: FloatingActionButton.extended(

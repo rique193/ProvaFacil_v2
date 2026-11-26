@@ -132,5 +132,30 @@ void main() {
 
       expect(find.byTooltip('Ocultar senha'), findsOneWidget);
     });
+
+    testWidgets('o menu da conta mostra o professor e Sair volta ao login', (tester) async {
+      final logado = authLogado();
+      addTearDown(logado.dispose);
+      await abrirApp(tester, rotaLista, auth: logado);
+
+      await tester.tap(find.byTooltip('Conta'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ana Lima'), findsOneWidget);
+      expect(find.text('ana@escola.com'), findsOneWidget);
+
+      await tester.tap(find.text('Sair'));
+      await tester.pumpAndSettle();
+
+      expect(logado.logado, isFalse);
+      expect(find.text(_subtituloLogin), findsOneWidget);
+      expect(find.text('Dashboard'), findsNothing);
+    });
+
+    testWidgets('sem login ligado, a lista não mostra o menu da conta', (tester) async {
+      await abrirApp(tester, rotaLista);
+
+      expect(find.text('Dashboard'), findsOneWidget);
+      expect(find.byTooltip('Conta'), findsNothing);
+    });
   });
 }
