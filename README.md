@@ -2,7 +2,7 @@
 
 # ProvaFácil
 
-**Aplicativo Android que ajuda o professor a cadastrar provas de múltipla escolha, corrigir as folhas de resposta dos alunos e acompanhar as notas e estatísticas da turma.**
+**Aplicativo Android que ajuda o professor a montar provas de múltipla escolha a partir de um banco de questões, imprimir a prova com folhas de resposta identificadas por QR Code, corrigir lendo o QR com a câmera do celular e acompanhar as notas da turma.**
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
@@ -10,7 +10,7 @@
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-F5A623?style=flat-square)
+![Status](https://img.shields.io/badge/status-entregue%20N3-2E7D32?style=flat-square)
 ![Entrega](https://img.shields.io/badge/entrega%20atual-N3-3D348B?style=flat-square)
 ![Licença](https://img.shields.io/badge/licença-uso%20acadêmico-7B4FA6?style=flat-square)
 
@@ -38,7 +38,7 @@
 - [6. Estrutura de Pastas](#6-estrutura-de-pastas)
 - [7. Como Executar o Projeto](#7-como-executar-o-projeto)
 - [8. Histórico do Projeto](#8-histórico-do-projeto)
-- [9. Próximas Etapas (N3)](#9-próximas-etapas-n3)
+- [9. Funcionalidades da N3](#9-funcionalidades-da-n3)
 
 ---
 
@@ -46,7 +46,7 @@
 
 *Entrega: N1*
 
-Professores gastam muito tempo corrigindo provas de múltipla escolha à mão e depois passando as notas para uma planilha. O **ProvaFácil** automatiza esse trabalho: o professor cadastra a prova e o gabarito, lê a folha de respostas do aluno (identificada por um QR Code), e o app corrige, calcula a nota de 0 a 10, guarda o histórico, mostra as estatísticas de cada questão e exporta o relatório da turma em Excel (.xlsx).
+Professores gastam muito tempo montando provas, corrigindo à mão e passando as notas para uma planilha. O **ProvaFácil** automatiza esse trabalho: o professor entra com a própria conta, cadastra turmas, disciplinas e um banco de questões, gera provas a partir do banco (com embaralhamento de questões e alternativas), exporta a prova em PDF com uma folha de respostas com QR Code para cada aluno e, depois da aplicação, lê o QR com a câmera do celular para corrigir. O app calcula a nota de 0 a 10, guarda o histórico, mostra o status da prova e as estatísticas de cada questão e exporta o relatório da turma em Excel (.xlsx).
 
 O app é usado pelo **professor**, no próprio celular Android.
 
@@ -61,7 +61,7 @@ O app é usado pelo **professor**, no próprio celular Android.
 | RF01 | O sistema deve permitir cadastrar, listar, editar e excluir provas (título, disciplina e questões com 5 alternativas, de A a E). | Implementado |
 | RF02 | O sistema deve permitir definir a alternativa correta (gabarito) de cada questão. | Implementado |
 | RF03 | O sistema deve permitir cadastrar, listar, editar e excluir alunos (nome, turma, matrícula e e-mail). | Implementado |
-| RF04 | O sistema deve identificar a prova, o aluno e a turma pela leitura de um QR Code no formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>`. | Pronto: QR Code lido pela câmera do celular; modo simulação para aparelho sem câmera |
+| RF04 | O sistema deve identificar a prova, o aluno e a turma pela leitura de um QR Code no formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>`, com a câmera do celular (e um modo de teste simulado). | Implementado |
 | RF05 | O sistema deve conferir as respostas da folha com o gabarito, avisando sobre questões em branco, marcações múltiplas (anuladas) e letras inexistentes, e pedir confirmação antes de corrigir uma folha incompleta. | Implementado |
 | RF06 | O sistema deve calcular a nota de 0 a 10 proporcional aos acertos e salvar o resultado de cada aluno. | Implementado |
 | RF07 | O sistema deve mostrar o resultado individual (nota, percentual, acertos, erros e em branco), com filtro por situação da questão. | Implementado |
@@ -69,12 +69,13 @@ O app é usado pelo **professor**, no próprio celular Android.
 | RF09 | O sistema deve mostrar as estatísticas da prova: média, maior e menor nota e o percentual de acerto de cada questão. | Implementado |
 | RF10 | O sistema deve gerar o relatório de notas e exportá-lo em .xlsx, com as abas "Notas" e "Estatísticas". | Implementado |
 | RF11 | O sistema deve enviar os alunos e os resultados para o Firebase Firestore como backup. | Implementado |
-| RF12 | O sistema deve permitir criar conta de professor e fazer login. | Previsto para a N3 |
-| RF13 | O sistema deve permitir cadastrar turmas e disciplinas. | Previsto para a N3 |
-| RF14 | O sistema deve manter um banco de questões reutilizáveis. | Previsto para a N3 |
-| RF15 | O sistema deve gerar uma prova selecionando questões do banco, com embaralhamento de questões e de alternativas. | Previsto para a N3 |
-| RF16 | O sistema deve exportar a prova em PDF: folha de questões e, em página separada, o gabarito com QR Code. | Previsto para a N3 |
-| RF17 | O sistema deve corrigir a prova impressa lendo o QR Code com a câmera do celular. | Parcial: QR Code lido pela câmera; marcações das respostas ainda simuladas |
+| RF12 | O sistema deve permitir criar conta de professor e fazer login (Firebase Authentication, e-mail e senha). | Implementado |
+| RF13 | O sistema deve permitir cadastrar turmas e disciplinas. | Implementado |
+| RF14 | O sistema deve manter um banco de questões reutilizáveis. | Implementado |
+| RF15 | O sistema deve gerar uma prova selecionando questões do banco, com embaralhamento de questões e de alternativas. | Implementado |
+| RF16 | O sistema deve exportar a prova em PDF: caderno de questões e, em páginas separadas, uma folha de respostas com QR Code para cada aluno escolhido. | Implementado |
+| RF17 | O sistema deve corrigir a prova impressa lendo o QR Code com a câmera do celular; o professor marca na tela as respostas da folha e o app calcula e salva a nota. | Implementado |
+| RF18 | O sistema deve mostrar o status de cada prova (Pendente, Em correção, Corrigida) e quantos alunos da turma já foram corrigidos. | Implementado |
 
 ### 2.2 Não Funcionais (RNF)
 
@@ -93,36 +94,27 @@ O app é usado pelo **professor**, no próprio celular Android.
 
 Telas na ordem em que o professor navega. Os prints ficam em `docs/telas/`.
 
-1. **Lista de Provas:** tela inicial, com as provas cadastradas e os atalhos para nova prova, gabarito, correção, alunos e histórico.
-   `![Lista de provas](docs/telas/lista-provas.png)`
-2. **Formulário de Prova:** criação e edição da prova e das questões.
-   `![Formulário de prova](docs/telas/formulario-prova.png)`
-3. **Gabarito:** marcação da alternativa correta de cada questão, com o progresso.
-   `![Gabarito](docs/telas/gabarito.png)`
-4. **Ler QR Code:** pela câmera do celular, identifica a prova, o aluno e a turma (com modo simulação, sem câmera).
-   `![Ler QR Code](docs/telas/ler-qr.png)`
-5. **Ler Respostas (simulada):** marcações da folha do aluno; a leitura das bolinhas ainda não usa a câmera.
-   `![Ler respostas](docs/telas/ler-respostas.png)`
-6. **Correção:** conferência das marcações e confirmação da correção.
-   `![Correção](docs/telas/correcao.png)`
-7. **Resultado:** nota, percentual e detalhe por questão.
-   `![Resultado](docs/telas/resultado.png)`
-8. **Alunos:** cadastro e lista de alunos por turma.
-   `![Alunos](docs/telas/alunos.png)`
-9. **Histórico:** provas corrigidas, com a média da turma.
-   `![Histórico](docs/telas/historico.png)`
-10. **Estatísticas:** média, maior e menor nota e o percentual de acerto por questão.
-    `![Estatísticas](docs/telas/estatisticas.png)`
-11. **Relatório de Notas:** notas dos alunos e exportação em .xlsx.
-    `![Relatório](docs/telas/relatorio.png)`
+1. **Login e Criar conta:** entrada do professor com e-mail e senha (Firebase Authentication).
+2. **Lista de Provas ("Dashboard" na barra do app):** tela inicial, com as provas, o status de cada uma ("Pendente", "Em correção · X de Y", "Corrigida") e os atalhos para nova prova, turmas e disciplinas, banco de questões, alunos, histórico e o menu da conta (Sair).
+3. **Turmas e Disciplinas:** cadastro e exclusão de turmas e disciplinas, em duas abas.
+4. **Banco de Questões:** lista com filtro por disciplina e formulário da questão (enunciado, 5 alternativas e a correta).
+5. **Gerar Prova:** título, disciplina e turma, seleção das questões do banco e embaralhamento de questões e de alternativas.
+6. **Visualizar Prova:** questões e alternativas da prova, com a correta destacada, e os atalhos para editar, gabarito, PDF e corrigir.
+7. **Formulário de Prova e Gabarito:** edição manual da prova e marcação da alternativa correta.
+8. **Exportar PDF:** escolha dos alunos e visualização/compartilhamento do PDF (caderno + uma folha de respostas com QR por aluno).
+9. **Ler QR Code:** leitura do QR da folha impressa com a câmera (ou modo de teste).
+10. **Ler Respostas / Correção:** marcação das respostas da folha e confirmação da correção.
+11. **Resultado:** nota, percentual e detalhe por questão.
+12. **Alunos:** cadastro de alunos por turma.
+13. **Histórico, Estatísticas e Relatório de Notas:** provas corrigidas, média, maior e menor nota, acerto por questão, status da prova, alunos que faltam corrigir e exportação em .xlsx.
 
-> Para inserir os prints, salve as imagens em `docs/telas/` e tire as crases das linhas acima.
+> Prints das telas em `docs/telas/`.
 
 ## 4. Modelo de Dados
 
 *Entrega: N3*
 
-Os dados ficam no banco local do aparelho (SQLite, com as tabelas `provas`, `questoes`, `alternativas`, `alunos`, `resultados` e `respostas_aluno`) e são enviados como backup para o Firestore, em duas coleções. Os ids dos documentos começam pelo id da instalação do app, para os dados de aparelhos diferentes não se sobrescreverem.
+As contas dos professores ficam no **Firebase Authentication** (e-mail e senha). Os dados do app ficam no banco local do aparelho (SQLite com `drift`, versão 2 do esquema), com as tabelas `provas` (com `turma`), `questoes`, `alternativas`, `alunos`, `resultados`, `respostas_aluno`, `turmas`, `disciplinas`, `banco_questoes` e `banco_alternativas`. Alunos e resultados são enviados como backup para o Firestore, em duas coleções. Os ids dos documentos começam pelo id da instalação do app, para os dados de aparelhos diferentes não se sobrescreverem.
 
 ```json
 // Coleção: alunos   (id do documento: {idInstalacao}_{alunoId})
@@ -179,7 +171,7 @@ Os dados ficam no banco local do aparelho (SQLite, com as tabelas `provas`, `que
 | atualizadoEm | Number | Data do envio, em milissegundos |
 | respostas | Array | Por questão: número, letras marcadas, letra correta e situação (`ACERTO`, `ERRO`, `EM_BRANCO` ou `MARCACAO_MULTIPLA`) |
 
-> Na N3 entram as coleções novas de professores, turmas/disciplinas e banco de questões (ver seção 9).
+> Turmas, disciplinas e o banco de questões ficam só no banco local; não há coleções novas no Firestore.
 
 ## 5. Stack Tecnológica
 
@@ -191,6 +183,8 @@ Os dados ficam no banco local do aparelho (SQLite, com as tabelas `provas`, `que
 
 - **Flutter / Dart:** interface e navegação do app.
 - **Firebase Firestore** (`firebase_core`, `cloud_firestore`): backup dos alunos e resultados na nuvem.
+- **Firebase Authentication** (`firebase_auth`): cadastro e login do professor.
+- **mobile_scanner:** leitura do QR Code com a câmera.
 - **drift** (`drift`, `drift_flutter`): banco local SQLite, com as tabelas e relações do app.
 - **provider:** estado das telas (`ChangeNotifier`).
 - **go_router:** navegação entre as telas.
@@ -199,7 +193,7 @@ Os dados ficam no banco local do aparelho (SQLite, com as tabelas `provas`, `que
 - **intl:** datas e números no formato brasileiro.
 - **archive:** geração do arquivo .xlsx.
 - **file_picker:** salvar o relatório exportado.
-- **pdf / printing:** geração da prova em PDF.
+- **pdf / printing:** geração, visualização e compartilhamento da prova em PDF.
 - **shared_preferences / uuid:** id da instalação usado no backup.
 
 ## 6. Estrutura de Pastas
@@ -216,17 +210,23 @@ lib/
     estatisticas/      #   cálculo das estatísticas por questão
     historico/         #   resumo das notas e formato das turmas
     model/             #   dados de entrada do formulário de prova
+    prova/             #   embaralhamento e status da prova
+    auth/              #   validações do login e do cadastro
     scanner/           #   leitura e geração do QR Code
   data/
     local/             # banco SQLite (drift): tabelas, DAOs e relações
     backup/            # envio para o Firebase Firestore
-    exportacao/        # geração do relatório .xlsx
+    auth/              # serviço de autenticação (Firebase Authentication)
+    exportacao/        # relatório .xlsx e PDF da prova
     repository/        # acesso aos dados usado pelas telas
   ui/
     theme/             # cores e tipografia (tema claro e escuro)
     navigation/        # rotas do app
     components/        # componentes reutilizáveis
-    provas/            # lista, formulário e gabarito
+    auth/              # login, criar conta e menu do professor
+    turmas_disciplinas/ # cadastro de turmas e disciplinas
+    banco_questoes/    # banco de questões e formulário da questão
+    provas/            # lista, gerar, visualizar, formulário, gabarito e PDF
     scanner/           # leitura do QR Code e das respostas
     correcao/          # correção e resultado
     alunos/            # cadastro de alunos
@@ -254,7 +254,8 @@ docs/
 4. flutter run
 ```
 
-- A configuração do Firebase (`android/app/google-services.json` e `lib/firebase_options.dart`) já está no repositório. Não é preciso configurar nada.
+- A configuração do Firebase (`android/app/google-services.json` e `lib/firebase_options.dart`) já está no repositório. O login por e-mail e senha precisa estar ativado no console (Authentication → Sign-in method).
+- A leitura do QR usa a câmera: teste num celular de verdade e permita o acesso à câmera na primeira vez.
 - Os arquivos gerados (`*.g.dart` e `*.freezed.dart`) também já estão no repositório. Se alterar alguma classe de dados, gere de novo com `dart run build_runner build`.
 - Para gerar o APK: `flutter build apk --release`. O arquivo fica em `build/app/outputs/flutter-apk/`.
 - Para rodar os testes: `flutter test`.
@@ -271,35 +272,33 @@ docs/
   - Fase 0: base do projeto (pacotes, tema, banco, rotas).
   - Fase 1: cada membro portou a sua frente (Provas, Scanner, Alunos, Correção, Histórico/Estatísticas/Relatório), com PR e revisão.
   - Fase 2: integração, correções e testes do fluxo completo no celular.
-  - Situação atual: `flutter analyze` sem avisos e mais de 300 testes automatizados passando.
+- **N3:** login do professor, turmas e disciplinas, banco de questões, geração de prova com embaralhamento, visualização da prova, PDF com folha de respostas e QR por aluno, correção lendo o QR com a câmera e status da prova.
+  - Situação atual: `flutter analyze` sem avisos e testes automatizados passando.
 
-## 9. Próximas Etapas (N3)
+## 9. Funcionalidades da N3
 
 *Entrega: N3*, em **26/11/2026**, apresentações de 26/11 a 03/12
 
-A apresentação segue o roteiro da Avaliação N3. A tabela mostra o que já existe e o que falta para cada item.
+Roteiro da apresentação (Avaliação N3) e onde cada item está no app:
 
-| # | Funcionalidade | Pontos | Situação | O que falta |
+| # | Funcionalidade | Pontos | Situação | Onde fica |
 |---|---|---|---|---|
-| 1 | Criar conta (cadastro de professor) | 0,5 | A fazer | Tela de cadastro com Firebase Authentication (e-mail e senha) |
-| 2 | Fazer login | 0,5 | A fazer | Tela de login e sessão do professor; cada professor vê só os próprios dados |
-| 3 | Criar turma / disciplina | 0,75 | Parcial | Hoje turma e disciplina são campos de texto; falta o cadastro próprio e a escolha na prova e no aluno |
-| 4 | Criar questões no banco de questões | 1,0 | A fazer | Banco de questões separado da prova, com enunciado, 5 alternativas e a correta, por disciplina |
-| 5 | Gerar prova a partir do banco, com embaralhamento | 1,25 | A fazer | Selecionar questões do banco e embaralhar a ordem das questões e das alternativas, guardando o gabarito de cada versão |
-| 6 | Ver a prova gerada e editar | 0,75 | Pronto | Lista de provas e formulário de edição já funcionam |
-| 7 | Exportar PDF: questões + gabarito com QR Code em página separada | 2,0 | Parcial | O PDF existe, mas o QR precisa usar o formato `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>` e o gabarito precisa ficar em página separada, com uma folha por aluno |
-| 8 | Corrigir a prova lendo o QR Code | 2,5 | Pronto | O QR Code impresso é lido pela câmera do celular (`mobile_scanner`), com lanterna e aviso de folha de outra prova; sem câmera, a tela tem um modo simulação. As marcações das respostas ainda são simuladas e podem ser ajustadas na tela de correção |
-| 9 | Status da prova após as correções (Relatório) | 0,75 | Pronto | Histórico, Estatísticas e Relatório com exportação .xlsx |
+| 1 | Criar conta (cadastro de professor) | 0,5 | Implementado | Tela de login → "Criar conta" (Firebase Authentication) |
+| 2 | Fazer login | 0,5 | Implementado | Tela de login; o app só abre com professor logado; "Sair" no menu da conta |
+| 3 | Criar turma / disciplina | 0,75 | Implementado | Lista de provas → ícone "Turmas e disciplinas" |
+| 4 | Criar questões no banco de questões | 1,0 | Implementado | Lista de provas → ícone "Banco de questões" |
+| 5 | Gerar prova a partir do banco, com embaralhamento | 1,25 | Implementado | "Nova Prova" → "Gerar prova do banco"; o embaralhamento é feito uma vez e gravado, com o gabarito já marcado |
+| 6 | Ver a prova gerada e editar | 0,75 | Implementado | Tocar no card da prova abre a visualização; "Editar" abre o formulário |
+| 7 | Exportar PDF: questões + gabarito com QR Code em página separada | 2,0 | Implementado | Ícone de PDF → escolher alunos → Visualizar/Compartilhar. Caderno sem QR e uma folha de respostas por aluno, com QR `PROVAFACIL\|1\|<idProva>\|<aluno>\|<turma>` e grade A–E |
+| 8 | Corrigir a prova lendo o QR Code | 2,5 | Implementado | "Corrigir" → Ler QR Code (câmera) → o QR identifica prova, aluno e turma → o professor marca as respostas da folha na tela → a nota é exibida e salva |
+| 9 | Status da prova após as correções (Relatório) | 0,75 | Implementado | Status no card da lista e no Relatório de Notas (X de Y alunos corrigidos e quem falta), com exportação .xlsx |
+
+**Como funciona a correção:** o QR Code da folha impressa identifica a prova, o aluno e a turma. Depois da leitura, o professor marca na tela as alternativas que o aluno preencheu na folha, e o app compara com o gabarito gravado, calcula a nota de 0 a 10 e salva o resultado. Há também um modo de teste, com folhas simuladas, para demonstrar sem papel.
 
 **Preparação para a apresentação:**
-- [ ] Criar uma prova no app antes do dia, com questões do banco.
-- [ ] Imprimir 1 caderno de questões e 2 cópias do gabarito com QR Code.
-- [ ] Deixar questões já cadastradas no banco de questões.
-- [ ] Estender as regras do Firestore para depois de 03/12 (hoje expiram em 27/11).
-- [ ] Testar o roteiro completo no celular e gerar o APK final.
-- [ ] Atualizar este README com os prints das telas novas.
-
-**Ordem de trabalho, por pontuação:** itens 7 e 8 (4,5 pontos) → itens 4 e 5 (2,25 pontos) → itens 1, 2 e 3 (1,75 pontos).
+- Prova criada antes no celular da apresentação, a partir do banco, com turma e alunos cadastrados.
+- Impressos: 1 caderno de questões e 2 folhas de respostas com QR Code.
+- Questões já cadastradas no banco (uma nova é cadastrada ao vivo).
 
 ---
 
