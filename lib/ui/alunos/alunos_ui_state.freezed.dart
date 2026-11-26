@@ -569,7 +569,7 @@ as int,
 /// @nodoc
 mixin _$AlunosUiState {
 
- List<AlunoEntity> get alunos; bool get carregando; String get busca; bool get mostrarDialogoAluno; AlunoFormState get formAluno; ConfirmacaoExclusaoAluno? get confirmacaoExclusao;/// Aviso exibido num snackbar (ex.: "Aluno excluído").
+ List<AlunoEntity> get alunos; List<TurmaEntity> get turmas; bool get carregando; String get busca; bool get mostrarDialogoAluno; AlunoFormState get formAluno; ConfirmacaoExclusaoAluno? get confirmacaoExclusao;/// Aviso exibido num snackbar (ex.: "Aluno excluído").
  String? get mensagem;
 /// Create a copy of AlunosUiState
 /// with the given fields replaced by the non-null parameter values.
@@ -582,20 +582,20 @@ $AlunosUiStateCopyWith<AlunosUiState> get copyWith => _$AlunosUiStateCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as AlunosUiState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AlunosUiState&&const DeepCollectionEquality().equals(other.alunos, _this.alunos)&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.busca, _this.busca) || other.busca == _this.busca)&&(identical(other.mostrarDialogoAluno, _this.mostrarDialogoAluno) || other.mostrarDialogoAluno == _this.mostrarDialogoAluno)&&(identical(other.formAluno, _this.formAluno) || other.formAluno == _this.formAluno)&&(identical(other.confirmacaoExclusao, _this.confirmacaoExclusao) || other.confirmacaoExclusao == _this.confirmacaoExclusao)&&(identical(other.mensagem, _this.mensagem) || other.mensagem == _this.mensagem));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AlunosUiState&&const DeepCollectionEquality().equals(other.alunos, _this.alunos)&&const DeepCollectionEquality().equals(other.turmas, _this.turmas)&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.busca, _this.busca) || other.busca == _this.busca)&&(identical(other.mostrarDialogoAluno, _this.mostrarDialogoAluno) || other.mostrarDialogoAluno == _this.mostrarDialogoAluno)&&(identical(other.formAluno, _this.formAluno) || other.formAluno == _this.formAluno)&&(identical(other.confirmacaoExclusao, _this.confirmacaoExclusao) || other.confirmacaoExclusao == _this.confirmacaoExclusao)&&(identical(other.mensagem, _this.mensagem) || other.mensagem == _this.mensagem));
 }
 
 
 @override
 int get hashCode {
   final _this = this as AlunosUiState;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.alunos),_this.carregando,_this.busca,_this.mostrarDialogoAluno,_this.formAluno,_this.confirmacaoExclusao,_this.mensagem);
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.alunos),const DeepCollectionEquality().hash(_this.turmas),_this.carregando,_this.busca,_this.mostrarDialogoAluno,_this.formAluno,_this.confirmacaoExclusao,_this.mensagem);
 }
 
 @override
 String toString() {
   final _this = this as AlunosUiState;
-  return 'AlunosUiState(alunos: ${_this.alunos}, carregando: ${_this.carregando}, busca: ${_this.busca}, mostrarDialogoAluno: ${_this.mostrarDialogoAluno}, formAluno: ${_this.formAluno}, confirmacaoExclusao: ${_this.confirmacaoExclusao}, mensagem: ${_this.mensagem})';
+  return 'AlunosUiState(alunos: ${_this.alunos}, turmas: ${_this.turmas}, carregando: ${_this.carregando}, busca: ${_this.busca}, mostrarDialogoAluno: ${_this.mostrarDialogoAluno}, formAluno: ${_this.formAluno}, confirmacaoExclusao: ${_this.confirmacaoExclusao}, mensagem: ${_this.mensagem})';
 }
 
 
@@ -606,7 +606,7 @@ abstract mixin class $AlunosUiStateCopyWith<$Res>  {
   factory $AlunosUiStateCopyWith(AlunosUiState value, $Res Function(AlunosUiState) _then) = _$AlunosUiStateCopyWithImpl;
 @useResult
 $Res call({
- List<AlunoEntity> alunos, bool carregando, String busca, bool mostrarDialogoAluno, AlunoFormState formAluno, ConfirmacaoExclusaoAluno? confirmacaoExclusao, String? mensagem
+ List<AlunoEntity> alunos, List<TurmaEntity> turmas, bool carregando, String busca, bool mostrarDialogoAluno, AlunoFormState formAluno, ConfirmacaoExclusaoAluno? confirmacaoExclusao, String? mensagem
 });
 
 
@@ -623,10 +623,11 @@ class _$AlunosUiStateCopyWithImpl<$Res>
 
 /// Create a copy of AlunosUiState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? alunos = null,Object? carregando = null,Object? busca = null,Object? mostrarDialogoAluno = null,Object? formAluno = null,Object? confirmacaoExclusao = freezed,Object? mensagem = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? alunos = null,Object? turmas = null,Object? carregando = null,Object? busca = null,Object? mostrarDialogoAluno = null,Object? formAluno = null,Object? confirmacaoExclusao = freezed,Object? mensagem = freezed,}) {
   return _then(AlunosUiState(
 alunos: null == alunos ? _self.alunos : alunos // ignore: cast_nullable_to_non_nullable
-as List<AlunoEntity>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
+as List<AlunoEntity>,turmas: null == turmas ? _self.turmas : turmas // ignore: cast_nullable_to_non_nullable
+as List<TurmaEntity>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,busca: null == busca ? _self.busca : busca // ignore: cast_nullable_to_non_nullable
 as String,mostrarDialogoAluno: null == mostrarDialogoAluno ? _self.mostrarDialogoAluno : mostrarDialogoAluno // ignore: cast_nullable_to_non_nullable
 as bool,formAluno: null == formAluno ? _self.formAluno : formAluno // ignore: cast_nullable_to_non_nullable
@@ -738,10 +739,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<AlunoEntity> alunos,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<AlunoEntity> alunos,  List<TurmaEntity> turmas,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AlunosUiState() when $default != null:
-return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
+return $default(_that.alunos,_that.turmas,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
   return orElse();
 
 }
@@ -759,10 +760,10 @@ return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAl
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<AlunoEntity> alunos,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<AlunoEntity> alunos,  List<TurmaEntity> turmas,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)  $default,) {final _that = this;
 switch (_that) {
 case _AlunosUiState():
-return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
+return $default(_that.alunos,_that.turmas,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -779,10 +780,10 @@ return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAl
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<AlunoEntity> alunos,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<AlunoEntity> alunos,  List<TurmaEntity> turmas,  bool carregando,  String busca,  bool mostrarDialogoAluno,  AlunoFormState formAluno,  ConfirmacaoExclusaoAluno? confirmacaoExclusao,  String? mensagem)?  $default,) {final _that = this;
 switch (_that) {
 case _AlunosUiState() when $default != null:
-return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
+return $default(_that.alunos,_that.turmas,_that.carregando,_that.busca,_that.mostrarDialogoAluno,_that.formAluno,_that.confirmacaoExclusao,_that.mensagem);case _:
   return null;
 
 }
@@ -794,7 +795,7 @@ return $default(_that.alunos,_that.carregando,_that.busca,_that.mostrarDialogoAl
 
 
 class _AlunosUiState extends AlunosUiState {
-  const _AlunosUiState({ List<AlunoEntity> alunos = const [], this.carregando = true, this.busca = '', this.mostrarDialogoAluno = false, this.formAluno = const AlunoFormState(), this.confirmacaoExclusao, this.mensagem}): _alunos = alunos,super._();
+  const _AlunosUiState({ List<AlunoEntity> alunos = const [],  List<TurmaEntity> turmas = const [], this.carregando = true, this.busca = '', this.mostrarDialogoAluno = false, this.formAluno = const AlunoFormState(), this.confirmacaoExclusao, this.mensagem}): _alunos = alunos,_turmas = turmas,super._();
   
 
  final  List<AlunoEntity> _alunos;
@@ -802,6 +803,13 @@ class _AlunosUiState extends AlunosUiState {
   if (_alunos is EqualUnmodifiableListView) return _alunos;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_alunos);
+}
+
+ final  List<TurmaEntity> _turmas;
+@override@JsonKey() List<TurmaEntity> get turmas {
+  if (_turmas is EqualUnmodifiableListView) return _turmas;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_turmas);
 }
 
 @override@JsonKey() final  bool carregando;
@@ -822,18 +830,18 @@ _$AlunosUiStateCopyWith<_AlunosUiState> get copyWith => __$AlunosUiStateCopyWith
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AlunosUiState&&const DeepCollectionEquality().equals(other.alunos, _alunos)&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.busca, busca) || other.busca == busca)&&(identical(other.mostrarDialogoAluno, mostrarDialogoAluno) || other.mostrarDialogoAluno == mostrarDialogoAluno)&&(identical(other.formAluno, formAluno) || other.formAluno == formAluno)&&(identical(other.confirmacaoExclusao, confirmacaoExclusao) || other.confirmacaoExclusao == confirmacaoExclusao)&&(identical(other.mensagem, mensagem) || other.mensagem == mensagem));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AlunosUiState&&const DeepCollectionEquality().equals(other.alunos, _alunos)&&const DeepCollectionEquality().equals(other.turmas, _turmas)&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.busca, busca) || other.busca == busca)&&(identical(other.mostrarDialogoAluno, mostrarDialogoAluno) || other.mostrarDialogoAluno == mostrarDialogoAluno)&&(identical(other.formAluno, formAluno) || other.formAluno == formAluno)&&(identical(other.confirmacaoExclusao, confirmacaoExclusao) || other.confirmacaoExclusao == confirmacaoExclusao)&&(identical(other.mensagem, mensagem) || other.mensagem == mensagem));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_alunos),carregando,busca,mostrarDialogoAluno,formAluno,confirmacaoExclusao,mensagem);
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_alunos),const DeepCollectionEquality().hash(_turmas),carregando,busca,mostrarDialogoAluno,formAluno,confirmacaoExclusao,mensagem);
 }
 
 @override
 String toString() {
-    return 'AlunosUiState(alunos: $alunos, carregando: $carregando, busca: $busca, mostrarDialogoAluno: $mostrarDialogoAluno, formAluno: $formAluno, confirmacaoExclusao: $confirmacaoExclusao, mensagem: $mensagem)';
+    return 'AlunosUiState(alunos: $alunos, turmas: $turmas, carregando: $carregando, busca: $busca, mostrarDialogoAluno: $mostrarDialogoAluno, formAluno: $formAluno, confirmacaoExclusao: $confirmacaoExclusao, mensagem: $mensagem)';
 }
 
 
@@ -844,7 +852,7 @@ abstract mixin class _$AlunosUiStateCopyWith<$Res> implements $AlunosUiStateCopy
   factory _$AlunosUiStateCopyWith(_AlunosUiState value, $Res Function(_AlunosUiState) _then) = __$AlunosUiStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<AlunoEntity> alunos, bool carregando, String busca, bool mostrarDialogoAluno, AlunoFormState formAluno, ConfirmacaoExclusaoAluno? confirmacaoExclusao, String? mensagem
+ List<AlunoEntity> alunos, List<TurmaEntity> turmas, bool carregando, String busca, bool mostrarDialogoAluno, AlunoFormState formAluno, ConfirmacaoExclusaoAluno? confirmacaoExclusao, String? mensagem
 });
 
 
@@ -861,10 +869,11 @@ class __$AlunosUiStateCopyWithImpl<$Res>
 
 /// Create a copy of AlunosUiState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? alunos = null,Object? carregando = null,Object? busca = null,Object? mostrarDialogoAluno = null,Object? formAluno = null,Object? confirmacaoExclusao = freezed,Object? mensagem = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? alunos = null,Object? turmas = null,Object? carregando = null,Object? busca = null,Object? mostrarDialogoAluno = null,Object? formAluno = null,Object? confirmacaoExclusao = freezed,Object? mensagem = freezed,}) {
   return _then(_AlunosUiState(
 alunos: null == alunos ? _self._alunos : alunos // ignore: cast_nullable_to_non_nullable
-as List<AlunoEntity>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
+as List<AlunoEntity>,turmas: null == turmas ? _self._turmas : turmas // ignore: cast_nullable_to_non_nullable
+as List<TurmaEntity>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,busca: null == busca ? _self.busca : busca // ignore: cast_nullable_to_non_nullable
 as String,mostrarDialogoAluno: null == mostrarDialogoAluno ? _self.mostrarDialogoAluno : mostrarDialogoAluno // ignore: cast_nullable_to_non_nullable
 as bool,formAluno: null == formAluno ? _self.formAluno : formAluno // ignore: cast_nullable_to_non_nullable

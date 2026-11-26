@@ -61,6 +61,7 @@ abstract class AlunosUiState with _$AlunosUiState {
 
   const factory AlunosUiState({
     @Default([]) List<AlunoEntity> alunos,
+    @Default([]) List<TurmaEntity> turmas,
     @Default(true) bool carregando,
     @Default('') String busca,
     @Default(false) bool mostrarDialogoAluno,
@@ -78,9 +79,9 @@ abstract class AlunosUiState with _$AlunosUiState {
     return alunos
         .where(
           (aluno) =>
-              aluno.nome.toLowerCase().contains(termo) ||
-              (aluno.matricula?.toLowerCase().contains(termo) ?? false),
-        )
+      aluno.nome.toLowerCase().contains(termo) ||
+          (aluno.matricula?.toLowerCase().contains(termo) ?? false),
+    )
         .toList();
   }
 

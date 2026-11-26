@@ -145,6 +145,7 @@ void main() {
       provaId: id,
       titulo: 'Editada',
       disciplina: 'Matemática',
+      turma: original.prova.turma,
       descricao: '',
       questoes: [
         for (final q in original.questoes)

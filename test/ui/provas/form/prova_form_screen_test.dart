@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provafacil/data/local/app_database.dart';
+import 'package:provafacil/data/repository/disciplina_repository.dart';
+import 'package:provafacil/data/repository/turma_repository.dart';
 import 'package:provafacil/ui/navigation/prova_facil_nav_host.dart';
 
 import '../../../ajudantes/app_de_teste.dart';
@@ -10,9 +13,27 @@ Future<void> digitar(WidgetTester tester, String label, String texto) async {
   await tester.enterText(campo, texto);
 }
 
+Future<void> selecionarDropdown(WidgetTester tester, Key key, String texto) async {
+  final campo = find.byKey(key);
+  await tester.ensureVisible(campo);
+  await tester.tap(campo);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(texto).last);
+  await tester.pumpAndSettle();
+}
+
+Future<void> cadastrarBase(WidgetTester tester, AppDatabase db) async {
+  await tester.runAsync(() async {
+    await DisciplinaRepository(db).salvar('Ciências');
+    await TurmaRepository(db).salvar('A');
+  });
+  await esperarBanco(tester);
+}
+
 Future<void> preencherProva(WidgetTester tester) async {
   await digitar(tester, 'Título da prova', 'Prova de Ciências');
-  await digitar(tester, 'Disciplina', 'Ciências');
+  await selecionarDropdown(tester, const Key('dropdown_disciplina_prova'), 'Ciências');
+  await selecionarDropdown(tester, const Key('dropdown_turma_prova'), 'Turma A');
   await digitar(tester, 'Enunciado', 'O que é fotossíntese?');
   for (final letra in ['A', 'B', 'C', 'D', 'E']) {
     await digitar(tester, 'Alternativa $letra', 'Resposta $letra');
@@ -36,6 +57,8 @@ void main() {
     await abrirApp(tester, rotaFormulario(null));
 
     expect(find.text('Informações Básicas'), findsOneWidget);
+    expect(find.text('Nenhuma disciplina cadastrada.'), findsOneWidget);
+    expect(find.text('Nenhuma turma cadastrada.'), findsOneWidget);
     expect(find.text('Questões'), findsOneWidget);
     expect(find.text('Questão 1'), findsOneWidget);
     expect(find.text('Alternativas'), findsOneWidget);
@@ -65,7 +88,8 @@ void main() {
   });
 
   testWidgets('prova nova salva fecha o formulário e abre o Gabarito dela', (tester) async {
-    await abrirApp(tester, rotaLista);
+    final db = await abrirApp(tester, rotaLista);
+    await cadastrarBase(tester, db);
     await abrirNovaProvaManual(tester);
 
     await preencherProva(tester);
@@ -79,8 +103,10 @@ void main() {
     expect(find.text('Dashboard'), findsOneWidget);
   });
 
-  testWidgets('edição salva fecha o formulário e volta à visualização', (tester) async {
+  testWidgets('edição salva fecha o formulário, volta à visualização e preserva a turma',
+      (tester) async {
     final db = await abrirApp(tester, rotaLista);
+    await cadastrarBase(tester, db);
     await abrirNovaProvaManual(tester);
     await preencherProva(tester);
     await salvar(tester);
@@ -101,6 +127,7 @@ void main() {
     expect(find.text('Prova Editada'), findsOneWidget);
     final provas = await tester.runAsync(() => db.select(db.provas).get());
     expect(provas!.single.titulo, 'Prova Editada');
+    expect(provas.single.turma, 'Turma A');
     await tester.tap(find.byTooltip('Voltar'));
     await esperarBanco(tester);
     expect(find.text('Dashboard'), findsOneWidget);

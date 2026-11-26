@@ -7,10 +7,16 @@ import 'prova_form_ui_state.dart';
 import 'prova_form_view_model.dart';
 
 class ProvaFormScreen extends StatefulWidget {
-  const ProvaFormScreen({super.key, required this.onSalvo, required this.onVoltar});
+  const ProvaFormScreen({
+    super.key,
+    required this.onSalvo,
+    required this.onVoltar,
+    this.onAbrirTurmasDisciplinas,
+  });
 
   final ValueChanged<int> onSalvo;
   final VoidCallback onVoltar;
+  final VoidCallback? onAbrirTurmasDisciplinas;
 
   @override
   State<ProvaFormScreen> createState() => _ProvaFormScreenState();
@@ -49,6 +55,18 @@ class _ProvaFormScreenState extends State<ProvaFormScreen> {
     final tema = Theme.of(context);
     final tituloSecao = tema.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
 
+    final opcoesDisciplina = <String>[
+      for (final d in uiState.disciplinas) d.nome,
+      if (uiState.disciplina.isNotEmpty &&
+          !uiState.disciplinas.any((d) => d.nome == uiState.disciplina))
+        uiState.disciplina,
+    ];
+    final opcoesTurma = <String>[
+      for (final t in uiState.turmas) t.nome,
+      if (uiState.turma.isNotEmpty && !uiState.turmas.any((t) => t.nome == uiState.turma))
+        uiState.turma,
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -83,12 +101,28 @@ class _ProvaFormScreenState extends State<ProvaFormScreen> {
             enabled: !travado,
           ),
           const SizedBox(height: 16),
-          ProvaFacilTextField(
-            value: uiState.disciplina,
+          _SeletorOuAviso(
+            dropdownKey: const Key('dropdown_disciplina_prova'),
+            rotulo: 'Disciplina',
+            dica: 'Selecione uma disciplina',
+            opcoes: opcoesDisciplina,
+            selecionado: uiState.disciplina,
+            habilitado: !travado,
+            mensagemVazio: 'Nenhuma disciplina cadastrada.',
             onChanged: viewModel.atualizarDisciplina,
-            label: 'Disciplina',
-            singleLine: true,
-            enabled: !travado,
+            onAbrirTurmasDisciplinas: widget.onAbrirTurmasDisciplinas,
+          ),
+          const SizedBox(height: 16),
+          _SeletorOuAviso(
+            dropdownKey: const Key('dropdown_turma_prova'),
+            rotulo: 'Turma',
+            dica: 'Selecione uma turma',
+            opcoes: opcoesTurma,
+            selecionado: uiState.turma,
+            habilitado: !travado,
+            mensagemVazio: 'Nenhuma turma cadastrada.',
+            onChanged: viewModel.atualizarTurma,
+            onAbrirTurmasDisciplinas: widget.onAbrirTurmasDisciplinas,
           ),
           const SizedBox(height: 16),
           ProvaFacilTextField(
@@ -214,6 +248,84 @@ class _QuestaoFormCard extends StatelessWidget {
               style: tema.textTheme.bodySmall?.copyWith(color: tema.colorScheme.onSurfaceVariant),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SeletorOuAviso extends StatelessWidget {
+  const _SeletorOuAviso({
+    required this.dropdownKey,
+    required this.rotulo,
+    required this.dica,
+    required this.opcoes,
+    required this.selecionado,
+    required this.habilitado,
+    required this.mensagemVazio,
+    required this.onChanged,
+    this.onAbrirTurmasDisciplinas,
+  });
+
+  final Key dropdownKey;
+  final String rotulo;
+  final String dica;
+  final List<String> opcoes;
+  final String selecionado;
+  final bool habilitado;
+  final String mensagemVazio;
+  final ValueChanged<String> onChanged;
+  final VoidCallback? onAbrirTurmasDisciplinas;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    if (opcoes.isEmpty) {
+      return ProvaFacilCard(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  mensagemVazio,
+                  style: tema.textTheme.bodyMedium?.copyWith(
+                    color: tema.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              if (onAbrirTurmasDisciplinas != null)
+                TextButton(
+                  onPressed: habilitado ? onAbrirTurmasDisciplinas : null,
+                  child: const Text('Cadastrar'),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final valorValido = opcoes.contains(selecionado) ? selecionado : null;
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: rotulo,
+        border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          key: dropdownKey,
+          isExpanded: true,
+          value: valorValido,
+          hint: Text(dica),
+          items: [
+            for (final nome in opcoes) DropdownMenuItem<String>(value: nome, child: Text(nome)),
+          ],
+          onChanged: habilitado
+              ? (valor) {
+            if (valor != null) onChanged(valor);
+          }
+              : null,
         ),
       ),
     );

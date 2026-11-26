@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../data/local/app_database.dart';
+
 part 'prova_form_ui_state.freezed.dart';
 
 /// Quantidade de alternativas (A, B, C, D, E) de toda questão. Ver a tela de Gabarito.
@@ -30,8 +32,8 @@ abstract class QuestaoFormState with _$QuestaoFormState {
   }) = _QuestaoFormState;
 }
 
-/// Estado da tela de cadastro/edição do conteúdo de uma prova (título, disciplina, questões e
-/// texto das alternativas). Definir qual alternativa é a correta acontece na tela de Gabarito.
+/// Estado da tela de cadastro/edição do conteúdo de uma prova (título, disciplina, turma, questões
+/// e texto das alternativas). Definir qual alternativa é a correta acontece na tela de Gabarito.
 @freezed
 abstract class ProvaFormUiState with _$ProvaFormUiState {
   const ProvaFormUiState._();
@@ -40,7 +42,10 @@ abstract class ProvaFormUiState with _$ProvaFormUiState {
     int? provaId,
     @Default('') String titulo,
     @Default('') String disciplina,
+    @Default('') String turma,
     @Default('') String descricao,
+    @Default([]) List<DisciplinaEntity> disciplinas,
+    @Default([]) List<TurmaEntity> turmas,
     @Default([QuestaoFormState()]) List<QuestaoFormState> questoes,
     @Default(false) bool carregando,
     String? erro,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/data/local/app_database.dart';
 import 'package:provafacil/data/repository/aluno_repository.dart';
+import 'package:provafacil/data/repository/turma_repository.dart';
 import 'package:provafacil/ui/alunos/alunos_screen.dart';
 import 'package:provafacil/ui/alunos/alunos_view_model.dart';
 import 'package:provafacil/ui/theme/theme.dart';
@@ -20,7 +21,11 @@ Future<void> esperarBanco(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<AppDatabase> abrirTela(WidgetTester tester) async {
+Future<AppDatabase> abrirTela(
+    WidgetTester tester, {
+      List<String> turmasIniciais = const ['3B', 'A', 'B'],
+      VoidCallback? onAbrirTurmasDisciplinas,
+    }) async {
   final db = AppDatabase(
     DatabaseConnection(NativeDatabase.memory(), closeStreamsSynchronously: true),
   );
@@ -32,12 +37,23 @@ Future<AppDatabase> abrirTela(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.runAsync(db.close);
   });
+
+  final turmaRepository = TurmaRepository(db);
+  await tester.runAsync(() async {
+    for (final nome in turmasIniciais) {
+      await turmaRepository.salvar(nome);
+    }
+  });
+
   await tester.pumpWidget(
     MaterialApp(
       theme: ProvaFacilTheme.claro,
       home: ChangeNotifierProvider(
-        create: (_) => AlunosViewModel(AlunoRepository(db)),
-        child: AlunosScreen(onVoltar: () {}),
+        create: (_) => AlunosViewModel(AlunoRepository(db), turmaRepository: turmaRepository),
+        child: AlunosScreen(
+          onVoltar: () {},
+          onAbrirTurmasDisciplinas: onAbrirTurmasDisciplinas,
+        ),
       ),
     ),
   );
@@ -47,14 +63,21 @@ Future<AppDatabase> abrirTela(WidgetTester tester) async {
 
 Finder campo(String rotulo) => find.widgetWithText(TextField, rotulo);
 
+Future<void> selecionarTurma(WidgetTester tester, String turma) async {
+  await tester.tap(find.byKey(const Key('dropdown_turma_aluno')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(turma).last);
+  await tester.pumpAndSettle();
+}
+
 Future<void> preencherAluno(
-  WidgetTester tester, {
-  String? nome,
-  String? turma,
-  String? matricula,
-}) async {
+    WidgetTester tester, {
+      String? nome,
+      String? turma,
+      String? matricula,
+    }) async {
   if (nome != null) await tester.enterText(campo('Nome'), nome);
-  if (turma != null) await tester.enterText(campo('Turma'), turma);
+  if (turma != null) await selecionarTurma(tester, turma);
   if (matricula != null) await tester.enterText(campo('Matrícula (opcional)'), matricula);
   await tester.pump();
 }
@@ -79,15 +102,31 @@ void main() {
     );
   });
 
-  testWidgets('cadastra com a turma normalizada e agrupa pela turma', (tester) async {
+  testWidgets('sem turmas cadastradas mostra aviso com atalho no diálogo', (tester) async {
+    var abriuTurmas = false;
+    await abrirTela(
+      tester,
+      turmasIniciais: const [],
+      onAbrirTurmasDisciplinas: () => abriuTurmas = true,
+    );
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nenhuma turma cadastrada.'), findsOneWidget);
+    await tester.tap(find.text('Cadastrar turma'));
+    await tester.pumpAndSettle();
+
+    expect(abriuTurmas, isTrue);
+  });
+
+  testWidgets('cadastra escolhendo turma cadastrada e agrupa pela turma', (tester) async {
     await abrirTela(tester);
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
 
     expect(find.text('Novo Aluno'), findsNWidgets(2)); // botão e título do diálogo
-    expect(find.text('Ex.: "A" será salvo como "Turma A"'), findsOneWidget);
-    await preencherAluno(tester, nome: 'Ana Souza', turma: '3b');
-    expect(find.text('Será salvo como "Turma 3B"'), findsOneWidget);
+    await preencherAluno(tester, nome: 'Ana Souza', turma: 'Turma 3B');
 
     await tester.tap(find.text('Adicionar'));
     await esperarBanco(tester);
@@ -100,9 +139,9 @@ void main() {
 
   testWidgets('matrícula repetida mostra a recusa no diálogo', (tester) async {
     await abrirTela(tester);
-    await cadastrar(tester, 'Ana Souza', 'A', matricula: '2023001');
+    await cadastrar(tester, 'Ana Souza', 'Turma A', matricula: '2023001');
 
-    await cadastrar(tester, 'Bruno Lima', 'B', matricula: '2023001');
+    await cadastrar(tester, 'Bruno Lima', 'Turma B', matricula: '2023001');
 
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(
@@ -117,7 +156,7 @@ void main() {
 
   testWidgets('edita o aluno pelo mesmo diálogo', (tester) async {
     await abrirTela(tester);
-    await cadastrar(tester, 'Ana Souza', 'A');
+    await cadastrar(tester, 'Ana Souza', 'Turma A');
 
     await tester.tap(find.text('Ana Souza'));
     await tester.pumpAndSettle();
@@ -132,7 +171,7 @@ void main() {
 
   testWidgets('excluir pede confirmação citando os resultados', (tester) async {
     final db = await abrirTela(tester);
-    await cadastrar(tester, 'Ana Souza', 'A');
+    await cadastrar(tester, 'Ana Souza', 'Turma A');
     await tester.runAsync(() async {
       final provaId = await criarProvaComGabarito(db, gabarito: ['A']);
       await gravarCorrecao(

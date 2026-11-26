@@ -558,7 +558,7 @@ as List<AlternativaFormState>,
 /// @nodoc
 mixin _$ProvaFormUiState {
 
- int? get provaId; String get titulo; String get disciplina; String get descricao; List<QuestaoFormState> get questoes; bool get carregando; String? get erro; bool get salvo;
+ int? get provaId; String get titulo; String get disciplina; String get turma; String get descricao; List<DisciplinaEntity> get disciplinas; List<TurmaEntity> get turmas; List<QuestaoFormState> get questoes; bool get carregando; String? get erro; bool get salvo;
 /// Create a copy of ProvaFormUiState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -570,20 +570,20 @@ $ProvaFormUiStateCopyWith<ProvaFormUiState> get copyWith => _$ProvaFormUiStateCo
 @override
 bool operator ==(Object other) {
   final _this = this as ProvaFormUiState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProvaFormUiState&&(identical(other.provaId, _this.provaId) || other.provaId == _this.provaId)&&(identical(other.titulo, _this.titulo) || other.titulo == _this.titulo)&&(identical(other.disciplina, _this.disciplina) || other.disciplina == _this.disciplina)&&(identical(other.descricao, _this.descricao) || other.descricao == _this.descricao)&&const DeepCollectionEquality().equals(other.questoes, _this.questoes)&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.erro, _this.erro) || other.erro == _this.erro)&&(identical(other.salvo, _this.salvo) || other.salvo == _this.salvo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProvaFormUiState&&(identical(other.provaId, _this.provaId) || other.provaId == _this.provaId)&&(identical(other.titulo, _this.titulo) || other.titulo == _this.titulo)&&(identical(other.disciplina, _this.disciplina) || other.disciplina == _this.disciplina)&&(identical(other.turma, _this.turma) || other.turma == _this.turma)&&(identical(other.descricao, _this.descricao) || other.descricao == _this.descricao)&&const DeepCollectionEquality().equals(other.disciplinas, _this.disciplinas)&&const DeepCollectionEquality().equals(other.turmas, _this.turmas)&&const DeepCollectionEquality().equals(other.questoes, _this.questoes)&&(identical(other.carregando, _this.carregando) || other.carregando == _this.carregando)&&(identical(other.erro, _this.erro) || other.erro == _this.erro)&&(identical(other.salvo, _this.salvo) || other.salvo == _this.salvo));
 }
 
 
 @override
 int get hashCode {
   final _this = this as ProvaFormUiState;
-  return Object.hash(runtimeType,_this.provaId,_this.titulo,_this.disciplina,_this.descricao,const DeepCollectionEquality().hash(_this.questoes),_this.carregando,_this.erro,_this.salvo);
+  return Object.hash(runtimeType,_this.provaId,_this.titulo,_this.disciplina,_this.turma,_this.descricao,const DeepCollectionEquality().hash(_this.disciplinas),const DeepCollectionEquality().hash(_this.turmas),const DeepCollectionEquality().hash(_this.questoes),_this.carregando,_this.erro,_this.salvo);
 }
 
 @override
 String toString() {
   final _this = this as ProvaFormUiState;
-  return 'ProvaFormUiState(provaId: ${_this.provaId}, titulo: ${_this.titulo}, disciplina: ${_this.disciplina}, descricao: ${_this.descricao}, questoes: ${_this.questoes}, carregando: ${_this.carregando}, erro: ${_this.erro}, salvo: ${_this.salvo})';
+  return 'ProvaFormUiState(provaId: ${_this.provaId}, titulo: ${_this.titulo}, disciplina: ${_this.disciplina}, turma: ${_this.turma}, descricao: ${_this.descricao}, disciplinas: ${_this.disciplinas}, turmas: ${_this.turmas}, questoes: ${_this.questoes}, carregando: ${_this.carregando}, erro: ${_this.erro}, salvo: ${_this.salvo})';
 }
 
 
@@ -594,7 +594,7 @@ abstract mixin class $ProvaFormUiStateCopyWith<$Res>  {
   factory $ProvaFormUiStateCopyWith(ProvaFormUiState value, $Res Function(ProvaFormUiState) _then) = _$ProvaFormUiStateCopyWithImpl;
 @useResult
 $Res call({
- int? provaId, String titulo, String disciplina, String descricao, List<QuestaoFormState> questoes, bool carregando, String? erro, bool salvo
+ int? provaId, String titulo, String disciplina, String turma, String descricao, List<DisciplinaEntity> disciplinas, List<TurmaEntity> turmas, List<QuestaoFormState> questoes, bool carregando, String? erro, bool salvo
 });
 
 
@@ -611,13 +611,16 @@ class _$ProvaFormUiStateCopyWithImpl<$Res>
 
 /// Create a copy of ProvaFormUiState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? provaId = freezed,Object? titulo = null,Object? disciplina = null,Object? descricao = null,Object? questoes = null,Object? carregando = null,Object? erro = freezed,Object? salvo = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? provaId = freezed,Object? titulo = null,Object? disciplina = null,Object? turma = null,Object? descricao = null,Object? disciplinas = null,Object? turmas = null,Object? questoes = null,Object? carregando = null,Object? erro = freezed,Object? salvo = null,}) {
   return _then(ProvaFormUiState(
 provaId: freezed == provaId ? _self.provaId : provaId // ignore: cast_nullable_to_non_nullable
 as int?,titulo: null == titulo ? _self.titulo : titulo // ignore: cast_nullable_to_non_nullable
 as String,disciplina: null == disciplina ? _self.disciplina : disciplina // ignore: cast_nullable_to_non_nullable
+as String,turma: null == turma ? _self.turma : turma // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,questoes: null == questoes ? _self.questoes : questoes // ignore: cast_nullable_to_non_nullable
+as String,disciplinas: null == disciplinas ? _self.disciplinas : disciplinas // ignore: cast_nullable_to_non_nullable
+as List<DisciplinaEntity>,turmas: null == turmas ? _self.turmas : turmas // ignore: cast_nullable_to_non_nullable
+as List<TurmaEntity>,questoes: null == questoes ? _self.questoes : questoes // ignore: cast_nullable_to_non_nullable
 as List<QuestaoFormState>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,erro: freezed == erro ? _self.erro : erro // ignore: cast_nullable_to_non_nullable
 as String?,salvo: null == salvo ? _self.salvo : salvo // ignore: cast_nullable_to_non_nullable
@@ -706,10 +709,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? provaId,  String titulo,  String disciplina,  String descricao,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? provaId,  String titulo,  String disciplina,  String turma,  String descricao,  List<DisciplinaEntity> disciplinas,  List<TurmaEntity> turmas,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProvaFormUiState() when $default != null:
-return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
+return $default(_that.provaId,_that.titulo,_that.disciplina,_that.turma,_that.descricao,_that.disciplinas,_that.turmas,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
   return orElse();
 
 }
@@ -727,10 +730,10 @@ return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? provaId,  String titulo,  String disciplina,  String descricao,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? provaId,  String titulo,  String disciplina,  String turma,  String descricao,  List<DisciplinaEntity> disciplinas,  List<TurmaEntity> turmas,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)  $default,) {final _that = this;
 switch (_that) {
 case _ProvaFormUiState():
-return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
+return $default(_that.provaId,_that.titulo,_that.disciplina,_that.turma,_that.descricao,_that.disciplinas,_that.turmas,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -747,10 +750,10 @@ return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? provaId,  String titulo,  String disciplina,  String descricao,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? provaId,  String titulo,  String disciplina,  String turma,  String descricao,  List<DisciplinaEntity> disciplinas,  List<TurmaEntity> turmas,  List<QuestaoFormState> questoes,  bool carregando,  String? erro,  bool salvo)?  $default,) {final _that = this;
 switch (_that) {
 case _ProvaFormUiState() when $default != null:
-return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
+return $default(_that.provaId,_that.titulo,_that.disciplina,_that.turma,_that.descricao,_that.disciplinas,_that.turmas,_that.questoes,_that.carregando,_that.erro,_that.salvo);case _:
   return null;
 
 }
@@ -762,13 +765,28 @@ return $default(_that.provaId,_that.titulo,_that.disciplina,_that.descricao,_tha
 
 
 class _ProvaFormUiState extends ProvaFormUiState {
-  const _ProvaFormUiState({this.provaId, this.titulo = '', this.disciplina = '', this.descricao = '',  List<QuestaoFormState> questoes = const [QuestaoFormState()], this.carregando = false, this.erro, this.salvo = false}): _questoes = questoes,super._();
+  const _ProvaFormUiState({this.provaId, this.titulo = '', this.disciplina = '', this.turma = '', this.descricao = '',  List<DisciplinaEntity> disciplinas = const [],  List<TurmaEntity> turmas = const [],  List<QuestaoFormState> questoes = const [QuestaoFormState()], this.carregando = false, this.erro, this.salvo = false}): _disciplinas = disciplinas,_turmas = turmas,_questoes = questoes,super._();
   
 
 @override final  int? provaId;
 @override@JsonKey() final  String titulo;
 @override@JsonKey() final  String disciplina;
+@override@JsonKey() final  String turma;
 @override@JsonKey() final  String descricao;
+ final  List<DisciplinaEntity> _disciplinas;
+@override@JsonKey() List<DisciplinaEntity> get disciplinas {
+  if (_disciplinas is EqualUnmodifiableListView) return _disciplinas;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_disciplinas);
+}
+
+ final  List<TurmaEntity> _turmas;
+@override@JsonKey() List<TurmaEntity> get turmas {
+  if (_turmas is EqualUnmodifiableListView) return _turmas;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_turmas);
+}
+
  final  List<QuestaoFormState> _questoes;
 @override@JsonKey() List<QuestaoFormState> get questoes {
   if (_questoes is EqualUnmodifiableListView) return _questoes;
@@ -790,18 +808,18 @@ _$ProvaFormUiStateCopyWith<_ProvaFormUiState> get copyWith => __$ProvaFormUiStat
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProvaFormUiState&&(identical(other.provaId, provaId) || other.provaId == provaId)&&(identical(other.titulo, titulo) || other.titulo == titulo)&&(identical(other.disciplina, disciplina) || other.disciplina == disciplina)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&const DeepCollectionEquality().equals(other.questoes, _questoes)&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.erro, erro) || other.erro == erro)&&(identical(other.salvo, salvo) || other.salvo == salvo));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProvaFormUiState&&(identical(other.provaId, provaId) || other.provaId == provaId)&&(identical(other.titulo, titulo) || other.titulo == titulo)&&(identical(other.disciplina, disciplina) || other.disciplina == disciplina)&&(identical(other.turma, turma) || other.turma == turma)&&(identical(other.descricao, descricao) || other.descricao == descricao)&&const DeepCollectionEquality().equals(other.disciplinas, _disciplinas)&&const DeepCollectionEquality().equals(other.turmas, _turmas)&&const DeepCollectionEquality().equals(other.questoes, _questoes)&&(identical(other.carregando, carregando) || other.carregando == carregando)&&(identical(other.erro, erro) || other.erro == erro)&&(identical(other.salvo, salvo) || other.salvo == salvo));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,provaId,titulo,disciplina,descricao,const DeepCollectionEquality().hash(_questoes),carregando,erro,salvo);
+    return Object.hash(runtimeType,provaId,titulo,disciplina,turma,descricao,const DeepCollectionEquality().hash(_disciplinas),const DeepCollectionEquality().hash(_turmas),const DeepCollectionEquality().hash(_questoes),carregando,erro,salvo);
 }
 
 @override
 String toString() {
-    return 'ProvaFormUiState(provaId: $provaId, titulo: $titulo, disciplina: $disciplina, descricao: $descricao, questoes: $questoes, carregando: $carregando, erro: $erro, salvo: $salvo)';
+    return 'ProvaFormUiState(provaId: $provaId, titulo: $titulo, disciplina: $disciplina, turma: $turma, descricao: $descricao, disciplinas: $disciplinas, turmas: $turmas, questoes: $questoes, carregando: $carregando, erro: $erro, salvo: $salvo)';
 }
 
 
@@ -812,7 +830,7 @@ abstract mixin class _$ProvaFormUiStateCopyWith<$Res> implements $ProvaFormUiSta
   factory _$ProvaFormUiStateCopyWith(_ProvaFormUiState value, $Res Function(_ProvaFormUiState) _then) = __$ProvaFormUiStateCopyWithImpl;
 @override @useResult
 $Res call({
- int? provaId, String titulo, String disciplina, String descricao, List<QuestaoFormState> questoes, bool carregando, String? erro, bool salvo
+ int? provaId, String titulo, String disciplina, String turma, String descricao, List<DisciplinaEntity> disciplinas, List<TurmaEntity> turmas, List<QuestaoFormState> questoes, bool carregando, String? erro, bool salvo
 });
 
 
@@ -829,13 +847,16 @@ class __$ProvaFormUiStateCopyWithImpl<$Res>
 
 /// Create a copy of ProvaFormUiState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? provaId = freezed,Object? titulo = null,Object? disciplina = null,Object? descricao = null,Object? questoes = null,Object? carregando = null,Object? erro = freezed,Object? salvo = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? provaId = freezed,Object? titulo = null,Object? disciplina = null,Object? turma = null,Object? descricao = null,Object? disciplinas = null,Object? turmas = null,Object? questoes = null,Object? carregando = null,Object? erro = freezed,Object? salvo = null,}) {
   return _then(_ProvaFormUiState(
 provaId: freezed == provaId ? _self.provaId : provaId // ignore: cast_nullable_to_non_nullable
 as int?,titulo: null == titulo ? _self.titulo : titulo // ignore: cast_nullable_to_non_nullable
 as String,disciplina: null == disciplina ? _self.disciplina : disciplina // ignore: cast_nullable_to_non_nullable
+as String,turma: null == turma ? _self.turma : turma // ignore: cast_nullable_to_non_nullable
 as String,descricao: null == descricao ? _self.descricao : descricao // ignore: cast_nullable_to_non_nullable
-as String,questoes: null == questoes ? _self._questoes : questoes // ignore: cast_nullable_to_non_nullable
+as String,disciplinas: null == disciplinas ? _self._disciplinas : disciplinas // ignore: cast_nullable_to_non_nullable
+as List<DisciplinaEntity>,turmas: null == turmas ? _self._turmas : turmas // ignore: cast_nullable_to_non_nullable
+as List<TurmaEntity>,questoes: null == questoes ? _self._questoes : questoes // ignore: cast_nullable_to_non_nullable
 as List<QuestaoFormState>,carregando: null == carregando ? _self.carregando : carregando // ignore: cast_nullable_to_non_nullable
 as bool,erro: freezed == erro ? _self.erro : erro // ignore: cast_nullable_to_non_nullable
 as String?,salvo: null == salvo ? _self.salvo : salvo // ignore: cast_nullable_to_non_nullable

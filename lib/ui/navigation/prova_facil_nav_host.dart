@@ -8,37 +8,43 @@ import '../../data/local/app_database.dart';
 import '../../data/repository/aluno_repository.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/backup_nuvem_repository.dart';
-import '../../data/repository/prova_repository.dart';
 import '../../data/repository/banco_questao_repository.dart';
 import '../../data/repository/disciplina_repository.dart';
+import '../../data/repository/estatisticas_repository.dart';
+import '../../data/repository/historico_repository.dart';
+import '../../data/repository/prova_repository.dart';
 import '../../data/repository/turma_repository.dart';
 import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
 import '../auth/auth_rotas.dart';
 import '../auth/menu_professor.dart';
-import '../../data/repository/historico_repository.dart';
-import '../../data/repository/estatisticas_repository.dart';
+import '../banco_questoes/banco_questoes_screen.dart';
+import '../banco_questoes/banco_questoes_view_model.dart';
+import '../banco_questoes/form/banco_questao_form_screen.dart';
+import '../banco_questoes/form/banco_questao_form_view_model.dart';
 import '../correcao/correcao_rotas.dart';
+import '../estatisticas/estatisticas_screen.dart';
+import '../estatisticas/estatisticas_view_model.dart';
+import '../historico/historico_screen.dart';
+import '../historico/historico_view_model.dart';
 import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
 import '../provas/gabarito/gabarito_screen.dart';
 import '../provas/gabarito/gabarito_view_model.dart';
-import '../provas/list/prova_list_screen.dart';
-import '../provas/list/prova_list_view_model.dart';
 import '../provas/gerar/gerar_prova_screen.dart';
 import '../provas/gerar/gerar_prova_view_model.dart';
+import '../provas/list/prova_list_screen.dart';
+import '../provas/list/prova_list_view_model.dart';
+import '../provas/pdf/pdf_prova_view_model.dart';
 import '../provas/visualizar/visualizar_prova_screen.dart';
 import '../provas/visualizar/visualizar_prova_view_model.dart';
-import '../provas/pdf/pdf_prova_view_model.dart';
-import '../historico/historico_screen.dart';
-import '../historico/historico_view_model.dart';
-import '../estatisticas/estatisticas_screen.dart';
-import '../estatisticas/estatisticas_view_model.dart';
 import '../relatorio/relatorio_notas_screen.dart';
 import '../scanner/qr_code_scanner_view_model.dart';
 import '../scanner/scan_respostas_screen.dart';
 import '../scanner/scan_respostas_view_model.dart';
 import '../scanner/scanner_screen.dart';
+import '../turmas_disciplinas/turmas_disciplinas_screen.dart';
+import '../turmas_disciplinas/turmas_disciplinas_view_model.dart';
 
 const _argProvaId = 'provaId';
 const _argQr = 'qr';
@@ -46,6 +52,7 @@ const _argQr = 'qr';
 const rotaLista = '/provas';
 const rotaAlunos = '/alunos';
 const rotaHistorico = '/historico';
+const rotaTurmas = '/turmas';
 
 String rotaFormulario(int? provaId) => '/provas/form?$_argProvaId=${provaId ?? -1}';
 String rotaGerarProva() => '/provas/gerar';
@@ -53,6 +60,9 @@ String rotaVisualizarProva(int provaId) => '/provas/$provaId';
 String rotaGabarito(int provaId) => '/provas/$provaId/gabarito';
 String rotaEstatisticas(int provaId) => '/estatisticas/$provaId';
 String rotaRelatorio(int provaId) => '/relatorio/$provaId';
+String rotaBancoQuestoes() => '/banco-questoes';
+String rotaFormularioBancoQuestao(int? id) =>
+    id == null ? '/banco-questoes/form' : '/banco-questoes/form?id=$id';
 
 /// O id da prova acompanha o escaneamento para chegar já preenchido na tela de correção.
 String rotaScanQr(int? provaId) => '/scan_qr?$_argProvaId=${provaId ?? -1}';
@@ -80,10 +90,10 @@ GoRouter provaFacilNavHost({
       redirect: auth == null
           ? null
           : (context, state) => redirecionarPorLogin(
-              logado: auth.logado,
-              local: state.uri.path,
-              aposEntrar: rotaLista,
-            ),
+        logado: auth.logado,
+        local: state.uri.path,
+        aposEntrar: rotaLista,
+      ),
       routes: [
         if (auth != null) ...rotasDeAutenticacao(auth),
         GoRoute(
@@ -102,6 +112,8 @@ GoRouter provaFacilNavHost({
               onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
               onAbrirAlunos: () => context.push(rotaAlunos),
               onAbrirHistorico: () => context.push(rotaHistorico),
+              onAbrirTurmasDisciplinas: () => context.push(rotaTurmas),
+              onAbrirBancoQuestoes: () => context.push(rotaBancoQuestoes()),
               menuConta: auth == null ? null : MenuProfessor(auth: auth),
             ),
           ),
@@ -110,9 +122,14 @@ GoRouter provaFacilNavHost({
           path: '/provas/form',
           builder: (context, state) {
             final provaId = _idOpcional(state.uri.queryParameters[_argProvaId]);
+            final database = context.read<AppDatabase>();
             return ChangeNotifierProvider(
-              create: (context) =>
-                  ProvaFormViewModel(ProvaRepository(context.read<AppDatabase>()), provaId),
+              create: (_) => ProvaFormViewModel(
+                ProvaRepository(database),
+                provaId,
+                disciplinaRepository: DisciplinaRepository(database),
+                turmaRepository: TurmaRepository(database),
+              ),
               child: ProvaFormScreen(
                 onSalvo: (idSalvo) {
                   final router = GoRouter.of(context);
@@ -120,6 +137,7 @@ GoRouter provaFacilNavHost({
                   if (provaId == null) router.push(rotaGabarito(idSalvo));
                 },
                 onVoltar: () => context.pop(),
+                onAbrirTurmasDisciplinas: () => context.push(rotaTurmas),
               ),
             );
           },
@@ -139,7 +157,7 @@ GoRouter provaFacilNavHost({
                 onVoltar: () => context.pop(),
                 onGerada: (id) => context.pushReplacement(rotaVisualizarProva(id)),
                 // Contrato do Membro 1: rotaBancoQuestoes() => '/banco-questoes'.
-                onAbrirBancoQuestoes: () => context.push('/banco-questoes'),
+                onAbrirBancoQuestoes: () => context.push(rotaBancoQuestoes()),
               ),
             );
           },
@@ -223,15 +241,22 @@ GoRouter provaFacilNavHost({
         ...rotasDeCorrecao(aoConcluir: (context) => context.go(rotaLista), backup: backup),
         GoRoute(
           path: rotaAlunos,
-          builder: (context, state) => ChangeNotifierProvider(
-            create: (context) => AlunosViewModel(
-              AlunoRepository(
-                context.read<AppDatabase>(),
-                backup: BackupAlunosFirestore(context.read<IdInstalacao>()),
+          builder: (context, state) {
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => AlunosViewModel(
+                AlunoRepository(
+                  database,
+                  backup: BackupAlunosFirestore(context.read<IdInstalacao>()),
+                ),
+                turmaRepository: TurmaRepository(database),
               ),
-            ),
-            child: AlunosScreen(onVoltar: () => context.pop()),
-          ),
+              child: AlunosScreen(
+                onVoltar: () => context.pop(),
+                onAbrirTurmasDisciplinas: () => context.push(rotaTurmas),
+              ),
+            );
+          },
         ),
         GoRoute(
           path: '/historico',
@@ -278,6 +303,55 @@ GoRouter provaFacilNavHost({
             return RelatorioNotasScreen(
               provaId: provaId,
               onVoltar: () => context.pop(),
+            );
+          },
+        ),
+        GoRoute(
+          path: rotaTurmas,
+          builder: (context, state) {
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => TurmasDisciplinasViewModel(
+                TurmaRepository(database),
+                DisciplinaRepository(database),
+              ),
+              child: TurmasDisciplinasScreen(onVoltar: () => context.pop()),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/banco-questoes',
+          builder: (context, state) {
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => BancoQuestoesViewModel(
+                BancoQuestaoRepository(database),
+                DisciplinaRepository(database),
+              ),
+              child: BancoQuestoesScreen(
+                onVoltar: () => context.pop(),
+                onNovaQuestao: () => context.push(rotaFormularioBancoQuestao(null)),
+                onEditarQuestao: (id) => context.push(rotaFormularioBancoQuestao(id)),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/banco-questoes/form',
+          builder: (context, state) {
+            final id = _idOpcional(state.uri.queryParameters['id']);
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => BancoQuestaoFormViewModel(
+                BancoQuestaoRepository(database),
+                DisciplinaRepository(database),
+                id,
+              ),
+              child: BancoQuestaoFormScreen(
+                onVoltar: () => context.pop(),
+                onConcluido: () => context.pop(),
+                onAbrirTurmasDisciplinas: () => context.push(rotaTurmas),
+              ),
             );
           },
         ),

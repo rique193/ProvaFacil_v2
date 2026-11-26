@@ -20,6 +20,8 @@ class ProvaListScreen extends StatelessWidget {
     required this.onCorrigirProva,
     required this.onAbrirAlunos,
     required this.onAbrirHistorico,
+    this.onAbrirTurmasDisciplinas,
+    this.onAbrirBancoQuestoes,
     this.onVisualizarProva,
     this.onGerarProvaDoBanco,
     this.menuConta,
@@ -31,6 +33,8 @@ class ProvaListScreen extends StatelessWidget {
   final ValueChanged<int> onCorrigirProva;
   final VoidCallback onAbrirAlunos;
   final VoidCallback onAbrirHistorico;
+  final VoidCallback? onAbrirTurmasDisciplinas;
+  final VoidCallback? onAbrirBancoQuestoes;
   final ValueChanged<int>? onVisualizarProva;
   final VoidCallback? onGerarProvaDoBanco;
 
@@ -108,6 +112,18 @@ class ProvaListScreen extends StatelessWidget {
                   tooltip: 'Histórico',
                   icon: const Icon(Icons.date_range),
                 ),
+                if (onAbrirTurmasDisciplinas != null)
+                  IconButton(
+                    onPressed: onAbrirTurmasDisciplinas,
+                    tooltip: 'Turmas e disciplinas',
+                    icon: const Icon(Icons.class_outlined),
+                  ),
+                if (onAbrirBancoQuestoes != null)
+                  IconButton(
+                    onPressed: onAbrirBancoQuestoes,
+                    tooltip: 'Banco de questões',
+                    icon: const Icon(Icons.library_books_outlined),
+                  ),
                 ?menuConta,
               ],
             ),

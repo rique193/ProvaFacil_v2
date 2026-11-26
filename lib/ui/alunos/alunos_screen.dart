@@ -11,9 +11,14 @@ import 'alunos_view_model.dart';
 /// ou edição aparece enquanto `mostrarDialogoAluno` for verdadeiro, e o de exclusão enquanto houver
 /// `confirmacaoExclusao`.
 class AlunosScreen extends StatefulWidget {
-  const AlunosScreen({super.key, required this.onVoltar});
+  const AlunosScreen({
+    super.key,
+    required this.onVoltar,
+    this.onAbrirTurmasDisciplinas,
+  });
 
   final VoidCallback onVoltar;
+  final VoidCallback? onAbrirTurmasDisciplinas;
 
   @override
   State<AlunosScreen> createState() => _AlunosScreenState();
@@ -94,7 +99,12 @@ class _AlunosScreenState extends State<AlunosScreen> {
           if (uiState.mostrarDialogoAluno)
             _Modal(
               aoFechar: viewModel.fecharDialogoAluno,
-              child: _AlunoDialog(form: uiState.formAluno, viewModel: viewModel),
+              child: _AlunoDialog(
+                form: uiState.formAluno,
+                turmas: uiState.turmas,
+                viewModel: viewModel,
+                onAbrirTurmasDisciplinas: widget.onAbrirTurmasDisciplinas,
+              ),
             ),
           if (confirmacao != null)
             _Modal(
@@ -248,16 +258,29 @@ class _AlunoCard extends StatelessWidget {
 }
 
 class _AlunoDialog extends StatelessWidget {
-  const _AlunoDialog({required this.form, required this.viewModel});
+  const _AlunoDialog({
+    required this.form,
+    required this.turmas,
+    required this.viewModel,
+    this.onAbrirTurmasDisciplinas,
+  });
 
   final AlunoFormState form;
+  final List<TurmaEntity> turmas;
   final AlunosViewModel viewModel;
+  final VoidCallback? onAbrirTurmasDisciplinas;
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    final turmaNormalizada = form.turmaNormalizada;
     final erro = form.erro;
+
+    final opcoesTurma = <String>[
+      for (final t in turmas) t.nome,
+      if (form.turma.isNotEmpty && !turmas.any((t) => t.nome == form.turma)) form.turma,
+    ];
+    final selecionada = opcoesTurma.contains(form.turma) ? form.turma : null;
+
     return AlertDialog(
       scrollable: true,
       title: Text(form.editando ? 'Editar aluno' : 'Novo Aluno'),
@@ -272,28 +295,65 @@ class _AlunoDialog extends StatelessWidget {
             singleLine: true,
           ),
           const SizedBox(height: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ProvaFacilTextField(
-                value: form.turma,
-                onChanged: viewModel.atualizarTurma,
-                label: 'Turma',
-                singleLine: true,
+          if (opcoesTurma.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: tema.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 4, top: 4),
-                child: Text(
-                  turmaNormalizada.isEmpty
-                      ? 'Ex.: "A" será salvo como "Turma A"'
-                      : 'Será salvo como "$turmaNormalizada"',
-                  style: tema.textTheme.bodySmall?.copyWith(
-                    color: tema.colorScheme.onSurfaceVariant,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nenhuma turma cadastrada.',
+                    style: tema.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Cadastre uma turma antes de adicionar alunos.',
+                    style: tema.textTheme.bodySmall?.copyWith(
+                      color: tema.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  if (onAbrirTurmasDisciplinas != null) ...[
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () {
+                        viewModel.fecharDialogoAluno();
+                        onAbrirTurmasDisciplinas!();
+                      },
+                      child: const Text('Cadastrar turma'),
+                    ),
+                  ],
+                ],
+              ),
+            )
+          else
+            InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Turma',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  key: const Key('dropdown_turma_aluno'),
+                  isExpanded: true,
+                  value: selecionada,
+                  hint: const Text('Selecione uma turma'),
+                  items: [
+                    for (final nome in opcoesTurma)
+                      DropdownMenuItem<String>(value: nome, child: Text(nome)),
+                  ],
+                  onChanged: form.salvando
+                      ? null
+                      : (valor) {
+                    if (valor != null) viewModel.atualizarTurma(valor);
+                  },
                 ),
               ),
-            ],
-          ),
+            ),
           const SizedBox(height: 12),
           ProvaFacilTextField(
             value: form.matricula,
