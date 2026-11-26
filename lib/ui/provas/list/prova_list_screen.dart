@@ -8,7 +8,7 @@ import '../../components/prova_facil_card.dart';
 import '../../../data/local/app_database.dart';
 import '../../../data/repository/aluno_repository.dart';
 import '../pdf/pdf_prova_view_model.dart';
-import '../pdf/selecao_alunos_pdf_dialog.dart';
+import '../pdf/acao_pdf_prova.dart';
 import 'prova_list_view_model.dart';
 
 class ProvaListScreen extends StatelessWidget {
@@ -22,6 +22,8 @@ class ProvaListScreen extends StatelessWidget {
     required this.onAbrirHistorico,
     this.onAbrirTurmasDisciplinas,
     this.onAbrirBancoQuestoes,
+    this.onVisualizarProva,
+    this.onGerarProvaDoBanco,
     this.menuConta,
   });
 
@@ -33,9 +35,44 @@ class ProvaListScreen extends StatelessWidget {
   final VoidCallback onAbrirHistorico;
   final VoidCallback? onAbrirTurmasDisciplinas;
   final VoidCallback? onAbrirBancoQuestoes;
+  final ValueChanged<int>? onVisualizarProva;
+  final VoidCallback? onGerarProvaDoBanco;
 
   /// Botão da conta do professor (com o "Sair"), no fim da barra.
   final Widget? menuConta;
+
+  Future<void> _escolherNovaProva(BuildContext context) async {
+    if (onGerarProvaDoBanco == null) {
+      onNovaProva();
+      return;
+    }
+    final doBanco = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.shuffle),
+              title: const Text('Gerar prova do banco'),
+              onTap: () => Navigator.pop(context, true),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_note),
+              title: const Text('Nova prova manual'),
+              onTap: () => Navigator.pop(context, false),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted || doBanco == null) return;
+    if (doBanco) {
+      onGerarProvaDoBanco!();
+    } else {
+      onNovaProva();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +128,7 @@ class ProvaListScreen extends StatelessWidget {
               ],
             ),
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: onNovaProva,
+              onPressed: () => _escolherNovaProva(context),
               icon: const Icon(Icons.add, semanticLabel: 'Nova prova'),
               label: const Text('Nova Prova'),
             ),
@@ -120,36 +157,36 @@ class ProvaListScreen extends StatelessWidget {
                 Expanded(
                   child: provas.isEmpty
                       ? Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Center(
-                            child: Text(
-                              "Nenhuma prova cadastrada ainda.\nToque em 'Nova Prova' para começar.",
-                              textAlign: TextAlign.center,
-                              style: tema.textTheme.bodyLarge?.copyWith(
-                                color: tema.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.only(left: 24, right: 24, bottom: 80),
-                          itemCount: provas.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 16),
-                          itemBuilder: (context, indice) {
-                            final provaComQuestoes = provas[indice];
-                            final provaId = provaComQuestoes.prova.id;
-                            return _ProvaListItem(
-                              key: ValueKey(provaId),
-                              provaComQuestoes: provaComQuestoes,
-                              progresso: viewModel.progressoDe(provaId),
-                              onClick: () => onEditarProva(provaId),
-                              onAbrirGabarito: () => onAbrirGabarito(provaId),
-                              onCorrigir: () => onCorrigirProva(provaId),
-                              onExcluir: () => viewModel.excluirProva(provaComQuestoes.prova),
-                              onGerarPdf: () => _gerarPdf(context, provaComQuestoes),
-                            );
-                          },
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Text(
+                        "Nenhuma prova cadastrada ainda.\nToque em 'Nova Prova' para começar.",
+                        textAlign: TextAlign.center,
+                        style: tema.textTheme.bodyLarge?.copyWith(
+                          color: tema.colorScheme.onSurfaceVariant,
                         ),
+                      ),
+                    ),
+                  )
+                      : ListView.separated(
+                    padding: const EdgeInsets.only(left: 24, right: 24, bottom: 80),
+                    itemCount: provas.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 16),
+                    itemBuilder: (context, indice) {
+                      final provaComQuestoes = provas[indice];
+                      final provaId = provaComQuestoes.prova.id;
+                      return _ProvaListItem(
+                        key: ValueKey(provaId),
+                        provaComQuestoes: provaComQuestoes,
+                        progresso: viewModel.progressoDe(provaId),
+                        onClick: () => (onVisualizarProva ?? onEditarProva)(provaId),
+                        onAbrirGabarito: () => onAbrirGabarito(provaId),
+                        onCorrigir: () => onCorrigirProva(provaId),
+                        onExcluir: () => viewModel.excluirProva(provaComQuestoes.prova),
+                        onGerarPdf: () => gerarPdfDaProva(context, provaComQuestoes),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -157,20 +194,6 @@ class ProvaListScreen extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-Future<void> _gerarPdf(BuildContext context, ProvaComQuestoes prova) async {
-  final viewModel = context.read<PdfProvaViewModel>();
-  final alunos = await viewModel.alunosDaProva(prova.prova);
-  if (!context.mounted) return;
-  final escolha = await escolherAlunosDoPdf(context, alunos: alunos, turma: prova.prova.turma);
-  if (escolha == null) return;
-  switch (escolha.acao) {
-    case AcaoPdf.visualizar:
-      await viewModel.visualizar(prova, escolha.alunos);
-    case AcaoPdf.compartilhar:
-      await viewModel.compartilhar(prova, escolha.alunos);
   }
 }
 

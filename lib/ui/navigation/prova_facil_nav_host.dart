@@ -31,8 +31,13 @@ import '../provas/form/prova_form_screen.dart';
 import '../provas/form/prova_form_view_model.dart';
 import '../provas/gabarito/gabarito_screen.dart';
 import '../provas/gabarito/gabarito_view_model.dart';
+import '../provas/gerar/gerar_prova_screen.dart';
+import '../provas/gerar/gerar_prova_view_model.dart';
 import '../provas/list/prova_list_screen.dart';
 import '../provas/list/prova_list_view_model.dart';
+import '../provas/pdf/pdf_prova_view_model.dart';
+import '../provas/visualizar/visualizar_prova_screen.dart';
+import '../provas/visualizar/visualizar_prova_view_model.dart';
 import '../relatorio/relatorio_notas_screen.dart';
 import '../scanner/qr_code_scanner_view_model.dart';
 import '../scanner/scan_respostas_screen.dart';
@@ -50,6 +55,8 @@ const rotaHistorico = '/historico';
 const rotaTurmas = '/turmas';
 
 String rotaFormulario(int? provaId) => '/provas/form?$_argProvaId=${provaId ?? -1}';
+String rotaGerarProva() => '/provas/gerar';
+String rotaVisualizarProva(int provaId) => '/provas/$provaId';
 String rotaGabarito(int provaId) => '/provas/$provaId/gabarito';
 String rotaEstatisticas(int provaId) => '/estatisticas/$provaId';
 String rotaRelatorio(int provaId) => '/relatorio/$provaId';
@@ -98,6 +105,8 @@ GoRouter provaFacilNavHost({
             ),
             child: ProvaListScreen(
               onNovaProva: () => context.push(rotaFormulario(null)),
+              onGerarProvaDoBanco: () => context.push(rotaGerarProva()),
+              onVisualizarProva: (provaId) => context.push(rotaVisualizarProva(provaId)),
               onEditarProva: (provaId) => context.push(rotaFormulario(provaId)),
               onAbrirGabarito: (provaId) => context.push(rotaGabarito(provaId)),
               onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
@@ -129,6 +138,45 @@ GoRouter provaFacilNavHost({
                 },
                 onVoltar: () => context.pop(),
                 onAbrirTurmasDisciplinas: () => context.push(rotaTurmas),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/provas/gerar',
+          builder: (context, state) {
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => GerarProvaViewModel(
+                provas: ProvaRepository(database),
+                bancoQuestoes: BancoQuestaoRepository(database),
+                disciplinas: DisciplinaRepository(database),
+                turmas: TurmaRepository(database),
+              ),
+              child: GerarProvaScreen(
+                onVoltar: () => context.pop(),
+                onGerada: (id) => context.pushReplacement(rotaVisualizarProva(id)),
+                // Contrato do Membro 1: rotaBancoQuestoes() => '/banco-questoes'.
+                onAbrirBancoQuestoes: () => context.push('/banco-questoes'),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/provas/:$_argProvaId',
+          builder: (context, state) {
+            final provaId = int.parse(state.pathParameters[_argProvaId]!);
+            final database = context.read<AppDatabase>();
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => VisualizarProvaViewModel(ProvaRepository(database), provaId)),
+                ChangeNotifierProvider(create: (_) => PdfProvaViewModel(AlunoRepository(database))),
+              ],
+              child: VisualizarProvaScreen(
+                onVoltar: () => context.pop(),
+                onEditar: () => context.push(rotaFormulario(provaId)),
+                onAbrirGabarito: () => context.push(rotaGabarito(provaId)),
+                onCorrigir: () => context.push(rotaScanQr(provaId)),
               ),
             );
           },
