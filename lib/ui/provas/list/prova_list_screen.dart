@@ -8,7 +8,7 @@ import '../../components/prova_facil_card.dart';
 import '../../../data/local/app_database.dart';
 import '../../../data/repository/aluno_repository.dart';
 import '../pdf/pdf_prova_view_model.dart';
-import '../pdf/selecao_alunos_pdf_dialog.dart';
+import '../pdf/acao_pdf_prova.dart';
 import 'prova_list_view_model.dart';
 
 class ProvaListScreen extends StatelessWidget {
@@ -20,6 +20,8 @@ class ProvaListScreen extends StatelessWidget {
     required this.onCorrigirProva,
     required this.onAbrirAlunos,
     required this.onAbrirHistorico,
+    this.onVisualizarProva,
+    this.onGerarProvaDoBanco,
     this.menuConta,
   });
 
@@ -29,9 +31,44 @@ class ProvaListScreen extends StatelessWidget {
   final ValueChanged<int> onCorrigirProva;
   final VoidCallback onAbrirAlunos;
   final VoidCallback onAbrirHistorico;
+  final ValueChanged<int>? onVisualizarProva;
+  final VoidCallback? onGerarProvaDoBanco;
 
   /// Botão da conta do professor (com o "Sair"), no fim da barra.
   final Widget? menuConta;
+
+  Future<void> _escolherNovaProva(BuildContext context) async {
+    if (onGerarProvaDoBanco == null) {
+      onNovaProva();
+      return;
+    }
+    final doBanco = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.shuffle),
+              title: const Text('Gerar prova do banco'),
+              onTap: () => Navigator.pop(context, true),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_note),
+              title: const Text('Nova prova manual'),
+              onTap: () => Navigator.pop(context, false),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted || doBanco == null) return;
+    if (doBanco) {
+      onGerarProvaDoBanco!();
+    } else {
+      onNovaProva();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +112,7 @@ class ProvaListScreen extends StatelessWidget {
               ],
             ),
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: onNovaProva,
+              onPressed: () => _escolherNovaProva(context),
               icon: const Icon(Icons.add, semanticLabel: 'Nova prova'),
               label: const Text('Nova Prova'),
             ),
@@ -126,11 +163,11 @@ class ProvaListScreen extends StatelessWidget {
                               key: ValueKey(provaId),
                               provaComQuestoes: provaComQuestoes,
                               progresso: viewModel.progressoDe(provaId),
-                              onClick: () => onEditarProva(provaId),
+                              onClick: () => (onVisualizarProva ?? onEditarProva)(provaId),
                               onAbrirGabarito: () => onAbrirGabarito(provaId),
                               onCorrigir: () => onCorrigirProva(provaId),
                               onExcluir: () => viewModel.excluirProva(provaComQuestoes.prova),
-                              onGerarPdf: () => _gerarPdf(context, provaComQuestoes),
+                              onGerarPdf: () => gerarPdfDaProva(context, provaComQuestoes),
                             );
                           },
                         ),
@@ -141,20 +178,6 @@ class ProvaListScreen extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-Future<void> _gerarPdf(BuildContext context, ProvaComQuestoes prova) async {
-  final viewModel = context.read<PdfProvaViewModel>();
-  final alunos = await viewModel.alunosDaProva(prova.prova);
-  if (!context.mounted) return;
-  final escolha = await escolherAlunosDoPdf(context, alunos: alunos, turma: prova.prova.turma);
-  if (escolha == null) return;
-  switch (escolha.acao) {
-    case AcaoPdf.visualizar:
-      await viewModel.visualizar(prova, escolha.alunos);
-    case AcaoPdf.compartilhar:
-      await viewModel.compartilhar(prova, escolha.alunos);
   }
 }
 

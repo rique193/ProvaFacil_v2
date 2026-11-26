@@ -24,6 +24,13 @@ Future<void> salvar(WidgetTester tester) async {
   await esperarBanco(tester);
 }
 
+Future<void> abrirNovaProvaManual(WidgetTester tester) async {
+  await tester.tap(find.byType(FloatingActionButton));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Nova prova manual'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('mostra os textos do formulário de prova nova', (tester) async {
     await abrirApp(tester, rotaFormulario(null));
@@ -59,8 +66,7 @@ void main() {
 
   testWidgets('prova nova salva fecha o formulário e abre o Gabarito dela', (tester) async {
     await abrirApp(tester, rotaLista);
-    await tester.tap(find.byType(FloatingActionButton));
-    await tester.pumpAndSettle();
+    await abrirNovaProvaManual(tester);
 
     await preencherProva(tester);
     await salvar(tester);
@@ -73,10 +79,9 @@ void main() {
     expect(find.text('Dashboard'), findsOneWidget);
   });
 
-  testWidgets('edição salva só fecha o formulário', (tester) async {
+  testWidgets('edição salva fecha o formulário e volta à visualização', (tester) async {
     final db = await abrirApp(tester, rotaLista);
-    await tester.tap(find.byType(FloatingActionButton));
-    await tester.pumpAndSettle();
+    await abrirNovaProvaManual(tester);
     await preencherProva(tester);
     await salvar(tester);
     await tester.tap(find.byTooltip('Voltar'));
@@ -84,14 +89,20 @@ void main() {
 
     await tester.tap(find.text('Prova de Ciências'));
     await esperarBanco(tester);
+    expect(find.text('Visualizar prova'), findsOneWidget);
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Editar'));
+    await esperarBanco(tester);
     expect(find.text('Editar Prova'), findsOneWidget);
 
     await digitar(tester, 'Título da prova', 'Prova Editada');
     await salvar(tester);
 
-    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('Visualizar prova'), findsOneWidget);
     expect(find.text('Prova Editada'), findsOneWidget);
     final provas = await tester.runAsync(() => db.select(db.provas).get());
     expect(provas!.single.titulo, 'Prova Editada');
+    await tester.tap(find.byTooltip('Voltar'));
+    await esperarBanco(tester);
+    expect(find.text('Dashboard'), findsOneWidget);
   });
 }

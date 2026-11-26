@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart';
 
 import '../../domain/model/questao_input.dart';
+import '../../domain/prova/embaralhador.dart';
 import '../local/app_database.dart';
 import '../local/dao/prova_dao.dart';
 import '../local/relation/prova_com_questoes.dart';
+import '../local/relation/banco_questao_com_alternativas.dart';
 
 /// Fonte única de verdade para provas/gabaritos, usada pelas ViewModels da feature de
 /// cadastro de provas.
@@ -16,6 +20,86 @@ class ProvaRepository {
   Stream<List<ProvaComQuestoes>> observarProvas() => _dao.observarProvas();
 
   Stream<ProvaComQuestoes?> observarProva(int provaId) => _dao.observarProva(provaId);
+
+  /// Copia o banco para uma prova independente, já na ordem definitiva do PDF e da correção.
+  Future<int> gerarProvaDoBanco({
+    required String titulo,
+    required String disciplina,
+    required String turma,
+    String descricao = '',
+    required List<int> bancoQuestaoIds,
+    required bool embaralharQuestoes,
+    required bool embaralharAlternativas,
+    Random? random,
+  }) {
+    // O chamador pode mudar sua seleção enquanto a transação aguarda o banco.
+    final ids = List<int>.of(bancoQuestaoIds);
+    return _database.transaction(() async {
+      _exigir(titulo.trim().isNotEmpty, 'Informe o título da prova.');
+      _exigir(disciplina.trim().isNotEmpty, 'Informe a disciplina.');
+      _exigir(turma.trim().isNotEmpty, 'Informe a turma.');
+      _exigir(ids.isNotEmpty, 'Selecione ao menos uma questão do banco.');
+      _exigir(ids.toSet().length == ids.length, 'Questões repetidas.');
+
+      final questoes = <BancoQuestaoComAlternativas>[];
+      for (final id in ids) {
+        final questao = await _database.bancoQuestaoDao.buscarQuestao(id);
+        _exigir(questao != null, 'Questão não encontrada no banco.');
+        final encontrada = questao!;
+        _exigir(
+          encontrada.questao.disciplina == disciplina.trim(),
+          'Selecione somente questões da disciplina escolhida.',
+        );
+        _exigir(
+          encontrada.alternativas.length == 5 &&
+              encontrada.alternativas.every((a) => a.texto.trim().isNotEmpty),
+          'Preencha as cinco alternativas de cada questão do banco.',
+        );
+        _exigir(
+          encontrada.alternativas.where((a) => a.correta).length == 1,
+          'Defina uma alternativa correta para cada questão do banco.',
+        );
+        questoes.add(encontrada);
+      }
+
+      final sorteio = random ?? Random();
+      final ordenadas = embaralharQuestoes
+          ? Embaralhador.embaralhar(questoes, sorteio)
+          : questoes;
+      final provaId = await _dao.inserirProva(
+        ProvasCompanion.insert(
+          titulo: titulo.trim(),
+          disciplina: disciplina.trim(),
+          turma: Value(turma.trim()),
+          descricao: Value(descricao.trim()),
+        ),
+      );
+      for (final (ordem, origem) in ordenadas.indexed) {
+        final questaoId = await _dao.inserirQuestao(
+          QuestoesCompanion.insert(
+            provaId: provaId,
+            enunciado: origem.questao.enunciado,
+            ordem: ordem,
+          ),
+        );
+        final originais = [...origem.alternativas]
+          ..sort((a, b) => a.ordem.compareTo(b.ordem));
+        final alternativas = embaralharAlternativas
+            ? Embaralhador.embaralhar(originais, sorteio)
+            : originais;
+        await _dao.inserirAlternativas([
+          for (final (indice, alternativa) in alternativas.indexed)
+            AlternativasCompanion.insert(
+              questaoId: questaoId,
+              texto: alternativa.texto,
+              correta: alternativa.correta,
+              ordem: indice,
+            ),
+        ]);
+      }
+      return provaId;
+    });
+  }
 
   /// Atualiza por identidade, preservando o gabarito das questões que permanecem.
   Future<int> salvarConteudoProva({

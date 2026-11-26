@@ -85,6 +85,10 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
 
+    expect(find.text('Gerar prova do banco'), findsOneWidget);
+    await tester.tap(find.text('Nova prova manual'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Dashboard'), findsNothing);
   });
 }

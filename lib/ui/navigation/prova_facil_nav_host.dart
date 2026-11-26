@@ -9,6 +9,9 @@ import '../../data/repository/aluno_repository.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/backup_nuvem_repository.dart';
 import '../../data/repository/prova_repository.dart';
+import '../../data/repository/banco_questao_repository.dart';
+import '../../data/repository/disciplina_repository.dart';
+import '../../data/repository/turma_repository.dart';
 import '../alunos/alunos_screen.dart';
 import '../alunos/alunos_view_model.dart';
 import '../auth/auth_rotas.dart';
@@ -22,6 +25,11 @@ import '../provas/gabarito/gabarito_screen.dart';
 import '../provas/gabarito/gabarito_view_model.dart';
 import '../provas/list/prova_list_screen.dart';
 import '../provas/list/prova_list_view_model.dart';
+import '../provas/gerar/gerar_prova_screen.dart';
+import '../provas/gerar/gerar_prova_view_model.dart';
+import '../provas/visualizar/visualizar_prova_screen.dart';
+import '../provas/visualizar/visualizar_prova_view_model.dart';
+import '../provas/pdf/pdf_prova_view_model.dart';
 import '../historico/historico_screen.dart';
 import '../historico/historico_view_model.dart';
 import '../estatisticas/estatisticas_screen.dart';
@@ -40,6 +48,8 @@ const rotaAlunos = '/alunos';
 const rotaHistorico = '/historico';
 
 String rotaFormulario(int? provaId) => '/provas/form?$_argProvaId=${provaId ?? -1}';
+String rotaGerarProva() => '/provas/gerar';
+String rotaVisualizarProva(int provaId) => '/provas/$provaId';
 String rotaGabarito(int provaId) => '/provas/$provaId/gabarito';
 String rotaEstatisticas(int provaId) => '/estatisticas/$provaId';
 String rotaRelatorio(int provaId) => '/relatorio/$provaId';
@@ -85,6 +95,8 @@ GoRouter provaFacilNavHost({
             ),
             child: ProvaListScreen(
               onNovaProva: () => context.push(rotaFormulario(null)),
+              onGerarProvaDoBanco: () => context.push(rotaGerarProva()),
+              onVisualizarProva: (provaId) => context.push(rotaVisualizarProva(provaId)),
               onEditarProva: (provaId) => context.push(rotaFormulario(provaId)),
               onAbrirGabarito: (provaId) => context.push(rotaGabarito(provaId)),
               onCorrigirProva: (provaId) => context.push(rotaScanQr(provaId)),
@@ -108,6 +120,45 @@ GoRouter provaFacilNavHost({
                   if (provaId == null) router.push(rotaGabarito(idSalvo));
                 },
                 onVoltar: () => context.pop(),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/provas/gerar',
+          builder: (context, state) {
+            final database = context.read<AppDatabase>();
+            return ChangeNotifierProvider(
+              create: (_) => GerarProvaViewModel(
+                provas: ProvaRepository(database),
+                bancoQuestoes: BancoQuestaoRepository(database),
+                disciplinas: DisciplinaRepository(database),
+                turmas: TurmaRepository(database),
+              ),
+              child: GerarProvaScreen(
+                onVoltar: () => context.pop(),
+                onGerada: (id) => context.pushReplacement(rotaVisualizarProva(id)),
+                // Contrato do Membro 1: rotaBancoQuestoes() => '/banco-questoes'.
+                onAbrirBancoQuestoes: () => context.push('/banco-questoes'),
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/provas/:$_argProvaId',
+          builder: (context, state) {
+            final provaId = int.parse(state.pathParameters[_argProvaId]!);
+            final database = context.read<AppDatabase>();
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => VisualizarProvaViewModel(ProvaRepository(database), provaId)),
+                ChangeNotifierProvider(create: (_) => PdfProvaViewModel(AlunoRepository(database))),
+              ],
+              child: VisualizarProvaScreen(
+                onVoltar: () => context.pop(),
+                onEditar: () => context.push(rotaFormulario(provaId)),
+                onAbrirGabarito: () => context.push(rotaGabarito(provaId)),
+                onCorrigir: () => context.push(rotaScanQr(provaId)),
               ),
             );
           },
