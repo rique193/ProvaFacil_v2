@@ -92,7 +92,7 @@ O app é usado pelo **professor**, no próprio celular Android.
 
 *Entrega: N1*
 
-Telas na ordem em que o professor navega. Os prints ficam em `docs/telas/`.
+Telas na ordem em que o professor navega.
 
 1. **Login e Criar conta:** entrada do professor com e-mail e senha (Firebase Authentication).
 2. **Lista de Provas ("Dashboard" na barra do app):** tela inicial, com as provas, o status de cada uma ("Pendente", "Em correção · X de Y", "Corrigida") e os atalhos para nova prova, turmas e disciplinas, banco de questões, alunos, histórico e o menu da conta (Sair).
@@ -107,8 +107,6 @@ Telas na ordem em que o professor navega. Os prints ficam em `docs/telas/`.
 11. **Resultado:** nota, percentual e detalhe por questão.
 12. **Alunos:** cadastro de alunos por turma.
 13. **Histórico, Estatísticas e Relatório de Notas:** provas corrigidas, média, maior e menor nota, acerto por questão, status da prova, alunos que faltam corrigir e exportação em .xlsx.
-
-> Prints das telas em `docs/telas/`.
 
 ## 4. Modelo de Dados
 
@@ -284,7 +282,7 @@ Roteiro da apresentação (Avaliação N3) e onde cada item está no app:
 | # | Funcionalidade | Pontos | Situação | Onde fica |
 |---|---|---|---|---|
 | 1 | Criar conta (cadastro de professor) | 0,5 | Implementado | Tela de login → "Criar conta" (Firebase Authentication) |
-| 2 | Fazer login | 0,5 | Implementado | Tela de login; o app só abre com professor logado; "Sair" no menu da conta |
+| 2 | Fazer login | 0,5 | Implementado | Tela de login; o app só abre com professor logado; "Sair" no menu da conta; cada professor vê só os próprios dados (um banco local por conta) |
 | 3 | Criar turma / disciplina | 0,75 | Implementado | Lista de provas → ícone "Turmas e disciplinas" |
 | 4 | Criar questões no banco de questões | 1,0 | Implementado | Lista de provas → ícone "Banco de questões" |
 | 5 | Gerar prova a partir do banco, com embaralhamento | 1,25 | Implementado | "Nova Prova" → "Gerar prova do banco"; o embaralhamento é feito uma vez e gravado, com o gabarito já marcado |
