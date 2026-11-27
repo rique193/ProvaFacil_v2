@@ -32,3 +32,16 @@ class IdInstalacao {
     return novo;
   }
 }
+
+/// Prefixo do backup de uma conta: `{idInstalacao}_{uid}`. Cada professor tem o próprio banco local,
+/// e os ids dos alunos e provas recomeçam em 1 em cada um; sem o uid, dois professores no mesmo
+/// celular escreveriam nos mesmos documentos do Firestore.
+class IdInstalacaoDaConta extends IdInstalacao {
+  IdInstalacaoDaConta(this._base, this.uid);
+
+  final IdInstalacao _base;
+  final String uid;
+
+  @override
+  Future<String> obter() async => '${await _base.obter()}_$uid';
+}

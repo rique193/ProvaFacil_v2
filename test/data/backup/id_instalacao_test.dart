@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provafacil/data/backup/id_instalacao.dart';
+import 'package:provafacil/data/backup/mapeamento_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -44,5 +45,28 @@ void main() {
 
     await expectLater(idInstalacao.obter(), throwsStateError);
     expect(await idInstalacao.obter(), 'id-novo');
+  });
+
+  group('IdInstalacaoDaConta', () {
+    test('contas diferentes no mesmo celular têm prefixos e ids de documento diferentes', () async {
+      final base = IdInstalacao(gerarId: () => 'inst');
+      final prefixoA = await IdInstalacaoDaConta(base, 'uidA').obter();
+      final prefixoB = await IdInstalacaoDaConta(base, 'uidB').obter();
+
+      expect(prefixoA, 'inst_uidA');
+      expect(prefixoB, 'inst_uidB');
+      expect(prefixoA, isNot(prefixoB));
+      expect(idDocumentoAluno(prefixoA, 1), isNot(idDocumentoAluno(prefixoB, 1)));
+      expect(idDocumentoResultado(prefixoA, 2, 1), 'inst_uidA_2_1');
+      expect(
+        idDocumentoResultado(prefixoA, 2, 1),
+        isNot(idDocumentoResultado(prefixoB, 2, 1)),
+      );
+    });
+
+    test('a mesma conta mantém o mesmo prefixo', () async {
+      final base = IdInstalacao(gerarId: () => 'inst');
+      expect(await IdInstalacaoDaConta(base, 'u').obter(), await IdInstalacaoDaConta(base, 'u').obter());
+    });
   });
 }

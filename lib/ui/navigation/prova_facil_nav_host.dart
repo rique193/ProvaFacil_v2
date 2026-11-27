@@ -83,22 +83,30 @@ int? _idOpcional(String? valor) {
 ///
 /// [usarCamera] liga a câmera de verdade na leitura do QR Code; os testes passam `false` para
 /// usar o modo simulação.
+///
+/// [uidDaSessao] marca o router de uma sessão por conta (`SessaoDaConta`): `uid` é a conta dona do
+/// banco desta sessão, ou `null` na sessão sem login. Se o login já mudou e a sessão ainda não foi
+/// trocada, o router não redireciona, para nunca abrir uma tela de dados fora da sua sessão.
 GoRouter provaFacilNavHost({
   String initialLocation = rotaLista,
   BackupResultados? backup,
   AuthRepository? auth,
   bool usarCamera = true,
+  ({String? uid})? uidDaSessao,
 }) =>
     GoRouter(
       initialLocation: initialLocation,
       refreshListenable: auth,
       redirect: auth == null
           ? null
-          : (context, state) => redirecionarPorLogin(
-        logado: auth.logado,
-        local: state.uri.path,
-        aposEntrar: rotaLista,
-      ),
+          : (context, state) {
+              if (uidDaSessao != null && auth.usuario?.uid != uidDaSessao.uid) return null;
+              return redirecionarPorLogin(
+                logado: auth.logado,
+                local: state.uri.path,
+                aposEntrar: rotaLista,
+              );
+            },
       routes: [
         if (auth != null) ...rotasDeAutenticacao(auth),
         GoRoute(
@@ -278,6 +286,7 @@ GoRouter provaFacilNavHost({
               create: (_) => HistoricoViewModel(
                 repository: HistoricoRepository(database),
                 enviarTudoNuvem: backupNuvem.enviarTudo,
+                contaId: auth?.usuario?.uid,
               ),
               child: HistoricoScreen(
                 onVoltar: () => context.pop(),
